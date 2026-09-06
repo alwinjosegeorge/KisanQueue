@@ -1,4 +1,4 @@
-# SmartProcure Visuals
+# KisanQueue
 
 I want to focus ONLY on the visual UI/UX of my SmartProcure application in this iteration.
 

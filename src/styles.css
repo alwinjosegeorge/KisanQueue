@@ -25,11 +25,6 @@
   --color-status-low: var(--status-low);
   --color-status-medium: var(--status-medium);
   --color-status-high: var(--status-high);
-  --color-butter: var(--butter);
-  --color-mint: var(--mint);
-  --color-blush: var(--blush);
-  --color-lilac: var(--lilac);
-  --color-lilac-soft: var(--lilac-soft);
   --shadow-float: var(--shadow-float);
 }
 
@@ -65,11 +60,6 @@
   --status-low: oklch(0.49 0.12 153);
   --status-medium: oklch(0.67 0.13 83);
   --status-high: oklch(0.55 0.16 34);
-  --butter: oklch(0.93 0.09 90);
-  --mint: oklch(0.91 0.07 165);
-  --blush: oklch(0.90 0.06 25);
-  --lilac: oklch(0.78 0.09 285);
-  --lilac-soft: oklch(0.94 0.035 285);
   --shadow-float: 0 24px 70px color-mix(in oklab, var(--primary) 16%, transparent);
 }
 
