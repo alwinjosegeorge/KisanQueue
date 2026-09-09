@@ -27,6 +27,10 @@ import {
   Check,
 } from "lucide-react";
 import heroImage from "@/assets/smartprocure-home.jpg";
+import cropPaddy from "@/assets/crop-paddy.jpg";
+import cropCoconut from "@/assets/crop-coconut.jpg";
+import cropRubber from "@/assets/crop-rubber.jpg";
+import cropPepper from "@/assets/crop-pepper.jpg";
 
 const CROPS_DATA = [
   {
@@ -36,7 +40,7 @@ const CROPS_DATA = [
     msp: "₹32 / kg MSP",
     badge: "Healthy",
     badgeClass: "bg-emerald-600 text-white",
-    image: "https://images.unsplash.com/photo-1536657464919-892534f60d6e?auto=format&fit=crop&w=400&q=80",
+    image: cropPaddy,
   },
   {
     id: "coconut",
@@ -45,7 +49,7 @@ const CROPS_DATA = [
     msp: "₹38 / kg MSP",
     badge: "Normal",
     badgeClass: "bg-white/90 text-gray-800 border border-gray-200",
-    image: "https://images.unsplash.com/photo-1544376798-89aa6b82c6cd?auto=format&fit=crop&w=400&q=80",
+    image: cropCoconut,
   },
   {
     id: "rubber",
@@ -54,7 +58,7 @@ const CROPS_DATA = [
     msp: "₹180 / kg MSP",
     badge: "Peak Tap",
     badgeClass: "bg-amber-500 text-white",
-    image: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=400&q=80",
+    image: cropRubber,
   },
   {
     id: "pepper",
@@ -63,7 +67,7 @@ const CROPS_DATA = [
     msp: "₹520 / kg MSP",
     badge: "Grade A",
     badgeClass: "bg-emerald-700 text-white",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+    image: cropPepper,
   },
 ];
 
