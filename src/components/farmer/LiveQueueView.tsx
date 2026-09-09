@@ -1,0 +1,226 @@
+import React, { useState } from "react";
+import { useKisanQueue } from "@/lib/store";
+import { t } from "@/lib/translations";
+import {
+  ArrowLeft,
+  Navigation,
+  Clock,
+  AlertTriangle,
+  Check,
+  RefreshCw,
+  X,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
+
+interface LiveQueueViewProps {
+  onBack: () => void;
+  onOpenReschedule: () => void;
+  onOpenDirections: () => void;
+}
+
+export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: LiveQueueViewProps) {
+  const { user, activeBooking, centres, queue, nowServing, language, predictWaitingTime } = useKisanQueue();
+  const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || centres[0];
+  const userQueueNumber = activeBooking?.queueNumber || 47;
+  const prediction = predictWaitingTime(currentCentre.id, userQueueNumber);
+  const farmersAhead = Math.max(0, userQueueNumber - nowServing);
+
+  return (
+    <div className="content-stack pt-2 space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex size-9 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted"
+          aria-label="Back to dashboard"
+        >
+          <ArrowLeft className="size-4" />
+        </button>
+        <div>
+          <h1 className="font-display text-xl font-bold">{t(language, "liveQueue")}</h1>
+          <p className="text-xs text-muted-foreground">{currentCentre.name}</p>
+        </div>
+      </div>
+
+      {/* Delay Alert Callout (Automatically synchronizes when staff clicks Report Delay!) */}
+      {currentCentre.activeDelayMinutes > 0 && (
+        <div className="rounded-2xl border border-amber-500/50 bg-amber-500/15 p-4 text-foreground shadow-sm">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <div className="flex items-center gap-2">
+                <strong className="text-xs font-bold uppercase text-amber-900 dark:text-amber-300">
+                  Operational Delay: +{currentCentre.activeDelayMinutes} minutes
+                </strong>
+              </div>
+              <p className="mt-1 text-xs text-amber-950/85 dark:text-amber-100/90 leading-relaxed">
+                {currentCentre.delayReason || "Moisture meter calibration & yard vehicle congestion."}
+              </p>
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-amber-500/20 px-2.5 py-1 text-xs font-semibold text-amber-900 dark:text-amber-200">
+                <Clock className="size-3.5" />
+                Updated turn: <strong>{prediction.timeStr}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Live Counter Hero Ring */}
+      <section className="queue-progress-card relative overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground shadow-xl">
+        <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
+
+        <div className="relative z-10 text-center">
+          <span className="eyebrow text-secondary">REAL-TIME POSITION IN LINE</span>
+
+          <div className="my-4 flex items-center justify-center gap-6">
+            <div className="rounded-2xl bg-white/10 px-4 py-3 text-center backdrop-blur-sm">
+              <span className="block text-[10px] uppercase tracking-wider text-primary-foreground/65">
+                Now Serving
+              </span>
+              <strong className="font-display text-5xl font-extrabold text-secondary">#{nowServing}</strong>
+              <small className="block text-[10px] text-primary-foreground/75 mt-0.5">Weighing Bay A</small>
+            </div>
+
+            <div className="rounded-2xl bg-white/15 px-4 py-3 text-center ring-2 ring-secondary/50 backdrop-blur-sm">
+              <span className="block text-[10px] uppercase tracking-wider text-primary-foreground/80 font-bold">
+                Your Token
+              </span>
+              <strong className="font-display text-5xl font-extrabold text-white">#{userQueueNumber}</strong>
+              <small className="block text-[10px] text-secondary mt-0.5 font-semibold">
+                {farmersAhead === 0 ? "Serving Now!" : `${farmersAhead} ahead`}
+              </small>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 border-t border-white/15 pt-3 text-center text-xs">
+            <div>
+              <span className="text-[10px] text-primary-foreground/60 block">Queue Gap</span>
+              <strong>{farmersAhead} Farmers</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-primary-foreground/60 block">Wait Time</span>
+              <strong className={currentCentre.activeDelayMinutes > 0 ? "text-secondary" : ""}>
+                ~{prediction.minutesLeft} mins
+              </strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-primary-foreground/60 block">Expected Call</span>
+              <strong className="text-secondary">{prediction.timeStr}</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Pipeline (SIH Main Demo Feature: #11 -> #12 -> #13 ... -> #18 YOU) */}
+      <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <Sparkles className="size-4 text-primary" /> Visual Queue Pipeline
+          </h3>
+          <span className="text-[11px] text-muted-foreground">Yard Gates 1 & 2</span>
+        </div>
+
+        <div className="space-y-2">
+          {queue.slice(0, 8).map((item) => {
+            const isServing = item.queueNumber === nowServing;
+            const isUser = item.queueNumber === userQueueNumber;
+            const isCompleted = item.queueNumber < nowServing;
+
+            return (
+              <div
+                key={item.queueNumber}
+                className={`flex items-center justify-between rounded-xl border p-2.5 text-xs transition-all ${
+                  isServing
+                    ? "border-secondary bg-secondary/15 font-bold shadow-sm"
+                    : isUser
+                    ? "border-primary bg-primary text-primary-foreground font-bold shadow-md"
+                    : isCompleted
+                    ? "opacity-45 border-border bg-muted/40"
+                    : "border-border bg-card"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`flex size-7 items-center justify-center rounded-lg font-mono text-xs font-bold ${
+                      isServing
+                        ? "bg-secondary text-secondary-foreground"
+                        : isUser
+                        ? "bg-white text-primary"
+                        : isCompleted
+                        ? "bg-muted text-muted-foreground"
+                        : "bg-muted text-foreground"
+                    }`}
+                  >
+                    #{item.queueNumber}
+                  </span>
+
+                  <div>
+                    <span className="font-semibold block">{item.farmerName}</span>
+                    <span
+                      className={`text-[10px] ${
+                        isUser ? "text-primary-foreground/80" : "text-muted-foreground"
+                      }`}
+                    >
+                      {item.crop} · {item.quantityKg} kg
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  {isServing && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-secondary/30 px-2 py-0.5 text-[10px] font-bold text-secondary-foreground">
+                      <span className="size-1.5 rounded-full bg-primary animate-ping" /> AT COUNTER
+                    </span>
+                  )}
+                  {isUser && (
+                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white">
+                      YOUR TURN
+                    </span>
+                  )}
+                  {isCompleted && (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <Check className="size-3 text-emerald-600" /> Done
+                    </span>
+                  )}
+                  {!isServing && !isUser && !isCompleted && (
+                    <span className="text-[10px] text-muted-foreground">
+                      ~{(item.queueNumber - nowServing) * currentCentre.avgProcessingMinutes}m
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Rebooking & Reschedule Option (Can't make your slot?) */}
+      <section className="rounded-2xl border border-border bg-muted/40 p-4">
+        <h4 className="text-xs font-bold">Running late or can't make your slot?</h4>
+        <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+          KisanQueue allows one-tap rescheduling without losing your verified eligibility.
+        </p>
+
+        <div className="mt-3 flex gap-2">
+          <button
+            type="button"
+            onClick={onOpenDirections}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary py-2.5 text-xs font-bold text-primary-foreground shadow-sm"
+          >
+            <Navigation className="size-4" /> Get Directions
+          </button>
+
+          <button
+            type="button"
+            onClick={onOpenReschedule}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-2.5 text-xs font-bold hover:bg-muted"
+          >
+            <RefreshCw className="size-3.5" /> Reschedule Slot
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
