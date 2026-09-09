@@ -138,29 +138,12 @@ function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) 
       <div className="relative z-10 flex min-h-dvh flex-col px-6 pb-8 pt-10 sm:mx-auto sm:max-w-md">
         <div className="flex items-center justify-between">
           <Logo inverse />
-          <div className="flex items-center gap-2">
-            <div className="flex items-center rounded-full bg-black/40 px-2.5 py-1 text-xs backdrop-blur-md border border-white/25 text-white">
-              <Languages className="size-3.5 text-secondary mr-1.5" />
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as any)}
-                aria-label="Language"
-                className="bg-transparent text-white text-xs font-bold outline-none cursor-pointer"
-              >
-                {SUPPORTED_LANGUAGES.map((l) => (
-                  <option key={l.id} value={l.id} className="text-foreground bg-card">
-                    {l.native} ({l.label})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button
-              onClick={onSkip}
-              className="rounded-full bg-black/25 px-3 py-1 text-xs font-semibold text-primary-foreground/90 hover:bg-black/40 hover:text-white backdrop-blur-sm transition-all"
-            >
-              Skip →
-            </button>
-          </div>
+          <button
+            onClick={onSkip}
+            className="rounded-full bg-black/30 border border-white/25 px-4 py-1.5 text-xs font-bold text-white hover:bg-black/50 backdrop-blur-md transition-all active:scale-95 shadow-sm"
+          >
+            Skip →
+          </button>
         </div>
         <div className="mt-auto">
           <p className="eyebrow text-secondary font-semibold">Kerala Agricultural Department</p>
