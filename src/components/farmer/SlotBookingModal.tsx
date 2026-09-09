@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useKisanQueue } from "@/lib/store";
 import { t } from "@/lib/translations";
 import { X, Check, Sparkles, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, ChevronRight } from "lucide-react";
@@ -30,9 +30,12 @@ export function SlotBookingModal({
   const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null);
   const [assignedQueueNumber, setAssignedQueueNumber] = useState<number | null>(null);
 
-  // Every time the booking modal is opened or a centre is selected, always start from Step 1 (Crop & Quantity)
+  const prevOpenRef = useRef(false);
+
+  // Initialize modal state ONLY when modal opens (transitions from closed to open)
+  // Prevents store updates during booking from violently resetting step 5 back to step 1
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !prevOpenRef.current) {
       setStep(1);
       setConfirmedBookingId(null);
       setAssignedQueueNumber(null);
@@ -67,6 +70,7 @@ export function SlotBookingModal({
         }
       }
     }
+    prevOpenRef.current = isOpen;
   }, [isOpen, initialCentreName, initialCropName, recommendedCentre, centres, crops]);
 
   const handleClose = () => {
@@ -104,7 +108,7 @@ export function SlotBookingModal({
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-              Step {step} of 4 · Smart Procurement Booking
+              {step < 5 ? `Step ${step} of 4 · Smart Procurement Booking` : "Success · Smart Procurement"}
             </span>
             <h2 className="font-display text-lg font-bold">
               {step === 1 && t(language, "step1Title")}
