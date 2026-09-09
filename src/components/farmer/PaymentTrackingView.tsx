@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useKisanQueue } from "@/lib/store";
+import { t } from "@/lib/translations";
 import { ArrowLeft, CheckCircle2, IndianRupee, Download, Building, FileText, Check } from "lucide-react";
 
 export function PaymentTrackingView({ onBack }: { onBack: () => void }) {
-  const { user, bookings } = useKisanQueue();
+  const { user, bookings, language } = useKisanQueue();
   const [showVoucher, setShowVoucher] = useState(false);
 
   const completed = bookings.filter((b) => b.paymentStatus === "completed" || b.status === "completed");
@@ -20,8 +21,8 @@ export function PaymentTrackingView({ onBack }: { onBack: () => void }) {
           <ArrowLeft className="size-4" />
         </button>
         <div>
-          <h1 className="font-display text-xl font-bold">Direct Benefit Transfer (DBT)</h1>
-          <p className="text-xs text-muted-foreground">Government MSP Procurement Settlements</p>
+          <h1 className="font-display text-xl font-bold">{t(language, "paymentStatus")}</h1>
+          <p className="text-xs text-muted-foreground">{t(language, "dbtPayout")}</p>
         </div>
       </div>
 

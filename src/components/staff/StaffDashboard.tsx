@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useKisanQueue } from "@/lib/store";
+import { t } from "@/lib/translations";
 import {
   UsersRound,
   CalendarCheck,
@@ -28,6 +29,7 @@ export function StaffDashboard() {
     completeProcurement,
     reportDelay,
     clearDelay,
+    language,
   } = useKisanQueue();
 
   const currentCentre = centres[0]; // Kottayam Centre staff view
@@ -75,14 +77,14 @@ export function StaffDashboard() {
             onClick={() => clearDelay(currentCentre.id)}
             className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white shadow-sm hover:bg-emerald-700"
           >
-            Clear Delay ({currentCentre.activeDelayMinutes}m)
+            {t(language, "clearDelay")} ({currentCentre.activeDelayMinutes}m)
           </button>
         ) : (
           <button
             onClick={() => setShowDelayModal(true)}
             className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-500/20"
           >
-            <AlertTriangle className="size-3.5" /> Report Delay
+            <AlertTriangle className="size-3.5" /> {t(language, "reportDelay")}
           </button>
         )}
       </div>
@@ -91,7 +93,7 @@ export function StaffDashboard() {
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
         <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-bold uppercase">Today's Bookings</span>
+            <span className="text-[11px] font-bold uppercase">{t(language, "todayBookings")}</span>
             <CalendarCheck className="size-4 text-primary" />
           </div>
           <p className="font-display text-2xl font-bold mt-1.5">{currentCentre.todayBookingsCount}</p>
@@ -100,7 +102,7 @@ export function StaffDashboard() {
 
         <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-bold uppercase">In Yard Queue</span>
+            <span className="text-[11px] font-bold uppercase">{t(language, "waitingInYard")}</span>
             <UsersRound className="size-4 text-primary" />
           </div>
           <p className="font-display text-2xl font-bold mt-1.5">{waitingCount}</p>
@@ -109,7 +111,7 @@ export function StaffDashboard() {
 
         <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-bold uppercase">Now Serving</span>
+            <span className="text-[11px] font-bold uppercase">{t(language, "nowServing")}</span>
             <Megaphone className="size-4 text-secondary" />
           </div>
           <p className="font-display text-2xl font-bold mt-1.5 text-primary">#{nowServing}</p>
@@ -118,7 +120,7 @@ export function StaffDashboard() {
 
         <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-bold uppercase">Yard Capacity</span>
+            <span className="text-[11px] font-bold uppercase">{t(language, "centreCapacity")}</span>
             <Gauge className="size-4 text-primary" />
           </div>
           <p className="font-display text-2xl font-bold mt-1.5">78%</p>
@@ -127,7 +129,7 @@ export function StaffDashboard() {
 
         <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-bold uppercase">Avg Processing</span>
+            <span className="text-[11px] font-bold uppercase">{t(language, "avgProcessingTime")}</span>
             <Clock className="size-4 text-primary" />
           </div>
           <p className="font-display text-2xl font-bold mt-1.5">{currentCentre.avgProcessingMinutes} min</p>
@@ -136,7 +138,7 @@ export function StaffDashboard() {
 
         <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-bold uppercase">Reported Delay</span>
+            <span className="text-[11px] font-bold uppercase">{t(language, "delayReported")}</span>
             <AlertTriangle className="size-4 text-amber-500" />
           </div>
           <p className="font-display text-2xl font-bold mt-1.5 text-amber-600">

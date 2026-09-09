@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useKisanQueue } from "@/lib/store";
+import { t } from "@/lib/translations";
 import { X, Check, Sparkles, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, ChevronRight } from "lucide-react";
 
 interface SlotBookingModalProps {
@@ -17,7 +18,7 @@ export function SlotBookingModal({
   initialCropName,
   onNavigateToQueue,
 }: SlotBookingModalProps) {
-  const { crops, centres, bookSlot, getRecommendedCentre, cancelBooking } = useKisanQueue();
+  const { crops, centres, bookSlot, getRecommendedCentre, cancelBooking, language } = useKisanQueue();
   const recommendedCentre = getRecommendedCentre();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
@@ -104,11 +105,11 @@ export function SlotBookingModal({
               Step {step} of 4 · Smart Procurement Booking
             </span>
             <h2 className="font-display text-lg font-bold">
-              {step === 1 && "1. Select Harvest Crop & Volume"}
-              {step === 2 && "2. Choose Procurement Centre"}
-              {step === 3 && "3. Choose Date & Slot"}
-              {step === 4 && "4. Review & Confirm"}
-              {step === 5 && "🎉 Booking Confirmed"}
+              {step === 1 && t(language, "step1Title")}
+              {step === 2 && t(language, "step2Title")}
+              {step === 3 && t(language, "step3Title")}
+              {step === 4 && t(language, "step4Title")}
+              {step === 5 && `🎉 ${t(language, "step5Title")}`}
             </h2>
           </div>
           <button
@@ -144,10 +145,10 @@ export function SlotBookingModal({
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                      <Sparkles className="size-3.5 text-emerald-600" /> Instant Token Generator
+                      <Sparkles className="size-3.5 text-emerald-600" /> {t(language, "instantTokenGen")}
                     </h4>
                     <p className="text-[10.5px] text-muted-foreground mt-0.5">
-                      Skip remaining steps · Auto-assign earliest slot at {currentCentre.name.replace(" Procurement Centre", "")}
+                      {t(language, "instantTokenGenSub")}
                     </p>
                   </div>
                   <button
@@ -161,13 +162,13 @@ export function SlotBookingModal({
                     }}
                     className="rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-md hover:bg-emerald-700 active:scale-95 transition-all whitespace-nowrap"
                   >
-                    ⚡ Get Token Now
+                    ⚡ {t(language, "getTokenNow")}
                   </button>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-muted-foreground">Select Crop</label>
+                <label className="text-xs font-bold uppercase text-muted-foreground">{t(language, "selectCrop")}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {crops.map((crop) => (
                     <button
@@ -192,7 +193,7 @@ export function SlotBookingModal({
 
               <div>
                 <label className="text-xs font-bold uppercase text-muted-foreground">
-                  Harvest Quantity (kg)
+                  {t(language, "harvestQty")}
                 </label>
                 <div className="mt-1 flex items-center gap-3">
                   <input
@@ -209,7 +210,7 @@ export function SlotBookingModal({
                   </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between rounded-xl bg-muted/40 p-2.5 text-xs">
-                  <span className="text-muted-foreground">Estimated Total Payout:</span>
+                  <span className="text-muted-foreground">{t(language, "estPayout")}</span>
                   <strong className="text-sm font-bold text-emerald-700">
                     ₹{totalPayout.toLocaleString("en-IN")}
                   </strong>
@@ -223,7 +224,7 @@ export function SlotBookingModal({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold uppercase text-muted-foreground">
-                  Select Facility (Recommended on top)
+                  {t(language, "chooseCentre")}
                 </label>
                 <span className="text-[10px] text-primary font-semibold">📍 Real-time queue sync</span>
               </div>
@@ -244,7 +245,7 @@ export function SlotBookingModal({
                     >
                       {isRec && (
                         <span className="absolute -top-2.5 right-4 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[9px] font-bold text-white shadow-sm">
-                          <Sparkles className="size-3" /> ⭐ RECOMMENDED CENTRE
+                          <Sparkles className="size-3" /> ⭐ {t(language, "recommendedCentre")}
                         </span>
                       )}
 
@@ -285,7 +286,7 @@ export function SlotBookingModal({
           {step === 3 && (
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-bold uppercase text-muted-foreground">Select Harvest Date</label>
+                <label className="text-xs font-bold uppercase text-muted-foreground">{t(language, "chooseDateSlot")}</label>
                 <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
                   {dates.map((d) => (
                     <button
@@ -308,7 +309,7 @@ export function SlotBookingModal({
               <div>
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold uppercase text-muted-foreground">
-                    Available Time Slots (Hourly Capacity)
+                    {t(language, "availableSlots")}
                   </label>
                   <div className="flex items-center gap-2 text-[10px]">
                     <span className="inline-flex items-center gap-1 text-emerald-600 font-bold">🟢 Open</span>
@@ -350,7 +351,7 @@ export function SlotBookingModal({
                                 : "text-destructive font-bold"
                             }
                           >
-                            {slot.available} slots left
+                            {slot.available} {t(language, "slotsLeft")}
                           </span>
                           {isSelected && <Check className="size-4 text-primary" />}
                         </span>
@@ -366,7 +367,7 @@ export function SlotBookingModal({
           {step === 4 && (
             <div className="space-y-4">
               <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 space-y-2.5">
-                <h3 className="font-display text-base font-bold text-primary">Procurement Booking Summary</h3>
+                <h3 className="font-display text-base font-bold text-primary">{t(language, "summaryTitle")}</h3>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
                     <span className="text-muted-foreground block text-[10px]">Crop & Weight</span>
@@ -403,8 +404,8 @@ export function SlotBookingModal({
                 <Check className="size-8 stroke-[3]" />
               </div>
               <div>
-                <span className="eyebrow text-primary">DIGITAL QUEUE PASS ISSUED</span>
-                <h3 className="font-display text-2xl font-bold mt-1">You’re All Set!</h3>
+                <span className="eyebrow text-primary">{t(language, "digitalPassIssued")}</span>
+                <h3 className="font-display text-2xl font-bold mt-1">{t(language, "allSet")}</h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   Arrive 15 mins prior to {selectedSlotTime} at {currentCentre.name}.
                 </p>
@@ -436,14 +437,14 @@ export function SlotBookingModal({
                   }}
                   className="rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
                 >
-                  <Clock className="size-3.5" /> Track Live Queue
+                  <Clock className="size-3.5" /> {t(language, "trackLiveQueue")}
                 </button>
                 <button
                   type="button"
                   onClick={handleClose}
                   className="rounded-xl border border-border bg-card py-3 text-xs font-bold text-foreground hover:bg-muted transition-colors"
                 >
-                  Go to Dashboard
+                  {t(language, "goToDashboard")}
                 </button>
               </div>
             </div>
@@ -459,7 +460,7 @@ export function SlotBookingModal({
                 onClick={() => setStep((s) => (s - 1) as any)}
                 className="rounded-xl border border-border px-4 py-2 text-xs font-semibold hover:bg-muted"
               >
-                Back
+                {t(language, "back")}
               </button>
             ) : (
               <span />
@@ -471,7 +472,7 @@ export function SlotBookingModal({
                 onClick={() => setStep((s) => (s + 1) as any)}
                 className="flex items-center gap-1.5 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-md"
               >
-                Next Step <ArrowRight className="size-4" />
+                {t(language, "nextStep")} <ArrowRight className="size-4" />
               </button>
             ) : (
               <button
@@ -479,7 +480,7 @@ export function SlotBookingModal({
                 onClick={handleConfirm}
                 className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-6 py-2.5 text-xs font-bold text-white shadow-lg active:scale-95 transition-all"
               >
-                🎟️ Confirm & Generate Token Pass <Check className="size-4 stroke-[3]" />
+                🎟️ {t(language, "confirmGenToken")} <Check className="size-4 stroke-[3]" />
               </button>
             )}
           </div>

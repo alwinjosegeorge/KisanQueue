@@ -37,36 +37,36 @@ const CROPS_DATA = [
   {
     id: "paddy",
     name: "Paddy (Nel)",
-    timeframe: "Ready for Harvest",
+    timeframeKey: "readyHarvest" as const,
     msp: "₹32 / kg MSP",
-    badge: "Healthy",
+    badgeKey: "healthy" as const,
     badgeClass: "bg-emerald-600 text-white",
     image: cropPaddy,
   },
   {
     id: "coconut",
     name: "Raw Coconut",
-    timeframe: "1 Month to Harvest",
+    timeframeKey: "oneMonthHarvest" as const,
     msp: "₹38 / kg MSP",
-    badge: "Normal",
+    badgeKey: "normal" as const,
     badgeClass: "bg-white/90 text-gray-800 border border-gray-200",
     image: cropCoconut,
   },
   {
     id: "rubber",
     name: "Rubber (RSS4)",
-    timeframe: "Daily Tapping",
+    timeframeKey: "dailyTapping" as const,
     msp: "₹180 / kg MSP",
-    badge: "Peak Tap",
+    badgeKey: "peakTap" as const,
     badgeClass: "bg-amber-500 text-white",
     image: cropRubber,
   },
   {
     id: "pepper",
     name: "Black Pepper",
-    timeframe: "Drying Stage",
+    timeframeKey: "dryingStage" as const,
     msp: "₹520 / kg MSP",
-    badge: "Grade A",
+    badgeKey: "gradeA" as const,
     badgeClass: "bg-emerald-700 text-white",
     image: cropPepper,
   },
@@ -174,10 +174,10 @@ export function FarmerDashboard({
           <div className="pt-1">
             <div className="flex items-baseline gap-2">
               <span className="font-display text-4xl font-extrabold tracking-tight drop-shadow-md">24°C</span>
-              <span className="text-xs font-semibold text-white/90">☀️ Bright and Sunny</span>
+              <span className="text-xs font-semibold text-white/90">☀️ {t(language, "weatherSunny")}</span>
             </div>
             <p className="text-[11px] text-white/75 flex items-center gap-2 mt-0.5">
-              <span>📍 Kottayam Agri Cluster</span>
+              <span>📍 Kottayam {t(language, "cluster")}</span>
               <span>·</span>
               <span>L: 21°C  H: 31°C</span>
             </p>
@@ -189,29 +189,29 @@ export function FarmerDashboard({
             <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-2.5 text-white shadow-sm">
               <div className="flex items-center gap-1 text-[10px] text-white/80 font-semibold">
                 <Wind className="size-3 text-emerald-300" />
-                <span>Now Serving</span>
+                <span>{t(language, "nowServing")}</span>
               </div>
               <p className="font-display text-xl font-extrabold mt-1 text-secondary">
                 #{nowServing}
               </p>
-              <p className="text-[9px] text-white/70 truncate">Gate 1 · Weigh Bay</p>
+              <p className="text-[9px] text-white/70 truncate">{t(language, "weighBay")}</p>
             </div>
 
             {/* Metric 2 */}
             <div
               onClick={() => onOpenBooking()}
               className="rounded-2xl bg-white/25 backdrop-blur-md border border-white/40 p-2.5 text-white shadow-md ring-1 ring-white/30 cursor-pointer hover:bg-white/30 transition-all"
-              title={activeBooking ? `Your active token #${userQueueNumber}` : "Tap to generate token"}
+              title={activeBooking ? `Your active token #${userQueueNumber}` : t(language, "tapToGenerate")}
             >
               <div className="flex items-center gap-1 text-[10px] text-white/90 font-bold">
                 <Sun className="size-3 text-amber-300" />
-                <span>Your Token</span>
+                <span>{t(language, "yourToken")}</span>
               </div>
               <p className="font-display text-xl font-extrabold mt-1 text-white">
-                {userQueueNumber ? `#${userQueueNumber}` : "No Token"}
+                {userQueueNumber ? `#${userQueueNumber}` : t(language, "noToken")}
               </p>
               <p className="text-[9px] text-emerald-300 font-semibold truncate">
-                {activeBooking ? `${farmersAhead} ahead` : "⚡ Tap to Generate"}
+                {activeBooking ? `${farmersAhead} ${t(language, "farmersAhead")}` : `⚡ ${t(language, "tapToGenerate")}`}
               </p>
             </div>
 
@@ -219,13 +219,13 @@ export function FarmerDashboard({
             <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-2.5 text-white shadow-sm">
               <div className="flex items-center gap-1 text-[10px] text-white/80 font-semibold">
                 <Droplets className="size-3 text-blue-300" />
-                <span>Wait Turn</span>
+                <span>{t(language, "waitTurn")}</span>
               </div>
               <p className="font-display text-xl font-extrabold mt-1 text-white">
                 {activeBooking ? `~${prediction.minutesLeft}m` : "Ready"}
               </p>
               <p className="text-[9px] text-white/70 truncate">
-                {activeBooking ? prediction.timeStr : "Fast-track entry"}
+                {activeBooking ? prediction.timeStr : "Fast-track"}
               </p>
             </div>
           </div>
@@ -238,14 +238,14 @@ export function FarmerDashboard({
                 onClick={onOpenLiveQueue}
                 className="flex items-center justify-center gap-2 rounded-xl bg-white text-[#123D35] py-2.5 text-xs font-extrabold shadow-lg hover:bg-white/90 transition-colors"
               >
-                Track Live Queue <ChevronRight className="size-4" />
+                {t(language, "trackLiveQueue")} <ChevronRight className="size-4" />
               </button>
               <button
                 type="button"
                 onClick={() => setShowCancelModal(true)}
                 className="flex items-center justify-center gap-1.5 rounded-xl border border-white/30 bg-black/30 backdrop-blur-sm px-3.5 py-2.5 text-xs font-semibold text-white hover:bg-rose-600 transition-colors"
               >
-                <XCircle className="size-4" /> Cancel Slot
+                <XCircle className="size-4" /> {t(language, "cancelSlot")}
               </button>
             </div>
           ) : (
@@ -255,7 +255,7 @@ export function FarmerDashboard({
                 onClick={() => onOpenBooking()}
                 className="flex items-center justify-center gap-1.5 rounded-xl bg-white text-[#123D35] py-3 text-xs font-extrabold shadow-lg hover:bg-white/90 transition-colors"
               >
-                <CalendarDays className="size-4" /> Custom Slot
+                <CalendarDays className="size-4" /> {t(language, "customSlot")}
               </button>
               <button
                 type="button"
@@ -265,7 +265,7 @@ export function FarmerDashboard({
                 }}
                 className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 text-white py-3 text-xs font-extrabold shadow-lg hover:bg-emerald-700 active:scale-95 transition-all"
               >
-                ⚡ Instant Token
+                ⚡ {t(language, "instantToken")}
               </button>
             </div>
           )}
@@ -304,14 +304,14 @@ export function FarmerDashboard({
       <section>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            My Crops & Fields (4)
+            {t(language, "myCrops")} (4)
           </h3>
           <button
             type="button"
             onClick={() => onOpenBooking()}
             className="text-xs font-semibold text-primary hover:underline"
           >
-            See all
+            {t(language, "seeAll")}
           </button>
         </div>
 
@@ -330,12 +330,12 @@ export function FarmerDashboard({
                   loading="lazy"
                 />
                 <span className={`absolute top-1.5 left-1.5 rounded-full px-2 py-0.5 text-[8px] font-bold shadow-sm ${crop.badgeClass}`}>
-                  {crop.badge}
+                  {t(language, crop.badgeKey)}
                 </span>
               </div>
               <div className="p-2.5">
                 <h4 className="text-xs font-bold truncate text-foreground">{crop.name}</h4>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{crop.timeframe}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{t(language, crop.timeframeKey)}</p>
                 <p className="text-[10px] font-bold text-primary mt-1">{crop.msp}</p>
               </div>
             </div>
@@ -347,14 +347,14 @@ export function FarmerDashboard({
       <section>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Today's Tasks (4)
+            {t(language, "todaysTasks")} (4)
           </h3>
           <button
             type="button"
             onClick={onOpenBookingsList}
             className="text-xs font-semibold text-primary hover:underline"
           >
-            See all
+            {t(language, "seeAll")}
           </button>
         </div>
 
@@ -371,15 +371,15 @@ export function FarmerDashboard({
           >
             <div className="min-w-0 pr-2">
               <h4 className="text-xs font-bold text-foreground">
-                {activeBooking ? "Procurement Slot Confirmed" : "No Active Token · Tap to Generate"}
+                {activeBooking ? t(language, "slotConfirmed") : t(language, "noSlotActive")}
               </h4>
               <p className="text-[11px] text-muted-foreground mt-0.5">
                 {activeBooking
                   ? `Token #${userQueueNumber} · ${activeBooking.centreName}`
-                  : "Tap here to book a slot or issue an instant queue pass"}
+                  : t(language, "slotConfirmedSub")}
               </p>
               <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">
-                {activeBooking ? "08:30 AM · Verified" : "⚡ Ready for token generation"}
+                {activeBooking ? `08:30 AM · ${t(language, "verified")}` : `⚡ ${t(language, "tapToGenerate")}`}
               </span>
             </div>
             <div className={`flex size-6 shrink-0 items-center justify-center rounded-full ${activeBooking ? "bg-emerald-600 text-white shadow-sm" : "border-2 border-dashed border-primary text-primary"}`}>
@@ -389,11 +389,11 @@ export function FarmerDashboard({
 
           <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
             <div className="min-w-0 pr-2">
-              <h4 className="text-xs font-bold text-foreground">Pre-Harvest Moisture Testing</h4>
+              <h4 className="text-xs font-bold text-foreground">{t(language, "moistureTesting")}</h4>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Target moisture &lt; 14% for MSP Grade A rate
+                {t(language, "moistureTestingSub")}
               </p>
-              <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">09:15 AM · Calibrated</span>
+              <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">09:15 AM · {t(language, "calibrated")}</span>
             </div>
             <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-sm">
               <Check className="size-3.5 stroke-[3]" />
@@ -402,11 +402,11 @@ export function FarmerDashboard({
 
           <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
             <div className="min-w-0 pr-2">
-              <h4 className="text-xs font-bold text-foreground">Yard Gate 1 Entry & Weighing</h4>
+              <h4 className="text-xs font-bold text-foreground">{t(language, "gateEntry")}</h4>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Certified weighbridge digital receipt generation
+                {t(language, "gateEntrySub")}
               </p>
-              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">Estimated 10:30 AM</span>
+              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">{t(language, "estimatedTime")}</span>
             </div>
             <div className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border text-muted-foreground">
               <Circle className="size-3 text-muted-foreground" />
@@ -415,11 +415,11 @@ export function FarmerDashboard({
 
           <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
             <div className="min-w-0 pr-2">
-              <h4 className="text-xs font-bold text-foreground">PFMS Direct Benefit Transfer (DBT)</h4>
+              <h4 className="text-xs font-bold text-foreground">{t(language, "dbtPayout")}</h4>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Automated bank transfer within 24 hours of weighing
+                {t(language, "dbtPayoutSub")}
               </p>
-              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">Aadhaar Linked Payout</span>
+              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">{t(language, "aadhaarLinked")}</span>
             </div>
             <div className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border text-muted-foreground">
               <Circle className="size-3 text-muted-foreground" />
@@ -439,7 +439,7 @@ export function FarmerDashboard({
             onClick={onOpenMap}
             className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
           >
-            <Map className="size-3.5" /> Centre Map
+            <Map className="size-3.5" /> {t(language, "mapView")}
           </button>
         </div>
 
@@ -452,7 +452,7 @@ export function FarmerDashboard({
             <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <Ticket className="size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">Generate Token</span>
+            <span className="text-[11px] font-bold text-center leading-tight">{t(language, "generateToken")}</span>
           </button>
 
           <button
@@ -463,7 +463,7 @@ export function FarmerDashboard({
             <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <UsersRound className="size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">Live Queue</span>
+            <span className="text-[11px] font-bold text-center leading-tight">{t(language, "liveQueue")}</span>
           </button>
 
           <button
@@ -474,7 +474,7 @@ export function FarmerDashboard({
             <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <PackageCheck className="size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">My Bookings</span>
+            <span className="text-[11px] font-bold text-center leading-tight">{t(language, "myBookings")}</span>
           </button>
 
           <button
@@ -485,7 +485,7 @@ export function FarmerDashboard({
             <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <IndianRupee className="size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">Payments</span>
+            <span className="text-[11px] font-bold text-center leading-tight">{t(language, "paymentStatus")}</span>
           </button>
         </div>
       </section>
@@ -510,24 +510,24 @@ export function FarmerDashboard({
               <h4 className="font-bold text-xs">{recommendedCentre.name}</h4>
               <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-2">
                 <span>📍 {recommendedCentre.distanceKm} km</span>
-                <span>👥 {recommendedCentre.currentQueueLength} farmers waiting</span>
+                <span>👥 {recommendedCentre.currentQueueLength} {t(language, "farmersAhead")}</span>
               </p>
             </div>
             <span className="rounded-full bg-emerald-500/15 text-emerald-700 px-2 py-0.5 text-[10px] font-bold">
-              ⭐ Fastest Turn
+              ⭐ {t(language, "fastestTurn")}
             </span>
           </div>
 
           <div className="mt-2 flex items-center justify-between text-xs border-t border-border/60 pt-2">
             <span className="text-muted-foreground text-[11px]">
-              Est wait: <strong>~{recommendedCentre.currentQueueLength * recommendedCentre.avgProcessingMinutes} mins</strong>
+              {t(language, "estWait")}: <strong>~{recommendedCentre.currentQueueLength * recommendedCentre.avgProcessingMinutes} mins</strong>
             </span>
             <button
               type="button"
               onClick={() => onSelectCentre(recommendedCentre.name)}
               className="font-bold text-primary hover:underline inline-flex items-center gap-1 text-xs"
             >
-              Book Here <ChevronRight className="size-3" />
+              {t(language, "bookHere")} <ChevronRight className="size-3" />
             </button>
           </div>
         </div>
@@ -537,13 +537,13 @@ export function FarmerDashboard({
       <section className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Nearby Centres ({centres.length})
+            {t(language, "nearbyCentres")} ({centres.length})
           </h3>
           <button
             onClick={onOpenMap}
             className="text-xs font-semibold text-primary hover:underline"
           >
-            View on Map
+            {t(language, "viewOnMap")}
           </button>
         </div>
 
@@ -575,7 +575,7 @@ export function FarmerDashboard({
                     : "bg-destructive/15 text-destructive"
                 }`}
               >
-                {centre.status === "normal" ? "Normal" : centre.status === "busy" ? "Busy" : "Delayed"}
+                {centre.status === "normal" ? t(language, "congestionLow") : centre.status === "busy" ? t(language, "congestionMed") : t(language, "delayReported")}
               </span>
               <p className="text-[10px] text-muted-foreground mt-0.5">
                 ~{centre.currentQueueLength * centre.avgProcessingMinutes + centre.activeDelayMinutes}m wait
@@ -592,7 +592,9 @@ export function FarmerDashboard({
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2 text-rose-600">
                 <AlertTriangle className="size-5" />
-                <h3 className="font-display font-bold text-base text-foreground">Cancel Booking?</h3>
+                <h3 className="font-display font-bold text-base text-foreground">
+                  {language === "ml" ? "ബുക്കിംഗ് റദ്ദാക്കണോ?" : language === "hi" ? "बुकिंग रद्द करें?" : "Cancel Booking?"}
+                </h3>
               </div>
               <button
                 type="button"
@@ -617,7 +619,7 @@ export function FarmerDashboard({
                 onClick={() => setShowCancelModal(false)}
                 className="rounded-xl border border-border bg-background py-2.5 text-xs font-semibold hover:bg-muted"
               >
-                Keep Booking
+                {t(language, "keepSpot")}
               </button>
               <button
                 type="button"
@@ -627,7 +629,7 @@ export function FarmerDashboard({
                 }}
                 className="rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow hover:bg-rose-700 transition-colors"
               >
-                Yes, Cancel Slot
+                {t(language, "yesCancelSlot")}
               </button>
             </div>
           </div>

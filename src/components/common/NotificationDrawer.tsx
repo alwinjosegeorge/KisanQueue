@@ -1,12 +1,22 @@
 import React, { useState } from "react";
 import { useKisanQueue } from "@/lib/store";
+import { t } from "@/lib/translations";
 import { X, Check, Bell, MessageSquare, AlertTriangle, IndianRupee, Clock } from "lucide-react";
 
-export function NotificationDrawer({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { notifications, markAllNotificationsRead } = useKisanQueue();
+export function NotificationDrawer({
+  isOpen,
+  open,
+  onClose,
+}: {
+  isOpen?: boolean;
+  open?: boolean;
+  onClose: () => void;
+}) {
+  const { notifications, markAllNotificationsRead, language } = useKisanQueue();
   const [tab, setTab] = useState<"app" | "sms">("app");
 
-  if (!isOpen) return null;
+  const visible = isOpen ?? open ?? false;
+  if (!visible) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-4 backdrop-blur-sm sm:items-center">
@@ -18,7 +28,7 @@ export function NotificationDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
               <Bell className="size-4" />
             </div>
             <div>
-              <h3 className="font-display text-lg font-bold">Smart Alerts & Updates</h3>
+              <h3 className="font-display text-lg font-bold">{t(language, "notifications")}</h3>
               <p className="text-xs text-muted-foreground">Real-time queue alerts & SMS broadcasts</p>
             </div>
           </div>
@@ -36,18 +46,18 @@ export function NotificationDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
           <button
             onClick={() => setTab("app")}
             className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all ${
-              tab === "app" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+              tab === "app" ? "bg-card text-primary shadow-sm font-bold" : "text-muted-foreground"
             }`}
           >
-            <Bell className="size-3.5" /> App Notifications ({notifications.length})
+            <Bell className="size-3.5" /> {t(language, "notifications")} ({notifications.length})
           </button>
           <button
             onClick={() => setTab("sms")}
             className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all ${
-              tab === "sms" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+              tab === "sms" ? "bg-card text-primary shadow-sm font-bold" : "text-muted-foreground"
             }`}
           >
-            <MessageSquare className="size-3.5" /> SMS Alerts (Live)
+            <MessageSquare className="size-3.5" /> {t(language, "smsAlerts")}
           </button>
         </div>
 
@@ -56,7 +66,7 @@ export function NotificationDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
           {tab === "app" ? (
             notifications.length === 0 ? (
               <div className="py-8 text-center text-sm text-muted-foreground">
-                No notifications right now
+                {t(language, "noNotifications")}
               </div>
             ) : (
               notifications.map((notif) => (
@@ -118,7 +128,7 @@ export function NotificationDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
               onClick={markAllNotificationsRead}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
             >
-              <Check className="size-3.5" /> Mark all as read
+              <Check className="size-3.5" /> {t(language, "markAllRead")}
             </button>
           </div>
         )}

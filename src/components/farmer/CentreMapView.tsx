@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useKisanQueue } from "@/lib/store";
+import { t } from "@/lib/translations";
 import {
   ArrowLeft,
   MapPin,
@@ -40,7 +41,7 @@ const FARMER_LOCATION = {
 };
 
 export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
-  const { centres, getRecommendedCentre } = useKisanQueue();
+  const { centres, getRecommendedCentre, language } = useKisanQueue();
   const recommendedCentre = getRecommendedCentre();
   const [selectedId, setSelectedId] = useState(recommendedCentre.id);
   const [mapType, setMapType] = useState<"street" | "satellite">("satellite");
@@ -258,14 +259,14 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
           <ArrowLeft className="size-4" />
         </button>
         <div className="text-center">
-          <h1 className="font-display text-sm font-bold text-foreground">My Fields & Centres</h1>
-          <p className="text-[11px] text-muted-foreground font-medium">Maps View · Live Satellite</p>
+          <h1 className="font-display text-sm font-bold text-foreground">{t(language, "myFieldsCentres")}</h1>
+          <p className="text-[11px] text-muted-foreground font-medium">{t(language, "mapsView")}</p>
         </div>
         <button
           type="button"
           onClick={() => setMapType(mapType === "satellite" ? "street" : "satellite")}
           className="flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted shadow-sm transition-transform active:scale-95"
-          title={mapType === "satellite" ? "Switch to Map View" : "Switch to Satellite"}
+          title={mapType === "satellite" ? t(language, "mapView") : t(language, "satelliteView")}
         >
           <Layers className="size-4 text-primary" />
         </button>
@@ -328,7 +329,7 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
               <h2 className="font-display text-base font-bold text-foreground">{activeCentre.name}</h2>
               {activeCentre.id === recommendedCentre.id && (
                 <span className="rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-[10px] font-bold flex items-center gap-1">
-                  <Sparkles className="size-3" /> Recommended
+                  <Sparkles className="size-3" /> ⭐ {t(language, "recommendedCentre")}
                 </span>
               )}
             </div>
@@ -345,45 +346,45 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
             }`}
           >
             {activeCentre.status === "normal"
-              ? "Normal Wait"
+              ? t(language, "congestionLow")
               : activeCentre.status === "busy"
-              ? "Busy"
-              : "Delayed"}
+              ? t(language, "congestionMed")
+              : t(language, "delayReported")}
           </span>
         </div>
 
         {/* Conditions Section (Matching Reference Image) */}
         <div className="space-y-2">
-          <h3 className="text-xs font-bold text-foreground tracking-tight">Conditions</h3>
+          <h3 className="text-xs font-bold text-foreground tracking-tight">{t(language, "conditions")}</h3>
           <div className="grid grid-cols-3 gap-2.5">
             {/* pH Level */}
             <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
               <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
                 <ShieldCheck className="size-3.5 text-primary" />
-                <span className="text-[10.5px] font-medium">pH Level</span>
+                <span className="text-[10.5px] font-medium">{t(language, "phLevel")}</span>
               </div>
               <p className="text-base font-bold text-foreground">7.2</p>
-              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Neutral · Ideal</span>
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">{t(language, "neutralIdeal")}</span>
             </div>
 
             {/* Temperature */}
             <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
               <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
                 <ThermometerSun className="size-3.5 text-amber-500" />
-                <span className="text-[10.5px] font-medium">Temperature</span>
+                <span className="text-[10.5px] font-medium">{t(language, "temperature")}</span>
               </div>
               <p className="text-base font-bold text-foreground">24°C</p>
-              <span className="text-[10px] font-semibold text-muted-foreground">Sunny · Dry</span>
+              <span className="text-[10px] font-semibold text-muted-foreground">{t(language, "sunnyDry")}</span>
             </div>
 
             {/* Moisture */}
             <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
               <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
                 <Droplets className="size-3.5 text-blue-500" />
-                <span className="text-[10.5px] font-medium">Moisture</span>
+                <span className="text-[10.5px] font-medium">{t(language, "moisture")}</span>
               </div>
               <p className="text-base font-bold text-foreground">13.8%</p>
-              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Optimal (&lt;14%)</span>
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">{t(language, "optimalMoisture")}</span>
             </div>
           </div>
         </div>
@@ -395,17 +396,17 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
               <CheckCircle2 className="size-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-foreground">Quality & Moisture Pre-Check</p>
-              <p className="text-[10.5px] text-muted-foreground">Moisture &lt; 14% Verified for Grade A procurement</p>
+              <p className="text-xs font-bold text-foreground">{t(language, "qualityPreCheck")}</p>
+              <p className="text-[10.5px] text-muted-foreground">{t(language, "qualityPreCheckSub")}</p>
             </div>
           </div>
-          <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400">Verified</span>
+          <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400">{t(language, "verified")}</span>
         </div>
 
         {/* Quick Centre Switcher Pills */}
         <div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
-            Procurement Centres ({centres.length})
+            {t(language, "procurementCentres")} ({centres.length})
           </p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {centres.map((c) => {
@@ -445,7 +446,7 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
             rel="noopener noreferrer"
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 text-xs font-bold text-foreground hover:bg-muted transition-colors shadow-sm"
           >
-            <Navigation className="size-4 text-primary" /> Directions
+            <Navigation className="size-4 text-primary" /> {t(language, "directions")}
           </a>
 
           <button
@@ -453,7 +454,7 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
             onClick={() => onSelectCentre(activeCentre.name)}
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
           >
-            <CalendarDays className="size-4" /> Book at this Centre
+            <CalendarDays className="size-4" /> {t(language, "bookAtCentre")}
           </button>
         </div>
       </div>

@@ -75,16 +75,16 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
       {!activeBooking && (
         <div className="rounded-2xl border-2 border-primary/30 bg-primary/10 p-4 text-center space-y-2.5 shadow-sm">
           <Sparkles className="size-6 text-primary mx-auto" />
-          <h3 className="font-bold text-sm text-foreground">You do not have an active queue token</h3>
+          <h3 className="font-bold text-sm text-foreground">{t(language, "noActiveTokenNotice")}</h3>
           <p className="text-xs text-muted-foreground">
-            Generate a digital token pass to secure your position in today's live procurement queue.
+            {t(language, "noActiveTokenSub")}
           </p>
           <button
             type="button"
             onClick={onOpenReschedule}
             className="rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
           >
-            ⚡ Generate Queue Token Now
+            ⚡ {t(language, "generateQueueToken")}
           </button>
         </div>
       )}
@@ -94,45 +94,45 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
         <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
 
         <div className="relative z-10 text-center">
-          <span className="eyebrow text-secondary">REAL-TIME POSITION IN LINE</span>
+          <span className="eyebrow text-secondary">{t(language, "realtimePosition")}</span>
 
           <div className="my-4 flex items-center justify-center gap-6">
             <div className="rounded-2xl bg-white/10 px-4 py-3 text-center backdrop-blur-sm">
               <span className="block text-[10px] uppercase tracking-wider text-primary-foreground/65">
-                Now Serving
+                {t(language, "nowServing")}
               </span>
               <strong className="font-display text-5xl font-extrabold text-secondary">#{nowServing}</strong>
-              <small className="block text-[10px] text-primary-foreground/75 mt-0.5">Weighing Bay A</small>
+              <small className="block text-[10px] text-primary-foreground/75 mt-0.5">{t(language, "weighBay")}</small>
             </div>
 
             <div className="rounded-2xl bg-white/15 px-4 py-3 text-center ring-2 ring-secondary/50 backdrop-blur-sm">
               <span className="block text-[10px] uppercase tracking-wider text-primary-foreground/80 font-bold">
-                Your Token
+                {t(language, "yourToken")}
               </span>
               <strong className="font-display text-5xl font-extrabold text-white">
                 {userQueueNumber ? `#${userQueueNumber}` : "—"}
               </strong>
               <small className="block text-[10px] text-secondary mt-0.5 font-semibold">
                 {activeBooking
-                  ? (farmersAhead === 0 ? "Serving Now!" : `${farmersAhead} ahead`)
-                  : "No Active Token"}
+                  ? (farmersAhead === 0 ? t(language, "servingNow") : `${farmersAhead} ${t(language, "farmersAhead")}`)
+                  : t(language, "noToken")}
               </small>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 border-t border-white/15 pt-3 text-center text-xs">
             <div>
-              <span className="text-[10px] text-primary-foreground/60 block">Queue Gap</span>
-              <strong>{activeBooking ? `${farmersAhead} Farmers` : "—"}</strong>
+              <span className="text-[10px] text-primary-foreground/60 block">{t(language, "queueGap")}</span>
+              <strong>{activeBooking ? `${farmersAhead} ${t(language, "farmersAhead")}` : "—"}</strong>
             </div>
             <div>
-              <span className="text-[10px] text-primary-foreground/60 block">Wait Time</span>
+              <span className="text-[10px] text-primary-foreground/60 block">{t(language, "waitTime")}</span>
               <strong className={currentCentre.activeDelayMinutes > 0 ? "text-secondary" : ""}>
                 {activeBooking ? `~${prediction.minutesLeft} mins` : "Ready"}
               </strong>
             </div>
             <div>
-              <span className="text-[10px] text-primary-foreground/60 block">Expected Call</span>
+              <span className="text-[10px] text-primary-foreground/60 block">{t(language, "expectedCall")}</span>
               <strong className="text-secondary">{activeBooking ? prediction.timeStr : "Immediate"}</strong>
             </div>
           </div>
@@ -237,7 +237,7 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
             onClick={onOpenDirections}
             className="flex items-center justify-center gap-1.5 rounded-xl bg-primary py-2.5 text-xs font-bold text-primary-foreground shadow-sm hover:opacity-90"
           >
-            <Navigation className="size-4" /> Get Directions
+            <Navigation className="size-4" /> {t(language, "directions")}
           </button>
 
           <button
@@ -245,7 +245,7 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
             onClick={onOpenReschedule}
             className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-2.5 text-xs font-bold hover:bg-muted"
           >
-            <RefreshCw className="size-3.5" /> Reschedule Slot
+            <RefreshCw className="size-3.5" /> {t(language, "rescheduleSlot")}
           </button>
         </div>
 
@@ -255,7 +255,7 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
             onClick={() => setShowCancelConfirm(true)}
             className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/60 dark:bg-rose-950/30 dark:border-rose-900/50 py-2.5 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors"
           >
-            <XCircle className="size-4" /> Cancel This Booking
+            <XCircle className="size-4" /> {t(language, "cancelBooking")}
           </button>
         )}
       </section>
@@ -267,7 +267,9 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2 text-rose-600">
                 <AlertTriangle className="size-5" />
-                <h3 className="font-display font-bold text-base text-foreground">Cancel Booking?</h3>
+                <h3 className="font-display font-bold text-base text-foreground">
+                  {language === "ml" ? "ബുക്കിംഗ് റദ്ദാക്കണോ?" : language === "hi" ? "बुकिंग रद्द करें?" : "Cancel Booking?"}
+                </h3>
               </div>
               <button
                 type="button"
@@ -292,7 +294,7 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
                 onClick={() => setShowCancelConfirm(false)}
                 className="rounded-xl border border-border bg-background py-2.5 text-xs font-semibold hover:bg-muted"
               >
-                Keep Spot
+                {t(language, "keepSpot")}
               </button>
               <button
                 type="button"
@@ -303,7 +305,7 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
                 }}
                 className="rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow hover:bg-rose-700 transition-colors"
               >
-                Yes, Cancel Slot
+                {t(language, "yesCancelSlot")}
               </button>
             </div>
           </div>

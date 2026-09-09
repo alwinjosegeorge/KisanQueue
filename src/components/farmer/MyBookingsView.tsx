@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useKisanQueue } from "@/lib/store";
+import { t } from "@/lib/translations";
 import { ArrowLeft, Calendar, MapPin, QrCode, RefreshCw, XCircle, CheckCircle2, ChevronRight } from "lucide-react";
 import { Booking } from "@/lib/types";
 
@@ -10,7 +11,7 @@ export function MyBookingsView({
   onBack: () => void;
   onOpenReschedule: (booking: Booking) => void;
 }) {
-  const { bookings, cancelBooking } = useKisanQueue();
+  const { bookings, cancelBooking, language } = useKisanQueue();
   const [activeTab, setActiveTab] = useState<"upcoming" | "completed" | "cancelled">("upcoming");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
@@ -33,7 +34,7 @@ export function MyBookingsView({
           <ArrowLeft className="size-4" />
         </button>
         <div>
-          <h1 className="font-display text-xl font-bold">My Procurement Bookings</h1>
+          <h1 className="font-display text-xl font-bold">{t(language, "myBookings")}</h1>
           <p className="text-xs text-muted-foreground">Digital passes and slot history</p>
         </div>
       </div>
@@ -123,14 +124,14 @@ export function MyBookingsView({
                       onClick={() => onOpenReschedule(booking)}
                       className="rounded-lg border border-border px-2.5 py-1 text-xs font-semibold hover:bg-muted"
                     >
-                      Reschedule
+                      {t(language, "rescheduleSlot")}
                     </button>
                     <button
                       type="button"
                       onClick={() => cancelBooking(booking.id)}
                       className="rounded-lg border border-destructive/30 px-2.5 py-1 text-xs font-semibold text-destructive hover:bg-destructive/10"
                     >
-                      Cancel
+                      {t(language, "cancelSlot")}
                     </button>
                   </div>
                 )}

@@ -1,6 +1,6 @@
 export type Role = "farmer" | "staff" | "admin";
 
-export type Language = "en" | "ml" | "hi";
+export type Language = "en" | "ml" | "hi" | "ta" | "te" | "kn" | "bn" | "mr";
 
 export interface User {
   id: string;

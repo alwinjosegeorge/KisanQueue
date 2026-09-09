@@ -1,6 +1,7 @@
 import React from "react";
 import { useKisanQueue } from "@/lib/store";
 import { Role, Language } from "@/lib/types";
+import { SUPPORTED_LANGUAGES, t } from "@/lib/translations";
 import { Bell, Globe, Sparkles, Type } from "lucide-react";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 
@@ -42,7 +43,7 @@ export function DemoHeader({ onOpenNotifications, onOpenAuth }: { onOpenNotifica
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <span>👨‍🌾</span> <span>Farmer</span>
+          <span>👨‍🌾</span> <span>{t(language, "farmerApp")}</span>
         </button>
 
         <button
@@ -54,7 +55,7 @@ export function DemoHeader({ onOpenNotifications, onOpenAuth }: { onOpenNotifica
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <span>🏢</span> <span>Staff</span>
+          <span>🏢</span> <span>{t(language, "staffDashboard")}</span>
         </button>
 
         <button
@@ -66,24 +67,26 @@ export function DemoHeader({ onOpenNotifications, onOpenAuth }: { onOpenNotifica
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <span>🧑‍💼</span> <span>Admin</span>
+          <span>🧑‍💼</span> <span>{t(language, "adminDashboard")}</span>
         </button>
       </div>
 
       {/* Language & Utilities */}
       <div className="flex items-center gap-2">
         {/* Language Selector */}
-        <div className="flex items-center rounded-full border border-border/70 bg-background/80 px-1 py-0.5 text-xs">
-          <Globe className="ml-1.5 size-3.5 text-muted-foreground" />
+        <div className="flex items-center rounded-full border border-border/70 bg-background/80 px-1 py-0.5 text-xs shadow-xs">
+          <Globe className="ml-1.5 size-3.5 text-primary" />
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value as Language)}
             aria-label="Select language"
-            className="cursor-pointer bg-transparent py-1 pl-1.5 pr-2 font-medium text-foreground outline-none"
+            className="cursor-pointer bg-transparent py-1 pl-1.5 pr-2 font-semibold text-foreground outline-none text-xs"
           >
-            <option value="en">English</option>
-            <option value="ml">മലയാളം</option>
-            <option value="hi">हिंदी</option>
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <option key={lang.id} value={lang.id} className="bg-card text-foreground py-1">
+                {lang.native} ({lang.label})
+              </option>
+            ))}
           </select>
         </div>
 

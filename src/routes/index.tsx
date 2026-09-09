@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 import { useKisanQueue } from "@/lib/store";
-import { useTranslation, t } from "@/lib/translations";
+import { useTranslation, t, SUPPORTED_LANGUAGES } from "@/lib/translations";
 import { NotificationDrawer } from "@/components/common/NotificationDrawer";
 import { AuthModal } from "@/components/auth/AuthModal";
 
@@ -125,6 +125,7 @@ function AppButton({
 }
 
 function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
+  const { language, setLanguage } = useKisanQueue();
   return (
     <main className="splash-screen">
       <img
@@ -138,12 +139,29 @@ function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) 
       <div className="relative z-10 flex min-h-dvh flex-col px-6 pb-8 pt-10 sm:mx-auto sm:max-w-md">
         <div className="flex items-center justify-between">
           <Logo inverse />
-          <button
-            onClick={onSkip}
-            className="rounded-full bg-black/25 px-3 py-1 text-xs font-semibold text-primary-foreground/90 hover:bg-black/40 hover:text-white backdrop-blur-sm transition-all"
-          >
-            Skip →
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center rounded-full bg-black/40 px-2.5 py-1 text-xs backdrop-blur-md border border-white/25 text-white">
+              <Languages className="size-3.5 text-secondary mr-1.5" />
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as any)}
+                aria-label="Language"
+                className="bg-transparent text-white text-xs font-bold outline-none cursor-pointer"
+              >
+                {SUPPORTED_LANGUAGES.map((l) => (
+                  <option key={l.id} value={l.id} className="text-foreground bg-card">
+                    {l.native} ({l.label})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={onSkip}
+              className="rounded-full bg-black/25 px-3 py-1 text-xs font-semibold text-primary-foreground/90 hover:bg-black/40 hover:text-white backdrop-blur-sm transition-all"
+            >
+              Skip →
+            </button>
+          </div>
         </div>
         <div className="mt-auto">
           <p className="eyebrow text-secondary font-semibold">Kerala Agricultural Department</p>
@@ -151,14 +169,14 @@ function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) 
             Kisan<br />Queue
           </h1>
           <p className="mt-4 text-sm leading-6 text-primary-foreground/85">
-            Digital procurement and fair, fast queue management for Kerala farmers.
+            {t(language, "subTagline")}
           </p>
           <AppButton
             tone="soft"
             className="mt-7 w-full flex items-center justify-center gap-1.5 py-3 font-bold text-base shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all"
             onClick={onNext}
           >
-            Begin <ChevronRight className="size-4" />
+            {language === "ml" ? "ആരംഭിക്കുക" : language === "hi" ? "शुरू करें" : language === "ta" ? "தொடங்குங்கள்" : language === "te" ? "ప్రారంభించండి" : language === "kn" ? "ಪ್ರಾರಂಭಿಸಿ" : language === "bn" ? "শুরু করুন" : language === "mr" ? "सुरू करा" : "Begin"} <ChevronRight className="size-4" />
           </AppButton>
         </div>
       </div>
@@ -349,6 +367,7 @@ function KisanQueueApp() {
             {FARMER_NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const active = farmerScreen === item.id;
+              const translatedLabel = t(language, item.id as any) || item.label;
               return (
                 <button
                   key={item.id}
@@ -356,7 +375,7 @@ function KisanQueueApp() {
                   className={`rail-item ${active ? "rail-item-active" : ""}`}
                 >
                   <Icon className="size-5" />
-                  <span>{item.label}</span>
+                  <span>{translatedLabel}</span>
                 </button>
               );
             })}
@@ -517,19 +536,21 @@ function FarmerBottomNav({
   screen: FarmerScreen;
   onNavigate: (s: FarmerScreen) => void;
 }) {
+  const { language } = useKisanQueue();
   return (
     <nav className="bottom-nav" aria-label="Main navigation">
       <div className="bottom-nav-pill">
         {FARMER_NAV_ITEMS.map(({ id, label, icon: Icon }) => {
           const active = screen === id;
+          const translatedLabel = t(language, id as any) || label;
           return (
             <button
               key={id}
               type="button"
               className={`bottom-nav-item ${active ? "bottom-nav-item-active" : ""}`}
               onClick={() => onNavigate(id)}
-              aria-label={label}
-              title={label}
+              aria-label={translatedLabel}
+              title={translatedLabel}
             >
               <Icon className="size-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
             </button>
@@ -600,25 +621,24 @@ function FarmerProfileView({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Languages className="size-4 text-primary" />
-            <h3 className="text-xs font-semibold text-foreground">App Language / ഭാഷ / भाषा</h3>
+            <h3 className="text-xs font-bold text-foreground">
+              {t(language, "appLanguage")} / Indian Languages (8)
+            </h3>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-2 text-xs">
-          {[
-            { id: "en", label: "English" },
-            { id: "ml", label: "മലയാളം" },
-            { id: "hi", label: "हिंदी" },
-          ].map((item) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          {SUPPORTED_LANGUAGES.map((item) => (
             <button
               key={item.id}
-              onClick={() => setLanguage(item.id as any)}
-              className={`rounded-xl border py-2.5 font-semibold transition-all ${
+              onClick={() => setLanguage(item.id)}
+              className={`flex flex-col items-center justify-center rounded-xl border py-2.5 px-2 transition-all text-center ${
                 language === item.id
-                  ? "border-primary bg-primary text-primary-foreground shadow"
+                  ? "border-primary bg-primary text-primary-foreground shadow font-bold"
                   : "border-border bg-background text-foreground hover:bg-muted"
               }`}
             >
-              {item.label}
+              <span className="text-xs font-bold leading-snug">{item.native}</span>
+              <span className="text-[10px] opacity-75">{item.label}</span>
             </button>
           ))}
         </div>
@@ -632,7 +652,7 @@ function FarmerProfileView({
         >
           <div className="flex items-center gap-2.5">
             <PlayCircle className="size-4 text-primary" />
-            <span>Replay Welcome Intro & Splash Screen</span>
+            <span>{t(language, "replayIntro")}</span>
           </div>
           <ChevronRight className="size-4 text-muted-foreground" />
         </button>
@@ -641,7 +661,7 @@ function FarmerProfileView({
       {/* Support & Helpline */}
       <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-2">
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          Support & Assistance
+          {t(language, "supportAssistance")}
         </h3>
         <a
           href="tel:18004251661"
@@ -650,7 +670,7 @@ function FarmerProfileView({
           <div className="flex items-center gap-2.5">
             <Phone className="size-4 text-primary" />
             <div>
-              <p className="text-foreground">Kisan Call Centre (Toll-Free)</p>
+              <p className="text-foreground">{t(language, "kisanCallCentre")}</p>
               <span className="text-[10px] text-muted-foreground font-mono">1800-180-1551 / 1800-425-1661</span>
             </div>
           </div>
@@ -661,7 +681,7 @@ function FarmerProfileView({
       {/* Official Government Portals */}
       <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          Government Procurement Portals
+          {t(language, "govPortals")}
         </h3>
         <div className="grid grid-cols-1 gap-2">
           <button
@@ -673,7 +693,7 @@ function FarmerProfileView({
           >
             <div className="flex items-center gap-2.5">
               <Building2 className="size-4 text-primary" />
-              <span>🏢 Procurement Centre Staff Console</span>
+              <span>🏢 {t(language, "staffDashboard")}</span>
             </div>
             <span className="text-[11px] text-muted-foreground font-mono">/staff</span>
           </button>
@@ -686,7 +706,7 @@ function FarmerProfileView({
           >
             <div className="flex items-center gap-2.5">
               <ShieldCheck className="size-4 text-primary" />
-              <span>🧑‍💼 Directorate Command Center</span>
+              <span>🧑‍💼 {t(language, "adminDashboard")}</span>
             </div>
             <span className="text-[11px] text-muted-foreground font-mono">/admin</span>
           </button>
