@@ -13,12 +13,12 @@ import {
   Phone,
   ShieldCheck,
   ChevronRight,
+  ChevronLeft,
   MapPin,
   Settings2,
   Sliders,
   LogOut,
   Sparkles,
-  Navigation,
   PlayCircle,
   Building2,
 } from "lucide-react";
@@ -170,10 +170,12 @@ function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) 
 function Onboarding({
   step,
   onNext,
+  onBack,
   onSkip,
 }: {
   step: number;
   onNext: () => void;
+  onBack: () => void;
   onSkip: () => void;
 }) {
   const item = ONBOARDING[step] ?? ONBOARDING[0];
@@ -182,7 +184,18 @@ function Onboarding({
       <section className="relative mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-[2rem] bg-primary p-5 text-primary-foreground shadow-float sm:min-h-[760px]">
         <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
         <div className="flex items-center justify-between">
-          <Logo inverse />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex size-8 items-center justify-center rounded-full bg-white/15 text-primary-foreground hover:bg-white/25 transition-all"
+              aria-label="Previous step"
+              title="Go Back"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <Logo inverse />
+          </div>
           <button
             className="text-xs font-semibold text-primary-foreground/75 hover:text-white transition-colors"
             onClick={onSkip}
@@ -198,9 +211,6 @@ function Onboarding({
             height={912}
             className="h-full w-full object-cover"
           />
-          <div className={`journey-marker journey-${item.focus}`}>
-            <Navigation className="size-4" />
-          </div>
           <div className="queue-ticket">
             <span>YOUR TOKEN</span>
             <strong>#47</strong>
@@ -211,7 +221,15 @@ function Onboarding({
           <p className="eyebrow text-secondary">{item.eyebrow}</p>
           <h1 className="mt-3 font-display text-5xl leading-none">{item.title}</h1>
           <p className="mt-4 max-w-xs text-sm leading-6 text-primary-foreground/75">{item.copy}</p>
-          <div className="mt-8 grid grid-cols-[1fr_auto] items-center gap-4">
+          <div className="mt-8 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex items-center gap-1 rounded-xl border border-white/25 bg-white/10 px-3.5 py-2 text-xs font-semibold text-primary-foreground hover:bg-white/20 transition-all active:scale-95"
+            >
+              <ChevronLeft className="size-4" /> Back
+            </button>
+
             <div className="flex gap-1.5">
               {ONBOARDING.map((_, index) => (
                 <span
@@ -220,7 +238,12 @@ function Onboarding({
                 />
               ))}
             </div>
-            <AppButton tone="soft" onClick={onNext} className="flex items-center gap-1 font-semibold">
+
+            <AppButton
+              tone="soft"
+              onClick={onNext}
+              className="flex items-center gap-1 font-semibold text-xs py-2 px-4 shadow-md"
+            >
               {step === 2 ? "Open KisanQueue" : "Next"}
               <ChevronRight className="size-4" />
             </AppButton>
@@ -257,7 +280,10 @@ function KisanQueueApp() {
         } ${highContrast ? "contrast-125" : ""}`}
       >
         <Splash
-          onNext={() => setFarmerScreen("onboarding")}
+          onNext={() => {
+            setOnboardingStep(0);
+            setFarmerScreen("onboarding");
+          }}
           onSkip={() => setFarmerScreen("home")}
         />
       </div>
@@ -274,16 +300,26 @@ function KisanQueueApp() {
       >
         <Onboarding
           step={onboardingStep}
+          onBack={() => {
+            if (onboardingStep > 0) {
+              setOnboardingStep((v) => v - 1);
+            } else {
+              setFarmerScreen("splash");
+            }
+          }}
           onSkip={() => setFarmerScreen("home")}
-          onNext={() =>
-            onboardingStep < 2
-              ? setOnboardingStep((v) => v + 1)
-              : setFarmerScreen("home")
-          }
+          onNext={() => {
+            if (onboardingStep < 2) {
+              setOnboardingStep((v) => v + 1);
+            } else {
+              setFarmerScreen("home");
+            }
+          }}
         />
       </div>
     );
   }
+
 
   // Main Farmer App
   return (
