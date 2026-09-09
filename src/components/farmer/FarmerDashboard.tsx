@@ -319,7 +319,7 @@ export function FarmerDashboard({
             </span>
             <button
               type="button"
-              onClick={onOpenBooking}
+              onClick={() => onSelectCentre(recommendedCentre.name)}
               className="font-bold text-primary hover:underline inline-flex items-center gap-1 text-xs"
             >
               Book Here <ChevronRight className="size-3" />

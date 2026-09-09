@@ -265,6 +265,7 @@ function KisanQueueApp() {
   const [authOpen, setAuthOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [selectedCentreForBooking, setSelectedCentreForBooking] = useState<string | null>(null);
   const [assistedModalOpen, setAssistedModalOpen] = useState(false);
 
   useEffect(() => {
@@ -418,13 +419,19 @@ function KisanQueueApp() {
           <div className="phone-content">
             {farmerScreen === "home" && (
               <FarmerDashboard
-                onOpenBooking={() => setBookingModalOpen(true)}
+                onOpenBooking={() => {
+                  setSelectedCentreForBooking(null);
+                  setBookingModalOpen(true);
+                }}
                 onOpenLiveQueue={() => setFarmerScreen("queue")}
                 onOpenBookingsList={() => setFarmerScreen("bookings")}
                 onOpenPayments={() => setFarmerScreen("payment")}
                 onOpenAssisted={() => setAssistedModalOpen(true)}
                 onOpenMap={() => setFarmerScreen("map")}
-                onSelectCentre={() => setBookingModalOpen(true)}
+                onSelectCentre={(centreName) => {
+                  setSelectedCentreForBooking(centreName);
+                  setBookingModalOpen(true);
+                }}
                 onOpenNotifications={() => setNotificationsOpen(true)}
               />
             )}
@@ -440,7 +447,10 @@ function KisanQueueApp() {
             {farmerScreen === "bookings" && (
               <MyBookingsView
                 onBack={() => setFarmerScreen("home")}
-                onOpenReschedule={() => setBookingModalOpen(true)}
+                onOpenReschedule={(booking) => {
+                  setSelectedCentreForBooking(booking?.centreName || null);
+                  setBookingModalOpen(true);
+                }}
               />
             )}
 
@@ -455,7 +465,10 @@ function KisanQueueApp() {
             {farmerScreen === "map" && (
               <CentreMapView
                 onBack={() => setFarmerScreen("home")}
-                onSelectCentre={() => setBookingModalOpen(true)}
+                onSelectCentre={(centreName) => {
+                  setSelectedCentreForBooking(centreName);
+                  setBookingModalOpen(true);
+                }}
               />
             )}
 
@@ -475,7 +488,14 @@ function KisanQueueApp() {
       {/* Global Modals */}
       <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
-      <SlotBookingModal isOpen={bookingModalOpen} onClose={() => setBookingModalOpen(false)} />
+      <SlotBookingModal
+        isOpen={bookingModalOpen}
+        initialCentreName={selectedCentreForBooking}
+        onClose={() => {
+          setBookingModalOpen(false);
+          setSelectedCentreForBooking(null);
+        }}
+      />
       <AssistedBookingModal isOpen={assistedModalOpen} onClose={() => setAssistedModalOpen(false)} />
     </div>
   );

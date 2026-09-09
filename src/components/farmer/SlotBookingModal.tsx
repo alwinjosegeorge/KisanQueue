@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useKisanQueue } from "@/lib/store";
 import { X, Check, Sparkles, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, ChevronRight } from "lucide-react";
 
-export function SlotBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function SlotBookingModal({
+  isOpen,
+  onClose,
+  initialCentreName,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  initialCentreName?: string | null;
+}) {
   const { crops, centres, bookSlot, getRecommendedCentre, cancelBooking } = useKisanQueue();
   const recommendedCentre = getRecommendedCentre();
 
@@ -14,6 +22,35 @@ export function SlotBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose
   const [selectedSlotTime, setSelectedSlotTime] = useState("10:00 – 11:00 AM");
   const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null);
   const [assignedQueueNumber, setAssignedQueueNumber] = useState<number | null>(null);
+
+  // Every time the booking modal is opened or a centre is selected, always start from Step 1 (Crop & Quantity)
+  useEffect(() => {
+    if (isOpen) {
+      setStep(1);
+      setConfirmedBookingId(null);
+      setAssignedQueueNumber(null);
+
+      if (initialCentreName) {
+        const match = centres.find(
+          (c) =>
+            c.name.toLowerCase().trim() === initialCentreName.toLowerCase().trim() ||
+            c.id.toLowerCase().trim() === initialCentreName.toLowerCase().trim()
+        );
+        if (match) {
+          setSelectedCentreId(match.id);
+        }
+      } else {
+        setSelectedCentreId(recommendedCentre.id);
+      }
+    }
+  }, [isOpen, initialCentreName, recommendedCentre.id, centres]);
+
+  const handleClose = () => {
+    setStep(1);
+    setConfirmedBookingId(null);
+    setAssignedQueueNumber(null);
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -54,7 +91,7 @@ export function SlotBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose
             </h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close modal"
             className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
           >
@@ -341,7 +378,7 @@ export function SlotBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
                 >
                   Go to Dashboard
@@ -352,7 +389,7 @@ export function SlotBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose
                     if (confirmedBookingId) {
                       cancelBooking(confirmedBookingId);
                     }
-                    onClose();
+                    handleClose();
                   }}
                   className="rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 py-3 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 transition-colors"
                 >
