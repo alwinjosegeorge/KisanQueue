@@ -124,8 +124,12 @@ export function FarmerDashboard({
         <div className="relative z-10">
           <div className="flex items-center justify-between">
             <span className="eyebrow text-secondary">{t(language, "upcomingBooking")}</span>
-            <span className="live-pill inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-              <span className="size-2 rounded-full bg-secondary animate-ping" /> Live Queue
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-red-500" />
+              </span>
+              Live Queue
             </span>
           </div>
 

@@ -393,8 +393,12 @@ function KisanQueueApp() {
               <span className="text-[10px] uppercase font-bold tracking-wider text-secondary">
                 Active Booking
               </span>
-              <span className="flex items-center gap-1 text-[10px] font-bold text-secondary">
-                <span className="size-1.5 rounded-full bg-secondary animate-ping" /> Live
+              <span className="flex items-center gap-1.5 text-[10px] font-bold text-red-300">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-red-500" />
+                </span>
+                Live
               </span>
             </div>
             <p className="relative mt-1 font-display text-3xl font-black text-secondary">

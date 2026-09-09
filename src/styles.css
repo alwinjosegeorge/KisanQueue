@@ -103,7 +103,7 @@ button { cursor: pointer; }
 .notification-dot { position: absolute; right: .32rem; top: .28rem; width: .45rem; height: .45rem; border-radius: 50%; background: var(--secondary); outline: 2px solid var(--primary); }
 .hero-queue-card { position: relative; z-index: 2; border-radius: 1.3rem; background: var(--primary); color: var(--primary-foreground); padding: 1.15rem; box-shadow: var(--shadow-float); }
 .live-pill { display: inline-flex; align-items: center; gap: .35rem; border-radius: 999px; background: color-mix(in oklab, var(--primary-foreground) 12%, transparent); padding: .3rem .55rem; color: var(--primary-foreground); font-size: .58rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.live-pill span { width: .4rem; height: .4rem; border-radius: 50%; background: var(--secondary); animation: live-pulse 2s ease-in-out infinite; }
+.live-pill span { width: .4rem; height: .4rem; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: live-pulse 1.5s ease-in-out infinite; }
 .live-pill-light { background: color-mix(in oklab, var(--status-low) 12%, var(--card)); color: var(--status-low); }.live-pill-light span { background: var(--status-low); }
 .section-title { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .55rem; }
 .section-title h2 { font-size: .7rem; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; color: var(--muted-foreground); }
