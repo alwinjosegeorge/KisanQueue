@@ -14,10 +14,6 @@ import {
   Maximize2,
   CalendarDays,
   MoreHorizontal,
-  Droplets,
-  ThermometerSun,
-  CheckCircle2,
-  ShieldCheck,
   Wheat,
 } from "lucide-react";
 
@@ -351,56 +347,6 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
               ? t(language, "congestionMed")
               : t(language, "delayReported")}
           </span>
-        </div>
-
-        {/* Conditions Section (Matching Reference Image) */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-foreground tracking-tight">{t(language, "conditions")}</h3>
-          <div className="grid grid-cols-3 gap-2.5">
-            {/* pH Level */}
-            <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
-              <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
-                <ShieldCheck className="size-3.5 text-primary" />
-                <span className="text-[10.5px] font-medium">{t(language, "phLevel")}</span>
-              </div>
-              <p className="text-base font-bold text-foreground">7.2</p>
-              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">{t(language, "neutralIdeal")}</span>
-            </div>
-
-            {/* Temperature */}
-            <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
-              <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
-                <ThermometerSun className="size-3.5 text-amber-500" />
-                <span className="text-[10.5px] font-medium">{t(language, "temperature")}</span>
-              </div>
-              <p className="text-base font-bold text-foreground">24°C</p>
-              <span className="text-[10px] font-semibold text-muted-foreground">{t(language, "sunnyDry")}</span>
-            </div>
-
-            {/* Moisture */}
-            <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
-              <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
-                <Droplets className="size-3.5 text-blue-500" />
-                <span className="text-[10.5px] font-medium">{t(language, "moisture")}</span>
-              </div>
-              <p className="text-base font-bold text-foreground">13.8%</p>
-              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">{t(language, "optimalMoisture")}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Checklist Item */}
-        <div className="flex items-center justify-between rounded-2xl border border-border/80 bg-background/60 p-3">
-          <div className="flex items-center gap-3">
-            <div className="flex size-7 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xs">
-              <CheckCircle2 className="size-4" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-foreground">{t(language, "qualityPreCheck")}</p>
-              <p className="text-[10.5px] text-muted-foreground">{t(language, "qualityPreCheckSub")}</p>
-            </div>
-          </div>
-          <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400">{t(language, "verified")}</span>
         </div>
 
         {/* Quick Centre Switcher Pills */}
