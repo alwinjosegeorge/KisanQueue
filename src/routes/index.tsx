@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   CalendarDays,
   UsersRound,
@@ -57,16 +57,8 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
     ],
   }),
-  component: AppRoot,
+  component: KisanQueueApp,
 });
-
-function AppRoot() {
-  return (
-    <KisanQueueProvider>
-      <KisanQueueApp />
-    </KisanQueueProvider>
-  );
-}
 
 type FarmerScreen = "home" | "bookings" | "queue" | "timeline" | "payment" | "map" | "profile";
 
@@ -103,6 +95,10 @@ function KisanQueueApp() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [assistedModalOpen, setAssistedModalOpen] = useState(false);
+
+  useEffect(() => {
+    setRole("farmer");
+  }, [setRole]);
 
   return (
     <div
@@ -280,6 +276,7 @@ function FarmerBottomNav({
 
 function FarmerProfileView({ onBack }: { onBack: () => void }) {
   const { user, language, setLanguage, setRole } = useKisanQueue();
+  const navigate = useNavigate();
 
   return (
     <div className="content-stack pt-2 space-y-4">
@@ -382,16 +379,22 @@ function FarmerProfileView({ onBack }: { onBack: () => void }) {
         </span>
         <div className="flex items-center justify-center gap-2">
           <button
-            onClick={() => setRole("staff")}
-            className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold hover:bg-muted"
+            onClick={() => {
+              setRole("staff");
+              navigate({ to: "/staff" });
+            }}
+            className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold hover:bg-muted transition-all"
           >
-            🏢 Open Staff Console
+            🏢 Open Staff Console (/staff)
           </button>
           <button
-            onClick={() => setRole("admin")}
-            className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold hover:bg-muted"
+            onClick={() => {
+              setRole("admin");
+              navigate({ to: "/admin" });
+            }}
+            className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold hover:bg-muted transition-all"
           >
-            🧑‍💼 Open Admin Center
+            🧑‍💼 Open Admin Center (/admin)
           </button>
         </div>
       </div>

@@ -2,10 +2,29 @@ import React from "react";
 import { useKisanQueue } from "@/lib/store";
 import { Role, Language } from "@/lib/types";
 import { Bell, Globe, Sparkles, Type } from "lucide-react";
+import { useNavigate, useLocation } from "@tanstack/react-router";
 
 export function DemoHeader({ onOpenNotifications, onOpenAuth }: { onOpenNotifications: () => void; onOpenAuth: () => void }) {
   const { role, setRole, language, setLanguage, largeText, setLargeText, notifications } = useKisanQueue();
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const pathname = location.pathname;
+  const isStaff = pathname === "/staff" || (pathname !== "/" && pathname !== "/admin" && role === "staff");
+  const isAdmin = pathname === "/admin" || (pathname !== "/" && pathname !== "/staff" && role === "admin");
+  const isFarmer = !isStaff && !isAdmin;
+
+  const handleRoleSelect = (targetRole: Role) => {
+    setRole(targetRole);
+    if (targetRole === "staff") {
+      navigate({ to: "/staff" });
+    } else if (targetRole === "admin") {
+      navigate({ to: "/admin" });
+    } else {
+      navigate({ to: "/" });
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b border-border/70 bg-card/90 px-4 py-2.5 backdrop-blur-md">
@@ -16,9 +35,9 @@ export function DemoHeader({ onOpenNotifications, onOpenAuth }: { onOpenNotifica
         </span>
         <button
           type="button"
-          onClick={() => setRole("farmer")}
+          onClick={() => handleRoleSelect("farmer")}
           className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
-            role === "farmer"
+            isFarmer
               ? "bg-primary text-primary-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           }`}
@@ -28,9 +47,9 @@ export function DemoHeader({ onOpenNotifications, onOpenAuth }: { onOpenNotifica
 
         <button
           type="button"
-          onClick={() => setRole("staff")}
+          onClick={() => handleRoleSelect("staff")}
           className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
-            role === "staff"
+            isStaff
               ? "bg-primary text-primary-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           }`}
@@ -40,9 +59,9 @@ export function DemoHeader({ onOpenNotifications, onOpenAuth }: { onOpenNotifica
 
         <button
           type="button"
-          onClick={() => setRole("admin")}
+          onClick={() => handleRoleSelect("admin")}
           className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
-            role === "admin"
+            isAdmin
               ? "bg-primary text-primary-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           }`}
