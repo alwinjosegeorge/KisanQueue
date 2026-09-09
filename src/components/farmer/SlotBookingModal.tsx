@@ -3,7 +3,7 @@ import { useKisanQueue } from "@/lib/store";
 import { X, Check, Sparkles, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, ChevronRight } from "lucide-react";
 
 export function SlotBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { crops, centres, bookSlot, getRecommendedCentre } = useKisanQueue();
+  const { crops, centres, bookSlot, getRecommendedCentre, cancelBooking } = useKisanQueue();
   const recommendedCentre = getRecommendedCentre();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
@@ -338,13 +338,27 @@ export function SlotBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-full rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md"
-              >
-                Go to Farmer Dashboard
-              </button>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
+                >
+                  Go to Dashboard
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirmedBookingId) {
+                      cancelBooking(confirmedBookingId);
+                    }
+                    onClose();
+                  }}
+                  className="rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 py-3 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 transition-colors"
+                >
+                  Cancel Slot
+                </button>
+              </div>
             </div>
           )}
         </div>

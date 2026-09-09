@@ -11,6 +11,7 @@ import {
   X,
   MapPin,
   Sparkles,
+  XCircle,
 } from "lucide-react";
 
 interface LiveQueueViewProps {
@@ -20,7 +21,8 @@ interface LiveQueueViewProps {
 }
 
 export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: LiveQueueViewProps) {
-  const { user, activeBooking, centres, queue, nowServing, language, predictWaitingTime } = useKisanQueue();
+  const { user, activeBooking, centres, queue, nowServing, language, predictWaitingTime, cancelBooking } = useKisanQueue();
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || centres[0];
   const userQueueNumber = activeBooking?.queueNumber || 47;
   const prediction = predictWaitingTime(currentCentre.id, userQueueNumber);
@@ -197,17 +199,19 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
       </section>
 
       {/* Rebooking & Reschedule Option (Can't make your slot?) */}
-      <section className="rounded-2xl border border-border bg-muted/40 p-4">
-        <h4 className="text-xs font-bold">Running late or can't make your slot?</h4>
-        <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-          KisanQueue allows one-tap rescheduling without losing your verified eligibility.
-        </p>
+      <section className="rounded-2xl border border-border bg-muted/40 p-4 space-y-3">
+        <div>
+          <h4 className="text-xs font-bold">Running late or can't make your slot?</h4>
+          <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+            KisanQueue allows one-tap rescheduling or cancellation so your slot can be offered to waiting farmers.
+          </p>
+        </div>
 
-        <div className="mt-3 flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={onOpenDirections}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary py-2.5 text-xs font-bold text-primary-foreground shadow-sm"
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-primary py-2.5 text-xs font-bold text-primary-foreground shadow-sm hover:opacity-90"
           >
             <Navigation className="size-4" /> Get Directions
           </button>
@@ -215,12 +219,72 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
           <button
             type="button"
             onClick={onOpenReschedule}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-2.5 text-xs font-bold hover:bg-muted"
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-2.5 text-xs font-bold hover:bg-muted"
           >
             <RefreshCw className="size-3.5" /> Reschedule Slot
           </button>
         </div>
+
+        {activeBooking && (
+          <button
+            type="button"
+            onClick={() => setShowCancelConfirm(true)}
+            className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/60 dark:bg-rose-950/30 dark:border-rose-900/50 py-2.5 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors"
+          >
+            <XCircle className="size-4" /> Cancel This Booking
+          </button>
+        )}
       </section>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && activeBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm overflow-hidden rounded-[24px] border border-border bg-card p-5 text-foreground shadow-2xl space-y-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2 text-rose-600">
+                <AlertTriangle className="size-5" />
+                <h3 className="font-display font-bold text-base text-foreground">Cancel Booking?</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCancelConfirm(false)}
+                className="rounded-full p-1 text-muted-foreground hover:bg-muted"
+                aria-label="Close"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Are you sure you want to cancel your queue slot for <strong>Token #{activeBooking.queueNumber}</strong>? You will lose your current spot in the live queue.
+            </p>
+            <div className="rounded-xl bg-muted/40 p-3 text-xs space-y-1 font-mono">
+              <p>Booking ID: <strong>{activeBooking.id}</strong></p>
+              <p>Crop: <strong>{activeBooking.crop} ({activeBooking.quantityKg} kg)</strong></p>
+              <p>Slot: <strong>{activeBooking.date} · {activeBooking.slotTime}</strong></p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowCancelConfirm(false)}
+                className="rounded-xl border border-border bg-background py-2.5 text-xs font-semibold hover:bg-muted"
+              >
+                Keep Spot
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  cancelBooking(activeBooking.id);
+                  setShowCancelConfirm(false);
+                  onBack();
+                }}
+                className="rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow hover:bg-rose-700 transition-colors"
+              >
+                Yes, Cancel Slot
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

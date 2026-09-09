@@ -495,13 +495,18 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
   };
 
   const cancelBooking = (bookingId: string) => {
+    const target = bookings.find((b) => b.id === bookingId);
     setBookings((prev) =>
       prev.map((b) => (b.id === bookingId ? { ...b, status: "cancelled" } : b))
     );
 
+    if (target) {
+      setQueue((prev) => prev.filter((item) => item.queueNumber !== target.queueNumber));
+    }
+
     addNotification(
       "Booking Cancelled ✕",
-      `Your procurement booking #${bookingId} has been cancelled.`,
+      `Slot for Token #${target?.queueNumber || bookingId} at ${target?.centreName || "Procurement Centre"} has been cancelled and released.`,
       "booking"
     );
   };

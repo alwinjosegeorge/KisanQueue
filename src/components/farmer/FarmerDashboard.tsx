@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useKisanQueue } from "@/lib/store";
 import { t } from "@/lib/translations";
 import {
@@ -15,6 +15,8 @@ import {
   Headphones,
   Map,
   Bell,
+  XCircle,
+  X,
 } from "lucide-react";
 
 interface FarmerDashboardProps {
@@ -38,8 +40,18 @@ export function FarmerDashboard({
   onSelectCentre,
   onOpenNotifications,
 }: FarmerDashboardProps) {
-  const { user, activeBooking, centres, language, nowServing, predictWaitingTime, getRecommendedCentre, notifications } =
-    useKisanQueue();
+  const {
+    user,
+    activeBooking,
+    centres,
+    language,
+    nowServing,
+    predictWaitingTime,
+    getRecommendedCentre,
+    notifications,
+    cancelBooking,
+  } = useKisanQueue();
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const recommendedCentre = getRecommendedCentre();
@@ -118,67 +130,99 @@ export function FarmerDashboard({
       )}
 
       {/* LIVE QUEUE HERO CARD (Styled with bg-dots & SIH visual language) */}
-      <section className="hero-queue-card relative overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground shadow-xl">
-        <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
+      {activeBooking ? (
+        <section className="hero-queue-card relative overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground shadow-xl">
+          <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
 
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <span className="eyebrow text-secondary">{t(language, "upcomingBooking")}</span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-                <span className="relative inline-flex size-2 rounded-full bg-red-500" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between">
+              <span className="eyebrow text-secondary">{t(language, "upcomingBooking")}</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-red-500" />
+                </span>
+                Live Queue
               </span>
-              Live Queue
-            </span>
-          </div>
-
-          <h2 className="mt-2 font-display text-xl font-bold leading-tight">
-            {activeBooking ? activeBooking.centreName : currentCentre.name}
-          </h2>
-          <p className="mt-0.5 text-xs text-primary-foreground/75">
-            {activeBooking ? `${activeBooking.crop} · ${activeBooking.quantityKg} kg` : "Paddy (നെല്ല്) · 420 kg"} · {activeBooking?.slotTime || "10:30 AM"}
-          </p>
-
-          <div className="mt-4 grid grid-cols-2 gap-3 rounded-2xl bg-white/10 p-3.5 backdrop-blur-sm">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-primary-foreground/60">
-                {t(language, "nowServing")}
-              </p>
-              <p className="font-display text-4xl font-extrabold text-secondary">#{nowServing}</p>
-              <p className="text-[11px] text-primary-foreground/75 mt-0.5">Yard Gate 1</p>
             </div>
 
-            <div className="border-l border-white/15 pl-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-primary-foreground/60">
-                {t(language, "yourToken")}
-              </p>
-              <p className="font-display text-4xl font-extrabold text-white">#{userQueueNumber}</p>
-              <p className="text-[11px] text-primary-foreground/80 mt-0.5">
-                <strong>{farmersAhead}</strong> farmers ahead
-              </p>
+            <h2 className="mt-2 font-display text-xl font-bold leading-tight">
+              {activeBooking.centreName}
+            </h2>
+            <p className="mt-0.5 text-xs text-primary-foreground/75">
+              {activeBooking.crop} · {activeBooking.quantityKg} kg · {activeBooking.slotTime}
+            </p>
+
+            <div className="mt-4 grid grid-cols-2 gap-3 rounded-2xl bg-white/10 p-3.5 backdrop-blur-sm">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-primary-foreground/60">
+                  {t(language, "nowServing")}
+                </p>
+                <p className="font-display text-4xl font-extrabold text-secondary">#{nowServing}</p>
+                <p className="text-[11px] text-primary-foreground/75 mt-0.5">Yard Gate 1</p>
+              </div>
+
+              <div className="border-l border-white/15 pl-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-primary-foreground/60">
+                  {t(language, "yourToken")}
+                </p>
+                <p className="font-display text-4xl font-extrabold text-white">#{userQueueNumber}</p>
+                <p className="text-[11px] text-primary-foreground/80 mt-0.5">
+                  <strong>{farmersAhead}</strong> farmers ahead
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-center justify-between text-xs text-primary-foreground/85">
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="size-3.5 text-secondary" />
+                {t(language, "approxTime")}: <strong className="text-secondary">{prediction.timeStr}</strong>
+              </span>
+              <span className="text-[11px] font-medium opacity-80">
+                ~{prediction.minutesLeft} min wait
+              </span>
+            </div>
+
+            <div className="mt-4 grid grid-cols-[1fr_auto] gap-2">
+              <button
+                type="button"
+                onClick={onOpenLiveQueue}
+                className="flex items-center justify-center gap-2 rounded-xl bg-secondary py-3 text-xs font-bold text-secondary-foreground shadow-lg transition-transform hover:scale-[1.01]"
+              >
+                Track Live Queue <ChevronRight className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(true)}
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3.5 py-3 text-xs font-semibold text-white hover:bg-rose-600 hover:border-rose-600 transition-colors"
+                title="Cancel slot"
+              >
+                <XCircle className="size-4" /> Cancel Slot
+              </button>
             </div>
           </div>
-
-          <div className="mt-3 flex items-center justify-between text-xs text-primary-foreground/85">
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="size-3.5 text-secondary" />
-              {t(language, "approxTime")}: <strong className="text-secondary">{prediction.timeStr}</strong>
-            </span>
-            <span className="text-[11px] font-medium opacity-80">
-              ~{prediction.minutesLeft} min wait
-            </span>
+        </section>
+      ) : (
+        <section className="rounded-3xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center space-y-3">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <CalendarDays className="size-6" />
           </div>
-
+          <div>
+            <h3 className="font-display text-lg font-bold">No Active Procurement Slot</h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+              Your previous booking was cancelled or completed. Book a new slot anytime to guarantee minimum wait time.
+            </p>
+          </div>
           <button
             type="button"
-            onClick={onOpenLiveQueue}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-secondary py-3 text-xs font-bold text-secondary-foreground shadow-lg transition-transform hover:scale-[1.01]"
+            onClick={onOpenBooking}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
           >
-            Track Real-time Queue Pipeline <ChevronRight className="size-4" />
+            + Book Procurement Slot
           </button>
-        </div>
-      </section>
+        </section>
+      )}
+
 
       {/* Quick Actions (SIH Priority 1-4) */}
       <section>
@@ -335,6 +379,55 @@ export function FarmerDashboard({
           </div>
         ))}
       </section>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && activeBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm overflow-hidden rounded-[24px] border border-border bg-card p-5 text-foreground shadow-2xl space-y-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2 text-rose-600">
+                <AlertTriangle className="size-5" />
+                <h3 className="font-display font-bold text-base text-foreground">Cancel Booking?</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(false)}
+                className="rounded-full p-1 text-muted-foreground hover:bg-muted"
+                aria-label="Close"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Are you sure you want to cancel your slot for <strong>Token #{activeBooking.queueNumber}</strong> at <strong>{activeBooking.centreName}</strong>? This slot will be released for other waiting farmers.
+            </p>
+            <div className="rounded-xl bg-muted/40 p-3 text-xs space-y-1 font-mono">
+              <p>Booking ID: <strong>{activeBooking.id}</strong></p>
+              <p>Crop: <strong>{activeBooking.crop} ({activeBooking.quantityKg} kg)</strong></p>
+              <p>Slot: <strong>{activeBooking.date} · {activeBooking.slotTime}</strong></p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(false)}
+                className="rounded-xl border border-border bg-background py-2.5 text-xs font-semibold hover:bg-muted"
+              >
+                Keep Booking
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  cancelBooking(activeBooking.id);
+                  setShowCancelModal(false);
+                }}
+                className="rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow hover:bg-rose-700 transition-colors"
+              >
+                Yes, Cancel Slot
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
