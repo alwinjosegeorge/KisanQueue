@@ -66,9 +66,8 @@ type FarmerScreen = "splash" | "onboarding" | "home" | "bookings" | "queue" | "t
 const FARMER_NAV_ITEMS: { id: FarmerScreen; label: string; icon: typeof Leaf }[] = [
   { id: "home", label: "Home", icon: Sprout },
   { id: "bookings", label: "Bookings", icon: CalendarDays },
+  { id: "map", label: "Map", icon: MapPin },
   { id: "queue", label: "Queue", icon: UsersRound },
-  { id: "timeline", label: "Tracking", icon: PackageCheck },
-  { id: "payment", label: "Payments", icon: IndianRupee },
   { id: "profile", label: "Profile", icon: UserRound },
 ];
 
@@ -520,9 +519,9 @@ function FarmerBottomNav({
               className={`bottom-nav-item ${active ? "bottom-nav-item-active" : ""}`}
               onClick={() => onNavigate(id)}
               aria-label={label}
+              title={label}
             >
-              <Icon className="size-4 shrink-0" strokeWidth={2.4} />
-              {active && <span className="truncate">{label}</span>}
+              <Icon className="size-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
             </button>
           );
         })}

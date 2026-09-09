@@ -12,6 +12,12 @@ import {
   LocateFixed,
   Maximize2,
   CalendarDays,
+  MoreHorizontal,
+  Droplets,
+  ThermometerSun,
+  CheckCircle2,
+  ShieldCheck,
+  Wheat,
 } from "lucide-react";
 
 interface CentreMapViewProps {
@@ -37,7 +43,7 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
   const { centres, getRecommendedCentre } = useKisanQueue();
   const recommendedCentre = getRecommendedCentre();
   const [selectedId, setSelectedId] = useState(recommendedCentre.id);
-  const [mapType, setMapType] = useState<"street" | "satellite">("street");
+  const [mapType, setMapType] = useState<"street" | "satellite">("satellite");
   const [isMapReady, setIsMapReady] = useState(false);
 
   const activeCentre = centres.find((c) => c.id === selectedId) || centres[0];
@@ -69,35 +75,31 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
       });
       mapInstanceRef.current = map;
 
-      // Add default tile layer (Carto Voyager - crisp, fast, modern map)
-      const streetLayer = L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+      // Default satellite aerial photography
+      const satLayer = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         {
           maxZoom: 19,
-          subdomains: "abcd",
+          attribution: "Esri Satellite",
         }
       );
-      streetLayer.addTo(map);
-      tileLayerRef.current = streetLayer;
+      satLayer.addTo(map);
+      tileLayerRef.current = satLayer;
 
       // 1. Add Farmer Origin Marker
       const farmerIcon = L.divIcon({
         className: "custom-farmer-pin",
         html: `
-          <div style="display:flex; flex-direction:column; align-items:center; transform: translate(-50%, -50%);">
-            <div style="position:relative; display:flex; align-items:center; justify-content:center;">
-              <span style="position:absolute; width:28px; height:28px; border-radius:50%; background-color:rgba(18,61,53,0.35); animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite;"></span>
-              <div style="position:relative; display:flex; width:22px; height:22px; border-radius:50%; background-color:#123D35; border:2px solid white; box-shadow:0 4px 6px -1px rgba(0,0,0,0.3); align-items:center; justify-content:center; color:white; font-size:10px;">
-                🚜
-              </div>
+          <div style="display:flex; flex-direction:column; align-items:center; transform: translate(-50%, -100%); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));">
+            <div style="background:#111815; color:white; padding:5px 12px; border-radius:18px; font-size:10.5px; font-weight:800; border:1.5px solid rgba(255,255,255,0.4); display:flex; align-items:center; gap:6px; white-space:nowrap;">
+              <span>🚜</span>
+              <span>My Farm (Kumarakom)</span>
             </div>
-            <span style="margin-top:3px; font-weight:800; font-size:9px; background:white; color:#123D35; padding:2px 6px; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,0.15); border:1px solid #e5e7eb; white-space:nowrap;">
-              Your Farm
-            </span>
+            <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid #111815; margin-top:-1px;"></div>
           </div>
         `,
-        iconSize: [30, 42],
-        iconAnchor: [15, 21],
+        iconSize: [140, 36],
+        iconAnchor: [70, 36],
       });
 
       L.marker([FARMER_LOCATION.lat, FARMER_LOCATION.lng], { icon: farmerIcon })
@@ -106,26 +108,27 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
           `<strong>🚜 Your Farm</strong><br><span style="font-size:11px; color:#6b7280;">Kumarakom Agricultural Belt</span>`
         );
 
-      // 2. Add Centre Pins
+      // 2. Add Centre Pins (Speech-bubble style matching reference)
       centres.forEach((c) => {
         const coords = CENTRE_COORDS[c.id] || { lat: 9.58, lng: 76.52 };
         const isRec = c.id === recommendedCentre.id;
-        const color =
-          c.status === "normal" ? "#16a34a" : c.status === "busy" ? "#d97706" : "#dc2626";
 
         const centreIcon = L.divIcon({
           className: `custom-centre-pin-${c.id}`,
           html: `
-            <div style="display:flex; flex-direction:column; align-items:center; transform: translate(-50%, -100%); cursor:pointer;">
-              <div style="background-color:${color}; color:white; padding:4px 8px; border-radius:12px; font-size:10px; font-weight:700; box-shadow:0 4px 8px rgba(0,0,0,0.25); border:2px solid white; display:flex; align-items:center; gap:4px; white-space:nowrap;">
-                ${isRec ? "⭐" : "🌾"} <span>${c.name.replace(" Procurement Centre", "")}</span>
-                <span style="background:rgba(0,0,0,0.25); border-radius:9999px; padding:1px 5px; font-size:8px;">${c.currentQueueLength} in line</span>
+            <div style="display:flex; flex-direction:column; align-items:center; transform: translate(-50%, -100%); cursor:pointer; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.3));">
+              <div style="background:white; color:#111815; padding:6px 12px; border-radius:20px; font-size:11px; font-weight:800; border:2px solid ${isRec ? '#123D35' : '#e5e7eb'}; display:flex; align-items:center; gap:6px; white-space:nowrap;">
+                <span style="display:inline-flex; width:20px; height:20px; border-radius:50%; background:#123D35; color:white; align-items:center; justify-content:center; font-size:10px;">🌾</span>
+                <span>${c.name.replace(" Procurement Centre", "")}</span>
+                <span style="background:#EDF4EE; color:#123D35; border-radius:9999px; padding:2px 8px; font-size:9.5px; font-weight:700;">
+                  ${c.currentQueueLength} in line · ${c.distanceKm} km
+                </span>
               </div>
-              <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid ${color}; margin-top:-1px;"></div>
+              <div style="width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-top:8px solid white; margin-top:-1px;"></div>
             </div>
           `,
-          iconSize: [120, 36],
-          iconAnchor: [60, 36],
+          iconSize: [160, 42],
+          iconAnchor: [80, 42],
         });
 
         const marker = L.marker([coords.lat, coords.lng], { icon: centreIcon })
@@ -219,7 +222,7 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
       color: "#123D35",
       weight: 3.5,
       dashArray: "8, 10",
-      opacity: 0.85,
+      opacity: 0.9,
     }).addTo(map);
 
     routeLineRef.current = polyline;
@@ -243,57 +246,41 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
   };
 
   return (
-    <div className="content-stack pt-2 space-y-4">
-      {/* Header */}
+    <div className="content-stack pt-2 space-y-3.5">
+      {/* Top Header Bar matching Reference Design */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex size-9 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted"
-            aria-label="Back to dashboard"
-          >
-            <ArrowLeft className="size-4" />
-          </button>
-          <div>
-            <h1 className="font-display text-xl font-bold">Procurement Map</h1>
-            <p className="text-xs text-muted-foreground">Live GPS Telemetry & Kerala Centre Grid</p>
-          </div>
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted shadow-sm transition-transform active:scale-95"
+          aria-label="Back to dashboard"
+        >
+          <ArrowLeft className="size-4" />
+        </button>
+        <div className="text-center">
+          <h1 className="font-display text-sm font-bold text-foreground">My Fields & Centres</h1>
+          <p className="text-[11px] text-muted-foreground font-medium">Maps View · Live Satellite</p>
         </div>
-
-        {/* Satellite / Street view switch */}
-        <div className="flex items-center rounded-xl border border-border bg-card p-1 shadow-sm text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setMapType("street")}
-            className={`rounded-lg px-2.5 py-1 text-[11px] transition-all ${
-              mapType === "street" ? "bg-primary text-primary-foreground font-bold shadow-sm" : "text-muted-foreground"
-            }`}
-          >
-            Map
-          </button>
-          <button
-            type="button"
-            onClick={() => setMapType("satellite")}
-            className={`rounded-lg px-2.5 py-1 text-[11px] transition-all ${
-              mapType === "satellite" ? "bg-primary text-primary-foreground font-bold shadow-sm" : "text-muted-foreground"
-            }`}
-          >
-            Satellite
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setMapType(mapType === "satellite" ? "street" : "satellite")}
+          className="flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted shadow-sm transition-transform active:scale-95"
+          title={mapType === "satellite" ? "Switch to Map View" : "Switch to Satellite"}
+        >
+          <Layers className="size-4 text-primary" />
+        </button>
       </div>
 
-      {/* Real Interactive Map Container */}
-      <div className="relative h-80 w-full overflow-hidden rounded-3xl border border-border bg-muted shadow-md">
+      {/* Interactive Map Container */}
+      <div className="relative h-[340px] w-full overflow-hidden rounded-[28px] border border-border bg-muted shadow-md">
         <div ref={mapContainerRef} className="h-full w-full z-0" />
 
         {/* Floating Custom Map Controls */}
-        <div className="absolute right-3 top-3 z-10 flex flex-col gap-1.5 shadow-md">
+        <div className="absolute right-3.5 top-3.5 z-10 flex flex-col gap-2">
           <button
             type="button"
             onClick={handleZoomIn}
-            className="flex size-8 items-center justify-center rounded-xl bg-card/95 border border-border font-bold text-foreground hover:bg-muted shadow-sm transition-colors text-sm"
+            className="flex size-9 items-center justify-center rounded-full bg-card/95 border border-border font-bold text-foreground hover:bg-muted shadow-md transition-all text-base"
             title="Zoom in"
           >
             +
@@ -301,7 +288,7 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
           <button
             type="button"
             onClick={handleZoomOut}
-            className="flex size-8 items-center justify-center rounded-xl bg-card/95 border border-border font-bold text-foreground hover:bg-muted shadow-sm transition-colors text-sm"
+            className="flex size-9 items-center justify-center rounded-full bg-card/95 border border-border font-bold text-foreground hover:bg-muted shadow-md transition-all text-base"
             title="Zoom out"
           >
             -
@@ -309,75 +296,36 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
           <button
             type="button"
             onClick={handleFitAll}
-            className="flex size-8 items-center justify-center rounded-xl bg-card/95 border border-border text-foreground hover:bg-muted shadow-sm transition-colors"
+            className="flex size-9 items-center justify-center rounded-full bg-card/95 border border-border text-foreground hover:bg-muted shadow-md transition-all"
             title="Fit All Kerala Centres"
           >
-            <Maximize2 className="size-3.5 text-primary" />
+            <Maximize2 className="size-4 text-primary" />
           </button>
         </div>
 
         {/* Map Legend Overlay */}
-        <div className="absolute bottom-3 left-3 z-10 rounded-xl bg-card/95 border border-border/80 px-2.5 py-1.5 backdrop-blur-sm shadow-md text-[10px] space-y-1">
-          <div className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-[#123D35]" />
-            <span className="font-semibold text-foreground">🚜 Your Farm</span>
+        <div className="absolute bottom-3 left-3 z-10 rounded-2xl bg-card/90 border border-border/80 px-3 py-2 backdrop-blur-md shadow-md text-[10px] space-y-1">
+          <div className="flex items-center gap-1.5 font-bold text-foreground">
+            <span>🚜</span>
+            <span>Your Farm (Kumarakom)</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-emerald-600" />
-            <span className="text-muted-foreground">🟢 Normal Queue</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-amber-500" />
-            <span className="text-muted-foreground">🟡 Busy</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-rose-600" />
-            <span className="text-muted-foreground">🔴 Delayed (+25m)</span>
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+            <span className="size-2 rounded-full bg-emerald-500" />
+            <span>Optimal Procurement Flow</span>
           </div>
         </div>
       </div>
 
-      {/* Quick Centre Selector Carousel Pills */}
-      <div>
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-          Select Centre to Inspect & Route
-        </h3>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {centres.map((c) => {
-            const isSelected = c.id === selectedId;
-            const isRec = c.id === recommendedCentre.id;
-            return (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setSelectedId(c.id)}
-                className={`flex flex-col items-start rounded-2xl border p-2.5 text-left transition-all ${
-                  isSelected
-                    ? "border-primary bg-primary/10 shadow-sm ring-1 ring-primary/40"
-                    : "border-border bg-card hover:border-primary/40"
-                }`}
-              >
-                <div className="flex w-full items-center justify-between">
-                  <span className="text-xs font-bold truncate">
-                    {c.name.replace(" Procurement Centre", "")}
-                  </span>
-                  {isRec && <span className="text-[10px]">⭐</span>}
-                </div>
-                <span className="text-[10px] text-muted-foreground mt-0.5">
-                  {c.distanceKm} km · {c.currentQueueLength} in line
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Pull-up Bottom Sheet Drawer */}
+      <div className="rounded-[30px] border border-border bg-card p-5 shadow-lg space-y-4">
+        {/* Drag Handle Indicator */}
+        <div className="mx-auto h-1.5 w-12 rounded-full bg-muted-foreground/20" />
 
-      {/* Selected Centre Details Card */}
-      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+        {/* Header Info */}
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-sm text-foreground">{activeCentre.name}</h3>
+              <h2 className="font-display text-base font-bold text-foreground">{activeCentre.name}</h2>
               {activeCentre.id === recommendedCentre.id && (
                 <span className="rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-[10px] font-bold flex items-center gap-1">
                   <Sparkles className="size-3" /> Recommended
@@ -388,7 +336,7 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
           </div>
 
           <span
-            className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
+            className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
               activeCentre.status === "normal"
                 ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
                 : activeCentre.status === "busy"
@@ -397,46 +345,115 @@ export function CentreMapView({ onBack, onSelectCentre }: CentreMapViewProps) {
             }`}
           >
             {activeCentre.status === "normal"
-              ? "Normal"
+              ? "Normal Wait"
               : activeCentre.status === "busy"
               ? "Busy"
               : "Delayed"}
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 border-t border-border/60 pt-3 text-xs">
-          <div>
-            <span className="text-[10px] text-muted-foreground block">Road Distance</span>
-            <strong className="text-foreground">{activeCentre.distanceKm} km</strong>
-          </div>
-          <div>
-            <span className="text-[10px] text-muted-foreground block">Active Queue</span>
-            <strong className="text-foreground">{activeCentre.currentQueueLength} farmers</strong>
-          </div>
-          <div>
-            <span className="text-[10px] text-muted-foreground block">Est Turnaround</span>
-            <strong className={activeCentre.activeDelayMinutes > 0 ? "text-rose-600 font-bold" : "text-foreground"}>
-              ~{activeCentre.currentQueueLength * activeCentre.avgProcessingMinutes + activeCentre.activeDelayMinutes} mins
-            </strong>
+        {/* Conditions Section (Matching Reference Image) */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-bold text-foreground tracking-tight">Conditions</h3>
+          <div className="grid grid-cols-3 gap-2.5">
+            {/* pH Level */}
+            <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
+              <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                <ShieldCheck className="size-3.5 text-primary" />
+                <span className="text-[10.5px] font-medium">pH Level</span>
+              </div>
+              <p className="text-base font-bold text-foreground">7.2</p>
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Neutral · Ideal</span>
+            </div>
+
+            {/* Temperature */}
+            <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
+              <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                <ThermometerSun className="size-3.5 text-amber-500" />
+                <span className="text-[10.5px] font-medium">Temperature</span>
+              </div>
+              <p className="text-base font-bold text-foreground">24°C</p>
+              <span className="text-[10px] font-semibold text-muted-foreground">Sunny · Dry</span>
+            </div>
+
+            {/* Moisture */}
+            <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-xs">
+              <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                <Droplets className="size-3.5 text-blue-500" />
+                <span className="text-[10.5px] font-medium">Moisture</span>
+              </div>
+              <p className="text-base font-bold text-foreground">13.8%</p>
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Optimal (&lt;14%)</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-2 border-t border-border/60 pt-3">
+        {/* Checklist Item */}
+        <div className="flex items-center justify-between rounded-2xl border border-border/80 bg-background/60 p-3">
+          <div className="flex items-center gap-3">
+            <div className="flex size-7 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xs">
+              <CheckCircle2 className="size-4" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-foreground">Quality & Moisture Pre-Check</p>
+              <p className="text-[10.5px] text-muted-foreground">Moisture &lt; 14% Verified for Grade A procurement</p>
+            </div>
+          </div>
+          <span className="text-[10.5px] font-bold text-emerald-600 dark:text-emerald-400">Verified</span>
+        </div>
+
+        {/* Quick Centre Switcher Pills */}
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
+            Procurement Centres ({centres.length})
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {centres.map((c) => {
+              const isSelected = c.id === selectedId;
+              const isRec = c.id === recommendedCentre.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setSelectedId(c.id)}
+                  className={`flex flex-col items-start rounded-2xl border p-2.5 text-left transition-all ${
+                    isSelected
+                      ? "border-primary bg-primary/10 shadow-xs ring-1 ring-primary/40"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <span className="text-xs font-bold truncate">
+                      {c.name.replace(" Procurement Centre", "")}
+                    </span>
+                    {isRec && <span className="text-[10px]">⭐</span>}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground mt-0.5">
+                    {c.distanceKm} km · {c.currentQueueLength} in line
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Bottom Action CTAs */}
+        <div className="flex gap-2.5 pt-1">
           <a
             href={`https://maps.google.com/?q=${encodeURIComponent(activeCentre.location)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-2.5 text-xs font-bold text-foreground hover:bg-muted transition-colors shadow-sm"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 text-xs font-bold text-foreground hover:bg-muted transition-colors shadow-sm"
           >
-            <Navigation className="size-3.5 text-primary" /> Directions <ExternalLink className="size-3 text-muted-foreground" />
+            <Navigation className="size-4 text-primary" /> Directions
           </a>
 
           <button
             type="button"
             onClick={() => onSelectCentre(activeCentre.name)}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
           >
-            <CalendarDays className="size-3.5" /> Book at this Centre
+            <CalendarDays className="size-4" /> Book at this Centre
           </button>
         </div>
       </div>

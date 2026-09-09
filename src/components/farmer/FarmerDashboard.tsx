@@ -17,7 +17,55 @@ import {
   Bell,
   XCircle,
   X,
+  Sun,
+  Wind,
+  Droplets,
+  CheckCircle2,
+  Circle,
+  Sprout,
+  ShieldCheck,
+  Check,
 } from "lucide-react";
+import heroImage from "@/assets/smartprocure-home.jpg";
+
+const CROPS_DATA = [
+  {
+    id: "paddy",
+    name: "Paddy (Nel)",
+    timeframe: "Ready for Harvest",
+    msp: "₹32 / kg MSP",
+    badge: "Healthy",
+    badgeClass: "bg-emerald-600 text-white",
+    image: "https://images.unsplash.com/photo-1536657464919-892534f60d6e?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    id: "coconut",
+    name: "Raw Coconut",
+    timeframe: "1 Month to Harvest",
+    msp: "₹38 / kg MSP",
+    badge: "Normal",
+    badgeClass: "bg-white/90 text-gray-800 border border-gray-200",
+    image: "https://images.unsplash.com/photo-1544376798-89aa6b82c6cd?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    id: "rubber",
+    name: "Rubber (RSS4)",
+    timeframe: "Daily Tapping",
+    msp: "₹180 / kg MSP",
+    badge: "Peak Tap",
+    badgeClass: "bg-amber-500 text-white",
+    image: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    id: "pepper",
+    name: "Black Pepper",
+    timeframe: "Drying Stage",
+    msp: "₹520 / kg MSP",
+    badge: "Grade A",
+    badgeClass: "bg-emerald-700 text-white",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+  },
+];
 
 interface FarmerDashboardProps {
   onOpenBooking: () => void;
@@ -62,46 +110,142 @@ export function FarmerDashboard({
 
   return (
     <div className="content-stack pt-2 space-y-4">
-      {/* Farmer Greeting Header */}
-      <div className="flex items-center justify-between rounded-2xl bg-card border border-border p-4 shadow-sm">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/15 font-display text-base font-bold text-primary">
-            AK
+      {/* LANDSCAPE HERO CARD (Matches Reference Design: Golden Hour Field + Weather + 3 Frosted Metric Cards) */}
+      <section className="relative overflow-hidden rounded-[32px] shadow-xl text-white">
+        {/* Background photo */}
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+          style={{
+            backgroundImage: `url(${heroImage})`,
+          }}
+        />
+        {/* Gradient overlays for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/85" />
+
+        <div className="relative z-10 p-5 space-y-4">
+          {/* Top Bar inside Hero */}
+          <div className="flex items-center justify-between">
+            {/* Left: Farm / Avatar circle */}
+            <div className="flex size-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-sm shadow-md">
+              <Sprout className="size-5 text-emerald-300" />
+            </div>
+
+            {/* Center: Greeting & Date */}
+            <div className="text-center">
+              <p className="text-sm font-bold text-white drop-shadow-sm">{t(language, "goodMorning")}, {user.name.split(" ")[0]}</p>
+              <p className="text-[11px] text-white/80 font-medium">Friday, 10 Sep 2026</p>
+            </div>
+
+            {/* Right: Notifications & Assisted */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={onOpenNotifications}
+                className="relative flex size-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-colors shadow-md"
+                aria-label="Notifications"
+              >
+                <Bell className="size-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex size-2.5 rounded-full bg-red-500 ring-2 ring-white" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={onOpenAssisted}
+                className="flex size-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-colors shadow-md"
+                title="Assisted Helpline"
+                aria-label="Assisted Helpline"
+              >
+                <Headphones className="size-4" />
+              </button>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-xs text-muted-foreground">{t(language, "goodMorning")}</p>
-            <h1 className="font-display text-lg font-bold truncate text-foreground">{user.name}</h1>
-            <p className="text-[10px] text-muted-foreground font-mono">ID: {user.farmerId} · {user.village}</p>
+
+          {/* Temperature & Weather / District */}
+          <div className="pt-1">
+            <div className="flex items-baseline gap-2">
+              <span className="font-display text-4xl font-extrabold tracking-tight drop-shadow-md">24°C</span>
+              <span className="text-xs font-semibold text-white/90">☀️ Bright and Sunny</span>
+            </div>
+            <p className="text-[11px] text-white/75 flex items-center gap-2 mt-0.5">
+              <span>📍 Kottayam Agri Cluster</span>
+              <span>·</span>
+              <span>L: 21°C  H: 31°C</span>
+            </p>
           </div>
+
+          {/* 3 Frosted White Metric Pills (Exact Match to Reference Image!) */}
+          <div className="grid grid-cols-3 gap-2">
+            {/* Metric 1 */}
+            <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-2.5 text-white shadow-sm">
+              <div className="flex items-center gap-1 text-[10px] text-white/80 font-semibold">
+                <Wind className="size-3 text-emerald-300" />
+                <span>Now Serving</span>
+              </div>
+              <p className="font-display text-xl font-extrabold mt-1 text-secondary">
+                #{nowServing}
+              </p>
+              <p className="text-[9px] text-white/70 truncate">Gate 1 · Weigh Bay</p>
+            </div>
+
+            {/* Metric 2 */}
+            <div className="rounded-2xl bg-white/25 backdrop-blur-md border border-white/40 p-2.5 text-white shadow-md ring-1 ring-white/30">
+              <div className="flex items-center gap-1 text-[10px] text-white/90 font-bold">
+                <Sun className="size-3 text-amber-300" />
+                <span>Your Token</span>
+              </div>
+              <p className="font-display text-xl font-extrabold mt-1 text-white">
+                #{userQueueNumber}
+              </p>
+              <p className="text-[9px] text-emerald-300 font-semibold truncate">
+                {activeBooking ? `${farmersAhead} ahead` : "Slot Ready"}
+              </p>
+            </div>
+
+            {/* Metric 3 */}
+            <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-2.5 text-white shadow-sm">
+              <div className="flex items-center gap-1 text-[10px] text-white/80 font-semibold">
+                <Droplets className="size-3 text-blue-300" />
+                <span>Wait Turn</span>
+              </div>
+              <p className="font-display text-xl font-extrabold mt-1 text-white">
+                ~{prediction.minutesLeft}m
+              </p>
+              <p className="text-[9px] text-white/70 truncate">{prediction.timeStr}</p>
+            </div>
+          </div>
+
+          {/* Hero Action Buttons */}
+          {activeBooking ? (
+            <div className="grid grid-cols-[1fr_auto] gap-2 pt-1">
+              <button
+                type="button"
+                onClick={onOpenLiveQueue}
+                className="flex items-center justify-center gap-2 rounded-xl bg-white text-[#123D35] py-2.5 text-xs font-extrabold shadow-lg hover:bg-white/90 transition-colors"
+              >
+                Track Live Queue <ChevronRight className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(true)}
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-white/30 bg-black/30 backdrop-blur-sm px-3.5 py-2.5 text-xs font-semibold text-white hover:bg-rose-600 transition-colors"
+              >
+                <XCircle className="size-4" /> Cancel Slot
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onOpenBooking}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-white text-[#123D35] py-3 text-xs font-extrabold shadow-lg hover:bg-white/90 transition-colors"
+            >
+              + Book Procurement Slot
+            </button>
+          )}
         </div>
+      </section>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onOpenNotifications}
-            className="relative flex size-9 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-muted transition-colors"
-            title="Notifications"
-            aria-label="Notifications"
-          >
-            <Bell className="size-4" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                {unreadCount}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={onOpenAssisted}
-            className="flex items-center gap-1 rounded-full border border-secondary/40 bg-secondary/15 px-3 py-1 text-xs font-bold text-foreground transition-all hover:bg-secondary/25"
-          >
-            <Headphones className="size-3.5 text-primary" />
-            <span className="hidden sm:inline">Assisted</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Delay Alert Broadcast Banner (Recalculated in real time when staff logs delay) */}
+      {/* Delay Alert Broadcast Banner (if operational delay exists) */}
       {currentCentre.activeDelayMinutes > 0 && (
         <div className="relative overflow-hidden rounded-2xl border border-amber-500/40 bg-amber-500/15 p-4 text-foreground shadow-sm">
           <div className="flex items-start gap-3">
@@ -129,99 +273,118 @@ export function FarmerDashboard({
         </div>
       )}
 
-      {/* LIVE QUEUE HERO CARD (Styled with bg-dots & SIH visual language) */}
-      {activeBooking ? (
-        <section className="hero-queue-card relative overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground shadow-xl">
-          <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
-
-          <div className="relative z-10">
-            <div className="flex items-center justify-between">
-              <span className="eyebrow text-secondary">{t(language, "upcomingBooking")}</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-                  <span className="relative inline-flex size-2 rounded-full bg-red-500" />
-                </span>
-                Live Queue
-              </span>
-            </div>
-
-            <h2 className="mt-2 font-display text-xl font-bold leading-tight">
-              {activeBooking.centreName}
-            </h2>
-            <p className="mt-0.5 text-xs text-primary-foreground/75">
-              {activeBooking.crop} · {activeBooking.quantityKg} kg · {activeBooking.slotTime}
-            </p>
-
-            <div className="mt-4 grid grid-cols-2 gap-3 rounded-2xl bg-white/10 p-3.5 backdrop-blur-sm">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-primary-foreground/60">
-                  {t(language, "nowServing")}
-                </p>
-                <p className="font-display text-4xl font-extrabold text-secondary">#{nowServing}</p>
-                <p className="text-[11px] text-primary-foreground/75 mt-0.5">Yard Gate 1</p>
-              </div>
-
-              <div className="border-l border-white/15 pl-3">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-primary-foreground/60">
-                  {t(language, "yourToken")}
-                </p>
-                <p className="font-display text-4xl font-extrabold text-white">#{userQueueNumber}</p>
-                <p className="text-[11px] text-primary-foreground/80 mt-0.5">
-                  <strong>{farmersAhead}</strong> farmers ahead
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-3 flex items-center justify-between text-xs text-primary-foreground/85">
-              <span className="inline-flex items-center gap-1.5">
-                <Clock className="size-3.5 text-secondary" />
-                {t(language, "approxTime")}: <strong className="text-secondary">{prediction.timeStr}</strong>
-              </span>
-              <span className="text-[11px] font-medium opacity-80">
-                ~{prediction.minutesLeft} min wait
-              </span>
-            </div>
-
-            <div className="mt-4 grid grid-cols-[1fr_auto] gap-2">
-              <button
-                type="button"
-                onClick={onOpenLiveQueue}
-                className="flex items-center justify-center gap-2 rounded-xl bg-secondary py-3 text-xs font-bold text-secondary-foreground shadow-lg transition-transform hover:scale-[1.01]"
-              >
-                Track Live Queue <ChevronRight className="size-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowCancelModal(true)}
-                className="flex items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3.5 py-3 text-xs font-semibold text-white hover:bg-rose-600 hover:border-rose-600 transition-colors"
-                title="Cancel slot"
-              >
-                <XCircle className="size-4" /> Cancel Slot
-              </button>
-            </div>
-          </div>
-        </section>
-      ) : (
-        <section className="rounded-3xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center space-y-3">
-          <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <CalendarDays className="size-6" />
-          </div>
-          <div>
-            <h3 className="font-display text-lg font-bold">No Active Procurement Slot</h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-              Your previous booking was cancelled or completed. Book a new slot anytime to guarantee minimum wait time.
-            </p>
-          </div>
+      {/* My Crops & Harvest Section (Horizontal Scrollable Cards matching reference image) */}
+      <section>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            My Crops & Fields (4)
+          </h3>
           <button
             type="button"
             onClick={onOpenBooking}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
+            className="text-xs font-semibold text-primary hover:underline"
           >
-            + Book Procurement Slot
+            See all
           </button>
-        </section>
-      )}
+        </div>
+
+        <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+          {CROPS_DATA.map((crop) => (
+            <div
+              key={crop.id}
+              onClick={onOpenBooking}
+              className="group min-w-[145px] max-w-[155px] shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="relative h-20 w-full overflow-hidden bg-muted">
+                <img
+                  src={crop.image}
+                  alt={crop.name}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <span className={`absolute top-1.5 left-1.5 rounded-full px-2 py-0.5 text-[8px] font-bold shadow-sm ${crop.badgeClass}`}>
+                  {crop.badge}
+                </span>
+              </div>
+              <div className="p-2.5">
+                <h4 className="text-xs font-bold truncate text-foreground">{crop.name}</h4>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{crop.timeframe}</p>
+                <p className="text-[10px] font-bold text-primary mt-1">{crop.msp}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* My Tasks Section (Matching "My Task" checklist in reference image) */}
+      <section>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Today's Tasks (4)
+          </h3>
+          <button
+            type="button"
+            onClick={onOpenBookingsList}
+            className="text-xs font-semibold text-primary hover:underline"
+          >
+            See all
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
+            <div className="min-w-0 pr-2">
+              <h4 className="text-xs font-bold text-foreground">Procurement Slot Confirmed</h4>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Token #{userQueueNumber} · {activeBooking ? activeBooking.centreName : currentCentre.name}
+              </p>
+              <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">08:30 AM · Verified</span>
+            </div>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-sm">
+              <Check className="size-3.5 stroke-[3]" />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
+            <div className="min-w-0 pr-2">
+              <h4 className="text-xs font-bold text-foreground">Pre-Harvest Moisture Testing</h4>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Target moisture &lt; 14% for MSP Grade A rate
+              </p>
+              <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">09:15 AM · Calibrated</span>
+            </div>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-sm">
+              <Check className="size-3.5 stroke-[3]" />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
+            <div className="min-w-0 pr-2">
+              <h4 className="text-xs font-bold text-foreground">Yard Gate 1 Entry & Weighing</h4>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Certified weighbridge digital receipt generation
+              </p>
+              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">Estimated 10:30 AM</span>
+            </div>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border text-muted-foreground">
+              <Circle className="size-3 text-muted-foreground" />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
+            <div className="min-w-0 pr-2">
+              <h4 className="text-xs font-bold text-foreground">PFMS Direct Benefit Transfer (DBT)</h4>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Automated bank transfer within 24 hours of weighing
+              </p>
+              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">Aadhaar Linked Payout</span>
+            </div>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border text-muted-foreground">
+              <Circle className="size-3 text-muted-foreground" />
+            </div>
+          </div>
+        </div>
+      </section>
 
 
       {/* Quick Actions (SIH Priority 1-4) */}
