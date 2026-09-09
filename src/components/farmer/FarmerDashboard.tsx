@@ -32,11 +32,16 @@ import cropPaddy from "@/assets/crop-paddy.jpg";
 import cropCoconut from "@/assets/crop-coconut.jpg";
 import cropRubber from "@/assets/crop-rubber.jpg";
 import cropPepper from "@/assets/crop-pepper.jpg";
+import cropCardamom from "@/assets/crop-cardamom.jpg";
+import cropArecanut from "@/assets/crop-arecanut.jpg";
+import cropNutmeg from "@/assets/crop-nutmeg.jpg";
+import cropCoffee from "@/assets/crop-coffee.jpg";
+import cropBanana from "@/assets/crop-banana.jpg";
 
 const CROPS_DATA = [
   {
     id: "paddy",
-    name: "Paddy (Nel)",
+    name: "Paddy (നെല്ല്)",
     timeframeKey: "readyHarvest" as const,
     msp: "₹32 / kg MSP",
     badgeKey: "healthy" as const,
@@ -45,7 +50,7 @@ const CROPS_DATA = [
   },
   {
     id: "coconut",
-    name: "Raw Coconut",
+    name: "Raw Coconut (തേങ്ങ)",
     timeframeKey: "oneMonthHarvest" as const,
     msp: "₹38 / kg MSP",
     badgeKey: "normal" as const,
@@ -63,12 +68,57 @@ const CROPS_DATA = [
   },
   {
     id: "pepper",
-    name: "Black Pepper",
+    name: "Black Pepper (കുരുമുളക്)",
     timeframeKey: "dryingStage" as const,
     msp: "₹520 / kg MSP",
     badgeKey: "gradeA" as const,
     badgeClass: "bg-emerald-700 text-white",
     image: cropPepper,
+  },
+  {
+    id: "cardamom",
+    name: "Cardamom (ഏലം)",
+    timeframeKey: "curingStage" as const,
+    msp: "₹1,850 / kg MSP",
+    badgeKey: "gradeSpecial" as const,
+    badgeClass: "bg-emerald-800 text-white",
+    image: cropCardamom,
+  },
+  {
+    id: "arecanut",
+    name: "Areca Nut (അടയ്ക്ക)",
+    timeframeKey: "sunDrying" as const,
+    msp: "₹360 / kg MSP",
+    badgeKey: "gradeA" as const,
+    badgeClass: "bg-amber-600 text-white",
+    image: cropArecanut,
+  },
+  {
+    id: "nutmeg",
+    name: "Nutmeg (ജാതിക്ക)",
+    timeframeKey: "maceSeparation" as const,
+    msp: "₹280 / kg MSP",
+    badgeKey: "healthy" as const,
+    badgeClass: "bg-orange-600 text-white",
+    image: cropNutmeg,
+  },
+  {
+    id: "coffee",
+    name: "Robusta Coffee (കാപ്പി)",
+    timeframeKey: "cherryPicking" as const,
+    msp: "₹210 / kg MSP",
+    badgeKey: "gradeA" as const,
+    badgeClass: "bg-rose-700 text-white",
+    image: cropCoffee,
+  },
+  {
+    id: "banana",
+    name: "Nendran (നേന്ത്രക്കായ)",
+    timeframeKey: "matureBunch" as const,
+    msp: "₹42 / kg MSP",
+    badgeKey: "healthy" as const,
+    badgeClass: "bg-emerald-600 text-white",
+    image: cropBanana,
   },
 ];
 
@@ -304,7 +354,7 @@ export function FarmerDashboard({
       <section>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            {t(language, "myCrops")} (4)
+            {t(language, "myCrops")} ({CROPS_DATA.length})
           </h3>
           <button
             type="button"

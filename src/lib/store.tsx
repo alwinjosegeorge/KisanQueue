@@ -91,6 +91,46 @@ const INITIAL_CROPS: Crop[] = [
     icon: "🌿",
     description: "Spices Board certified grade procurement",
   },
+  {
+    id: "cardamom",
+    name: "Green Cardamom (ഏലം)",
+    localName: { ml: "ഏലം (Cardamom)", hi: "इलायची (Cardamom)" },
+    mspPerKg: 1850,
+    icon: "🌱",
+    description: "Spices Board Grade 8mm+ procurement",
+  },
+  {
+    id: "arecanut",
+    name: "Areca Nut (അടയ്ക്ക)",
+    localName: { ml: "അടയ്ക്ക (Areca Nut)", hi: "सुपारी (Areca Nut)" },
+    mspPerKg: 360,
+    icon: "🌰",
+    description: "CAMPCO & cooperative procurement support price",
+  },
+  {
+    id: "nutmeg",
+    name: "Nutmeg & Mace (ജാതിക്ക)",
+    localName: { ml: "ജാതിക്ക (Nutmeg)", hi: "जायफल (Nutmeg)" },
+    mspPerKg: 280,
+    icon: "🍂",
+    description: "Sun-dried bold nutmeg with premium mace subsidy",
+  },
+  {
+    id: "coffee",
+    name: "Robusta Coffee (കാപ്പി)",
+    localName: { ml: "കാപ്പിക്കുരു (Coffee)", hi: "कॉफ़ी (Coffee)" },
+    mspPerKg: 210,
+    icon: "☕",
+    description: "Wayanad GI Robusta Cherry A procurement",
+  },
+  {
+    id: "banana",
+    name: "Nendran Banana (നേന്ത്രക്കായ)",
+    localName: { ml: "നേന്ത്രക്കായ (Nendran)", hi: "केला (Banana)" },
+    mspPerKg: 42,
+    icon: "🍌",
+    description: "VFPCK floor price procurement scheme",
+  },
 ];
 
 const INITIAL_CENTRES: ProcurementCentre[] = [

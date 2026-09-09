@@ -58,6 +58,8 @@ export function SlotBookingModal({
         const cropMatch = crops.find(
           (c) =>
             c.name.toLowerCase().includes(initialCropName.toLowerCase().trim()) ||
+            initialCropName.toLowerCase().includes(c.name.toLowerCase().trim()) ||
+            c.id.toLowerCase() === initialCropName.toLowerCase().trim() ||
             initialCropName.toLowerCase().includes(c.id.toLowerCase().trim())
         );
         if (cropMatch) {
