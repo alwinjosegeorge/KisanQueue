@@ -14,6 +14,7 @@ import {
   MapPin,
   Headphones,
   Map,
+  Bell,
 } from "lucide-react";
 
 interface FarmerDashboardProps {
@@ -24,6 +25,7 @@ interface FarmerDashboardProps {
   onOpenAssisted: () => void;
   onOpenMap: () => void;
   onSelectCentre: (centreName: string) => void;
+  onOpenNotifications: () => void;
 }
 
 export function FarmerDashboard({
@@ -34,9 +36,11 @@ export function FarmerDashboard({
   onOpenAssisted,
   onOpenMap,
   onSelectCentre,
+  onOpenNotifications,
 }: FarmerDashboardProps) {
-  const { user, activeBooking, centres, language, nowServing, predictWaitingTime, getRecommendedCentre } =
+  const { user, activeBooking, centres, language, nowServing, predictWaitingTime, getRecommendedCentre, notifications } =
     useKisanQueue();
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const recommendedCentre = getRecommendedCentre();
   const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || centres[0];
@@ -58,13 +62,31 @@ export function FarmerDashboard({
             <p className="text-[10px] text-muted-foreground font-mono">ID: {user.farmerId} · {user.village}</p>
           </div>
         </div>
-        <button
-          onClick={onOpenAssisted}
-          className="flex items-center gap-1 rounded-full border border-secondary/40 bg-secondary/15 px-3 py-1 text-xs font-bold text-foreground transition-all hover:bg-secondary/25"
-        >
-          <Headphones className="size-3.5 text-primary" />
-          <span className="hidden sm:inline">Assisted Mode</span>
-        </button>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onOpenNotifications}
+            className="relative flex size-9 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-muted transition-colors"
+            title="Notifications"
+            aria-label="Notifications"
+          >
+            <Bell className="size-4" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={onOpenAssisted}
+            className="flex items-center gap-1 rounded-full border border-secondary/40 bg-secondary/15 px-3 py-1 text-xs font-bold text-foreground transition-all hover:bg-secondary/25"
+          >
+            <Headphones className="size-3.5 text-primary" />
+            <span className="hidden sm:inline">Assisted</span>
+          </button>
+        </div>
       </div>
 
       {/* Delay Alert Broadcast Banner (Recalculated in real time when staff logs delay) */}

@@ -20,11 +20,11 @@ import {
   Sparkles,
   Navigation,
   PlayCircle,
+  Building2,
 } from "lucide-react";
 
 import { useKisanQueue } from "@/lib/store";
 import { useTranslation, t } from "@/lib/translations";
-import { DemoHeader } from "@/components/common/DemoHeader";
 import { NotificationDrawer } from "@/components/common/NotificationDrawer";
 import { AuthModal } from "@/components/auth/AuthModal";
 
@@ -40,10 +40,6 @@ import { MyBookingsView } from "@/components/farmer/MyBookingsView";
 import { ProcurementTimelineView } from "@/components/farmer/ProcurementTimelineView";
 import { PaymentTrackingView } from "@/components/farmer/PaymentTrackingView";
 import { CentreMapView } from "@/components/farmer/CentreMapView";
-
-// Staff & Admin components
-import { StaffDashboard } from "@/components/staff/StaffDashboard";
-import { AdminDashboard } from "@/components/admin/AdminDashboard";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -140,12 +136,12 @@ function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) 
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="splash-shade" />
-      <div className="relative z-10 flex min-h-[calc(100dvh-3.5rem)] flex-col px-6 pb-7 pt-8 sm:mx-auto sm:max-w-md">
+      <div className="relative z-10 flex min-h-dvh flex-col px-6 pb-8 pt-10 sm:mx-auto sm:max-w-md">
         <div className="flex items-center justify-between">
           <Logo inverse />
           <button
             onClick={onSkip}
-            className="rounded-full bg-black/20 px-3 py-1 text-xs font-semibold text-primary-foreground/80 hover:bg-black/30 hover:text-white backdrop-blur-sm transition-all"
+            className="rounded-full bg-black/25 px-3 py-1 text-xs font-semibold text-primary-foreground/90 hover:bg-black/40 hover:text-white backdrop-blur-sm transition-all"
           >
             Skip →
           </button>
@@ -155,7 +151,7 @@ function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) 
           <h1 className="mt-2 font-display text-6xl leading-[0.92] text-primary-foreground">
             Kisan<br />Queue
           </h1>
-          <p className="mt-4 text-sm leading-6 text-primary-foreground/80">
+          <p className="mt-4 text-sm leading-6 text-primary-foreground/85">
             Digital procurement and fair, fast queue management for Kerala farmers.
           </p>
           <AppButton
@@ -182,13 +178,13 @@ function Onboarding({
 }) {
   const item = ONBOARDING[step] ?? ONBOARDING[0];
   return (
-    <main className="min-h-[calc(100dvh-3.5rem)] bg-background p-4 sm:grid sm:place-items-center">
-      <section className="relative mx-auto flex min-h-[calc(100dvh-5.5rem)] w-full max-w-md flex-col overflow-hidden rounded-[2rem] bg-primary p-5 text-primary-foreground shadow-float sm:min-h-[740px]">
+    <main className="min-h-dvh bg-background p-4 sm:grid sm:place-items-center">
+      <section className="relative mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-[2rem] bg-primary p-5 text-primary-foreground shadow-float sm:min-h-[760px]">
         <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
         <div className="flex items-center justify-between">
           <Logo inverse />
           <button
-            className="text-xs font-semibold text-primary-foreground/70 hover:text-white transition-colors"
+            className="text-xs font-semibold text-primary-foreground/75 hover:text-white transition-colors"
             onClick={onSkip}
           >
             Skip
@@ -214,7 +210,7 @@ function Onboarding({
         <div className="mt-auto pt-8">
           <p className="eyebrow text-secondary">{item.eyebrow}</p>
           <h1 className="mt-3 font-display text-5xl leading-none">{item.title}</h1>
-          <p className="mt-4 max-w-xs text-sm leading-6 text-primary-foreground/70">{item.copy}</p>
+          <p className="mt-4 max-w-xs text-sm leading-6 text-primary-foreground/75">{item.copy}</p>
           <div className="mt-8 grid grid-cols-[1fr_auto] items-center gap-4">
             <div className="flex gap-1.5">
               {ONBOARDING.map((_, index) => (
@@ -239,6 +235,7 @@ function KisanQueueApp() {
   const { role, setRole, language, setLanguage, user, activeBooking, nowServing, largeText, highContrast } =
     useKisanQueue();
   const { t: translate } = useTranslation();
+  const navigate = useNavigate();
 
   const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>("splash");
   const [onboardingStep, setOnboardingStep] = useState(0);
@@ -251,40 +248,30 @@ function KisanQueueApp() {
     setRole("farmer");
   }, [setRole]);
 
-  // If user is on Splash screen
+  // If user is on pure Splash screen
   if (farmerScreen === "splash") {
     return (
       <div
-        className={`min-h-screen flex flex-col bg-background text-foreground ${
+        className={`min-h-screen bg-background text-foreground ${
           largeText ? "text-lg" : ""
         } ${highContrast ? "contrast-125" : ""}`}
       >
-        <DemoHeader
-          onOpenAuth={() => setAuthOpen(true)}
-          onOpenNotifications={() => setNotificationsOpen(true)}
-        />
         <Splash
           onNext={() => setFarmerScreen("onboarding")}
           onSkip={() => setFarmerScreen("home")}
         />
-        <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
-        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
       </div>
     );
   }
 
-  // If user is on Onboarding screen
+  // If user is on Onboarding walkthrough
   if (farmerScreen === "onboarding") {
     return (
       <div
-        className={`min-h-screen flex flex-col bg-background text-foreground ${
+        className={`min-h-screen bg-background text-foreground ${
           largeText ? "text-lg" : ""
         } ${highContrast ? "contrast-125" : ""}`}
       >
-        <DemoHeader
-          onOpenAuth={() => setAuthOpen(true)}
-          onOpenNotifications={() => setNotificationsOpen(true)}
-        />
         <Onboarding
           step={onboardingStep}
           onSkip={() => setFarmerScreen("home")}
@@ -294,8 +281,6 @@ function KisanQueueApp() {
               : setFarmerScreen("home")
           }
         />
-        <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
-        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
       </div>
     );
   }
@@ -307,137 +292,145 @@ function KisanQueueApp() {
         largeText ? "text-lg" : ""
       } ${highContrast ? "contrast-125" : ""}`}
     >
-      {/* Universal Top HUD / Demo Header */}
-      <DemoHeader
-        onOpenAuth={() => setAuthOpen(true)}
-        onOpenNotifications={() => setNotificationsOpen(true)}
-      />
+      <div className="app-canvas flex-1">
+        {/* Desktop Sidebar Rail */}
+        <aside className="desktop-rail">
+          <Logo />
+          <div className="mt-8">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+              👨‍🌾 Farmer Portal
+            </span>
+            <h2 className="mt-2 font-display text-3xl font-bold leading-tight">
+              Fair & Fast<br />Procurement
+            </h2>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              Skip long road queues. Book optimal slots, monitor live queue status, and track MSP DBT payments.
+            </p>
+          </div>
 
-      {/* Role-based Dynamic View */}
-      {role === "staff" ? (
-        <main className="flex-1">
-          <StaffDashboard />
-        </main>
-      ) : role === "admin" ? (
-        <main className="flex-1">
-          <AdminDashboard />
-        </main>
-      ) : (
-        /* Farmer Experience */
-        <div className="app-canvas flex-1">
-          {/* Desktop Sidebar Rail */}
-          <aside className="desktop-rail">
-            <Logo />
-            <div className="mt-8">
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                👨‍🌾 Farmer Portal
+          <nav className="mt-8 space-y-1.5" aria-label="Desktop navigation">
+            {FARMER_NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const active = farmerScreen === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setFarmerScreen(item.id)}
+                  className={`rail-item ${active ? "rail-item-active" : ""}`}
+                >
+                  <Icon className="size-5" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Clean Portal Navigation Links in Rail */}
+          <div className="mt-6 space-y-1.5 border-t border-border/50 pt-4 text-xs font-medium text-muted-foreground">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 px-2 mb-1">
+              Official Portals
+            </p>
+            <button
+              onClick={() => navigate({ to: "/staff" })}
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors text-left"
+            >
+              <span className="flex items-center gap-2">
+                <Building2 className="size-4 text-primary" /> Staff Portal (/staff)
               </span>
-              <h2 className="mt-2 font-display text-3xl font-bold leading-tight">
-                Fair & Fast<br />Procurement
-              </h2>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                Skip long road queues. Book optimal slots, monitor live queue status, and track MSP DBT payments.
-              </p>
+              <ChevronRight className="size-3.5 text-muted-foreground" />
+            </button>
+            <button
+              onClick={() => navigate({ to: "/admin" })}
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors text-left"
+            >
+              <span className="flex items-center gap-2">
+                <ShieldCheck className="size-4 text-primary" /> Admin Directorate (/admin)
+              </span>
+              <ChevronRight className="size-3.5 text-muted-foreground" />
+            </button>
+          </div>
+
+          {/* Live Token Snapshot in Rail */}
+          <div className="relative mt-auto overflow-hidden rounded-2xl bg-primary p-4 text-primary-foreground shadow-md">
+            <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
+            <div className="relative z-10 flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-secondary">
+                Active Booking
+              </span>
+              <span className="flex items-center gap-1 text-[10px] font-bold text-secondary">
+                <span className="size-1.5 rounded-full bg-secondary animate-ping" /> Live
+              </span>
             </div>
+            <p className="relative mt-1 font-display text-3xl font-black text-secondary">
+              Token #{activeBooking?.queueNumber || 47}
+            </p>
+            <p className="relative mt-1 text-xs text-primary-foreground/80 truncate">
+              {activeBooking?.centreName || "Kottayam Procurement Centre"}
+            </p>
+            <p className="relative mt-0.5 text-[11px] text-primary-foreground/60">
+              Now serving: #{nowServing} · {Math.max(0, (activeBooking?.queueNumber || 47) - nowServing)} ahead
+            </p>
+          </div>
+        </aside>
 
-            <nav className="mt-8 space-y-1.5" aria-label="Desktop navigation">
-              {FARMER_NAV_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const active = farmerScreen === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setFarmerScreen(item.id)}
-                    className={`rail-item ${active ? "rail-item-active" : ""}`}
-                  >
-                    <Icon className="size-5" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+        {/* Farmer Phone / Mobile View Shell */}
+        <main className="phone-shell">
+          <div className="phone-content">
+            {farmerScreen === "home" && (
+              <FarmerDashboard
+                onOpenBooking={() => setBookingModalOpen(true)}
+                onOpenLiveQueue={() => setFarmerScreen("queue")}
+                onOpenBookingsList={() => setFarmerScreen("bookings")}
+                onOpenPayments={() => setFarmerScreen("payment")}
+                onOpenAssisted={() => setAssistedModalOpen(true)}
+                onOpenMap={() => setFarmerScreen("map")}
+                onSelectCentre={() => setBookingModalOpen(true)}
+                onOpenNotifications={() => setNotificationsOpen(true)}
+              />
+            )}
 
-            {/* Live Token Snapshot in Rail */}
-            <div className="relative mt-auto overflow-hidden rounded-2xl bg-primary p-4 text-primary-foreground shadow-md">
-              <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
-              <div className="relative z-10 flex items-center justify-between">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-secondary">
-                  Active Booking
-                </span>
-                <span className="flex items-center gap-1 text-[10px] font-bold text-secondary">
-                  <span className="size-1.5 rounded-full bg-secondary animate-ping" /> Live
-                </span>
-              </div>
-              <p className="relative mt-1 font-display text-3xl font-black text-secondary">
-                Token #{activeBooking?.queueNumber || 47}
-              </p>
-              <p className="relative mt-1 text-xs text-primary-foreground/80 truncate">
-                {activeBooking?.centreName || "Kottayam Procurement Centre"}
-              </p>
-              <p className="relative mt-0.5 text-[11px] text-primary-foreground/60">
-                Now serving: #{nowServing} · {Math.max(0, (activeBooking?.queueNumber || 47) - nowServing)} ahead
-              </p>
-            </div>
-          </aside>
+            {farmerScreen === "queue" && (
+              <LiveQueueView
+                onBack={() => setFarmerScreen("home")}
+                onOpenReschedule={() => setFarmerScreen("bookings")}
+                onOpenDirections={() => setFarmerScreen("map")}
+              />
+            )}
 
-          {/* Farmer Phone / Mobile View Shell */}
-          <main className="phone-shell">
-            <div className="phone-content">
-              {farmerScreen === "home" && (
-                <FarmerDashboard
-                  onOpenBooking={() => setBookingModalOpen(true)}
-                  onOpenLiveQueue={() => setFarmerScreen("queue")}
-                  onOpenBookingsList={() => setFarmerScreen("bookings")}
-                  onOpenPayments={() => setFarmerScreen("payment")}
-                  onOpenAssisted={() => setAssistedModalOpen(true)}
-                  onOpenMap={() => setFarmerScreen("map")}
-                  onSelectCentre={() => setBookingModalOpen(true)}
-                />
-              )}
+            {farmerScreen === "bookings" && (
+              <MyBookingsView
+                onBack={() => setFarmerScreen("home")}
+                onOpenReschedule={() => setBookingModalOpen(true)}
+              />
+            )}
 
-              {farmerScreen === "queue" && (
-                <LiveQueueView
-                  onBack={() => setFarmerScreen("home")}
-                  onOpenReschedule={() => setFarmerScreen("bookings")}
-                  onOpenDirections={() => setFarmerScreen("map")}
-                />
-              )}
+            {farmerScreen === "timeline" && (
+              <ProcurementTimelineView onBack={() => setFarmerScreen("home")} />
+            )}
 
-              {farmerScreen === "bookings" && (
-                <MyBookingsView
-                  onBack={() => setFarmerScreen("home")}
-                  onOpenReschedule={() => setBookingModalOpen(true)}
-                />
-              )}
+            {farmerScreen === "payment" && (
+              <PaymentTrackingView onBack={() => setFarmerScreen("home")} />
+            )}
 
-              {farmerScreen === "timeline" && (
-                <ProcurementTimelineView onBack={() => setFarmerScreen("home")} />
-              )}
+            {farmerScreen === "map" && (
+              <CentreMapView
+                onBack={() => setFarmerScreen("home")}
+                onSelectCentre={() => setBookingModalOpen(true)}
+              />
+            )}
 
-              {farmerScreen === "payment" && (
-                <PaymentTrackingView onBack={() => setFarmerScreen("home")} />
-              )}
+            {farmerScreen === "profile" && (
+              <FarmerProfileView
+                onBack={() => setFarmerScreen("home")}
+                onReplayIntro={() => setFarmerScreen("splash")}
+              />
+            )}
+          </div>
 
-              {farmerScreen === "map" && (
-                <CentreMapView
-                  onBack={() => setFarmerScreen("home")}
-                  onSelectCentre={() => setBookingModalOpen(true)}
-                />
-              )}
-
-              {farmerScreen === "profile" && (
-                <FarmerProfileView
-                  onBack={() => setFarmerScreen("home")}
-                  onReplayIntro={() => setFarmerScreen("splash")}
-                />
-              )}
-            </div>
-
-            {/* Mobile Bottom Navigation Pill */}
-            <FarmerBottomNav screen={farmerScreen} onNavigate={setFarmerScreen} />
-          </main>
-        </div>
-      )}
+          {/* Mobile Bottom Navigation Pill */}
+          <FarmerBottomNav screen={farmerScreen} onNavigate={setFarmerScreen} />
+        </main>
+      </div>
 
       {/* Global Modals */}
       <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
@@ -596,29 +589,37 @@ function FarmerProfileView({
         </a>
       </div>
 
-      {/* Role Switcher Shortcuts */}
-      <div className="rounded-2xl border border-dashed border-border bg-card/60 p-4 text-center space-y-2">
-        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-          Hackathon / Evaluation Quick Switch
-        </span>
-        <div className="flex items-center justify-center gap-2">
+      {/* Official Government Portals */}
+      <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Government Procurement Portals
+        </h3>
+        <div className="grid grid-cols-1 gap-2">
           <button
             onClick={() => {
               setRole("staff");
               navigate({ to: "/staff" });
             }}
-            className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold hover:bg-muted transition-all"
+            className="flex items-center justify-between rounded-xl border border-border bg-muted/30 p-3 text-xs font-bold text-foreground hover:bg-muted transition-all"
           >
-            🏢 Open Staff Console (/staff)
+            <div className="flex items-center gap-2.5">
+              <Building2 className="size-4 text-primary" />
+              <span>🏢 Procurement Centre Staff Console</span>
+            </div>
+            <span className="text-[11px] text-muted-foreground font-mono">/staff</span>
           </button>
           <button
             onClick={() => {
               setRole("admin");
               navigate({ to: "/admin" });
             }}
-            className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold hover:bg-muted transition-all"
+            className="flex items-center justify-between rounded-xl border border-border bg-muted/30 p-3 text-xs font-bold text-foreground hover:bg-muted transition-all"
           >
-            🧑‍💼 Open Admin Center (/admin)
+            <div className="flex items-center gap-2.5">
+              <ShieldCheck className="size-4 text-primary" />
+              <span>🧑‍💼 Directorate Command Center</span>
+            </div>
+            <span className="text-[11px] text-muted-foreground font-mono">/admin</span>
           </button>
         </div>
       </div>
