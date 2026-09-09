@@ -19,7 +19,6 @@ import {
   Sliders,
   LogOut,
   Sparkles,
-  PlayCircle,
   Building2,
 } from "lucide-react";
 
@@ -498,10 +497,7 @@ function KisanQueueApp() {
             )}
 
             {farmerScreen === "profile" && (
-              <FarmerProfileView
-                onBack={() => setFarmerScreen("home")}
-                onReplayIntro={() => setFarmerScreen("splash")}
-              />
+              <FarmerProfileView onBack={() => setFarmerScreen("home")} />
             )}
           </div>
 
@@ -564,10 +560,8 @@ function FarmerBottomNav({
 
 function FarmerProfileView({
   onBack,
-  onReplayIntro,
 }: {
   onBack: () => void;
-  onReplayIntro: () => void;
 }) {
   const { user, language, setLanguage, setRole } = useKisanQueue();
   const navigate = useNavigate();
@@ -645,19 +639,6 @@ function FarmerProfileView({
         </div>
       </div>
 
-      {/* Replay Intro Splash */}
-      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-        <button
-          onClick={onReplayIntro}
-          className="flex w-full items-center justify-between text-xs font-semibold text-foreground hover:text-primary transition-colors"
-        >
-          <div className="flex items-center gap-2.5">
-            <PlayCircle className="size-4 text-primary" />
-            <span>{t(language, "replayIntro")}</span>
-          </div>
-          <ChevronRight className="size-4 text-muted-foreground" />
-        </button>
-      </div>
 
       {/* Support & Helpline */}
       <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-2">
