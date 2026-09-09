@@ -25,6 +25,7 @@ import {
   Sprout,
   ShieldCheck,
   Check,
+  Ticket,
 } from "lucide-react";
 import heroImage from "@/assets/smartprocure-home.jpg";
 import cropPaddy from "@/assets/crop-paddy.jpg";
@@ -72,7 +73,7 @@ const CROPS_DATA = [
 ];
 
 interface FarmerDashboardProps {
-  onOpenBooking: () => void;
+  onOpenBooking: (cropName?: string) => void;
   onOpenLiveQueue: () => void;
   onOpenBookingsList: () => void;
   onOpenPayments: () => void;
@@ -96,21 +97,25 @@ export function FarmerDashboard({
     user,
     activeBooking,
     centres,
+    crops,
     language,
     nowServing,
     predictWaitingTime,
     getRecommendedCentre,
     notifications,
     cancelBooking,
+    bookSlot,
   } = useKisanQueue();
   const [showCancelModal, setShowCancelModal] = useState(false);
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const recommendedCentre = getRecommendedCentre();
-  const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || centres[0];
-  const userQueueNumber = activeBooking?.queueNumber || 47;
-  const prediction = predictWaitingTime(currentCentre.id, userQueueNumber);
-  const farmersAhead = Math.max(0, userQueueNumber - nowServing);
+  const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || recommendedCentre;
+  const userQueueNumber = activeBooking ? activeBooking.queueNumber : null;
+  const prediction = activeBooking
+    ? predictWaitingTime(currentCentre.id, activeBooking.queueNumber)
+    : { timeStr: "Immediate", minutesLeft: 0, delayMinutes: 0 };
+  const farmersAhead = activeBooking ? Math.max(0, activeBooking.queueNumber - nowServing) : 0;
 
   return (
     <div className="content-stack pt-2 space-y-4">
@@ -193,16 +198,20 @@ export function FarmerDashboard({
             </div>
 
             {/* Metric 2 */}
-            <div className="rounded-2xl bg-white/25 backdrop-blur-md border border-white/40 p-2.5 text-white shadow-md ring-1 ring-white/30">
+            <div
+              onClick={() => onOpenBooking()}
+              className="rounded-2xl bg-white/25 backdrop-blur-md border border-white/40 p-2.5 text-white shadow-md ring-1 ring-white/30 cursor-pointer hover:bg-white/30 transition-all"
+              title={activeBooking ? `Your active token #${userQueueNumber}` : "Tap to generate token"}
+            >
               <div className="flex items-center gap-1 text-[10px] text-white/90 font-bold">
                 <Sun className="size-3 text-amber-300" />
                 <span>Your Token</span>
               </div>
               <p className="font-display text-xl font-extrabold mt-1 text-white">
-                #{userQueueNumber}
+                {userQueueNumber ? `#${userQueueNumber}` : "No Token"}
               </p>
               <p className="text-[9px] text-emerald-300 font-semibold truncate">
-                {activeBooking ? `${farmersAhead} ahead` : "Slot Ready"}
+                {activeBooking ? `${farmersAhead} ahead` : "⚡ Tap to Generate"}
               </p>
             </div>
 
@@ -213,9 +222,11 @@ export function FarmerDashboard({
                 <span>Wait Turn</span>
               </div>
               <p className="font-display text-xl font-extrabold mt-1 text-white">
-                ~{prediction.minutesLeft}m
+                {activeBooking ? `~${prediction.minutesLeft}m` : "Ready"}
               </p>
-              <p className="text-[9px] text-white/70 truncate">{prediction.timeStr}</p>
+              <p className="text-[9px] text-white/70 truncate">
+                {activeBooking ? prediction.timeStr : "Fast-track entry"}
+              </p>
             </div>
           </div>
 
@@ -238,13 +249,25 @@ export function FarmerDashboard({
               </button>
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={onOpenBooking}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-white text-[#123D35] py-3 text-xs font-extrabold shadow-lg hover:bg-white/90 transition-colors"
-            >
-              + Book Procurement Slot
-            </button>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => onOpenBooking()}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-white text-[#123D35] py-3 text-xs font-extrabold shadow-lg hover:bg-white/90 transition-colors"
+              >
+                <CalendarDays className="size-4" /> Custom Slot
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const availableSlot = recommendedCentre.slots.find((s) => s.status !== "full")?.time || "11:00 – 12:00 PM";
+                  bookSlot(recommendedCentre.id, crops[0].name, 420, "10 Sep 2026", availableSlot);
+                }}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 text-white py-3 text-xs font-extrabold shadow-lg hover:bg-emerald-700 active:scale-95 transition-all"
+              >
+                ⚡ Instant Token
+              </button>
+            </div>
           )}
         </div>
       </section>
@@ -285,7 +308,7 @@ export function FarmerDashboard({
           </h3>
           <button
             type="button"
-            onClick={onOpenBooking}
+            onClick={() => onOpenBooking()}
             className="text-xs font-semibold text-primary hover:underline"
           >
             See all
@@ -296,8 +319,8 @@ export function FarmerDashboard({
           {CROPS_DATA.map((crop) => (
             <div
               key={crop.id}
-              onClick={onOpenBooking}
-              className="group min-w-[145px] max-w-[155px] shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all"
+              onClick={() => onOpenBooking(crop.name)}
+              className="group min-w-[145px] max-w-[155px] shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all active:scale-95"
             >
               <div className="relative h-20 w-full overflow-hidden bg-muted">
                 <img
@@ -336,16 +359,31 @@ export function FarmerDashboard({
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
+          <div
+            onClick={() => {
+              if (activeBooking) {
+                onOpenLiveQueue();
+              } else {
+                onOpenBooking();
+              }
+            }}
+            className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all cursor-pointer"
+          >
             <div className="min-w-0 pr-2">
-              <h4 className="text-xs font-bold text-foreground">Procurement Slot Confirmed</h4>
+              <h4 className="text-xs font-bold text-foreground">
+                {activeBooking ? "Procurement Slot Confirmed" : "No Active Token · Tap to Generate"}
+              </h4>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Token #{userQueueNumber} · {activeBooking ? activeBooking.centreName : currentCentre.name}
+                {activeBooking
+                  ? `Token #${userQueueNumber} · ${activeBooking.centreName}`
+                  : "Tap here to book a slot or issue an instant queue pass"}
               </p>
-              <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">08:30 AM · Verified</span>
+              <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">
+                {activeBooking ? "08:30 AM · Verified" : "⚡ Ready for token generation"}
+              </span>
             </div>
-            <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-sm">
-              <Check className="size-3.5 stroke-[3]" />
+            <div className={`flex size-6 shrink-0 items-center justify-center rounded-full ${activeBooking ? "bg-emerald-600 text-white shadow-sm" : "border-2 border-dashed border-primary text-primary"}`}>
+              {activeBooking ? <Check className="size-3.5 stroke-[3]" /> : <Sparkles className="size-3.5" />}
             </div>
           </div>
 
@@ -408,13 +446,13 @@ export function FarmerDashboard({
         <div className="grid grid-cols-4 gap-2">
           <button
             type="button"
-            onClick={onOpenBooking}
-            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3 text-foreground transition-all hover:border-primary/50 hover:shadow-sm"
+            onClick={() => onOpenBooking()}
+            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3 text-foreground transition-all hover:border-primary/50 hover:shadow-sm active:scale-95"
           >
             <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <CalendarDays className="size-5" />
+              <Ticket className="size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">Book Slot</span>
+            <span className="text-[11px] font-bold text-center leading-tight">Generate Token</span>
           </button>
 
           <button

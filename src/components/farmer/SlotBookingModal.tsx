@@ -2,15 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useKisanQueue } from "@/lib/store";
 import { X, Check, Sparkles, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, ChevronRight } from "lucide-react";
 
+interface SlotBookingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialCentreName?: string | null;
+  initialCropName?: string | null;
+  onNavigateToQueue?: () => void;
+}
+
 export function SlotBookingModal({
   isOpen,
   onClose,
   initialCentreName,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  initialCentreName?: string | null;
-}) {
+  initialCropName,
+  onNavigateToQueue,
+}: SlotBookingModalProps) {
   const { crops, centres, bookSlot, getRecommendedCentre, cancelBooking } = useKisanQueue();
   const recommendedCentre = getRecommendedCentre();
 
@@ -19,7 +25,7 @@ export function SlotBookingModal({
   const [quantity, setQuantity] = useState(420);
   const [selectedCentreId, setSelectedCentreId] = useState(recommendedCentre.id);
   const [selectedDate, setSelectedDate] = useState("10 Sep 2026");
-  const [selectedSlotTime, setSelectedSlotTime] = useState("10:00 – 11:00 AM");
+  const [selectedSlotTime, setSelectedSlotTime] = useState("11:00 – 12:00 PM");
   const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null);
   const [assignedQueueNumber, setAssignedQueueNumber] = useState<number | null>(null);
 
@@ -38,12 +44,27 @@ export function SlotBookingModal({
         );
         if (match) {
           setSelectedCentreId(match.id);
+          const firstAvail = match.slots.find((s) => s.status !== "full")?.time || "11:00 – 12:00 PM";
+          setSelectedSlotTime(firstAvail);
         }
       } else {
         setSelectedCentreId(recommendedCentre.id);
+        const firstAvail = recommendedCentre.slots.find((s) => s.status !== "full")?.time || "11:00 – 12:00 PM";
+        setSelectedSlotTime(firstAvail);
+      }
+
+      if (initialCropName) {
+        const cropMatch = crops.find(
+          (c) =>
+            c.name.toLowerCase().includes(initialCropName.toLowerCase().trim()) ||
+            initialCropName.toLowerCase().includes(c.id.toLowerCase().trim())
+        );
+        if (cropMatch) {
+          setSelectedCrop(cropMatch.name);
+        }
       }
     }
-  }, [isOpen, initialCentreName, recommendedCentre.id, centres]);
+  }, [isOpen, initialCentreName, initialCropName, recommendedCentre, centres, crops]);
 
   const handleClose = () => {
     setStep(1);
@@ -118,6 +139,33 @@ export function SlotBookingModal({
           {/* STEP 1: CROP & QUANTITY */}
           {step === 1 && (
             <div className="space-y-4">
+              {/* Instant Token Quick Action Banner */}
+              <div className="rounded-2xl border-2 border-emerald-500/30 bg-emerald-500/10 p-3.5 shadow-sm space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                      <Sparkles className="size-3.5 text-emerald-600" /> Instant Token Generator
+                    </h4>
+                    <p className="text-[10.5px] text-muted-foreground mt-0.5">
+                      Skip remaining steps · Auto-assign earliest slot at {currentCentre.name.replace(" Procurement Centre", "")}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const availableSlot = currentCentre.slots.find((s) => s.status !== "full")?.time || "11:00 – 12:00 PM";
+                      const newBooking = bookSlot(selectedCentreId, selectedCrop, quantity, selectedDate, availableSlot);
+                      setConfirmedBookingId(newBooking.id);
+                      setAssignedQueueNumber(newBooking.queueNumber);
+                      setStep(5);
+                    }}
+                    className="rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-md hover:bg-emerald-700 active:scale-95 transition-all whitespace-nowrap"
+                  >
+                    ⚡ Get Token Now
+                  </button>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase text-muted-foreground">Select Crop</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -144,25 +192,27 @@ export function SlotBookingModal({
 
               <div>
                 <label className="text-xs font-bold uppercase text-muted-foreground">
-                  Estimated Quantity for Procurement (kg)
+                  Harvest Quantity (kg)
                 </label>
-                <div className="mt-1.5 flex items-center gap-3">
+                <div className="mt-1 flex items-center gap-3">
                   <input
                     type="range"
-                    min={50}
-                    max={2000}
-                    step={25}
+                    min="100"
+                    max="3000"
+                    step="50"
                     value={quantity}
                     onChange={(e) => setQuantity(Number(e.target.value))}
-                    className="w-full accent-primary"
+                    className="flex-1 accent-primary"
                   />
-                  <span className="w-20 rounded-lg border border-input bg-background px-2.5 py-1 text-center font-mono text-sm font-bold">
+                  <span className="font-mono text-base font-bold text-primary">
                     {quantity} kg
                   </span>
                 </div>
-                <div className="mt-2 flex justify-between rounded-xl bg-muted/40 p-3 text-xs">
-                  <span className="text-muted-foreground">Calculated MSP Value:</span>
-                  <strong className="text-primary font-bold">₹{totalPayout.toLocaleString("en-IN")}</strong>
+                <div className="mt-2 flex items-center justify-between rounded-xl bg-muted/40 p-2.5 text-xs">
+                  <span className="text-muted-foreground">Estimated Total Payout:</span>
+                  <strong className="text-sm font-bold text-emerald-700">
+                    ₹{totalPayout.toLocaleString("en-IN")}
+                  </strong>
                 </div>
               </div>
             </div>
@@ -378,22 +428,22 @@ export function SlotBookingModal({
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={handleClose}
-                  className="rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
+                  onClick={() => {
+                    handleClose();
+                    if (onNavigateToQueue) {
+                      onNavigateToQueue();
+                    }
+                  }}
+                  className="rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
                 >
-                  Go to Dashboard
+                  <Clock className="size-3.5" /> Track Live Queue
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (confirmedBookingId) {
-                      cancelBooking(confirmedBookingId);
-                    }
-                    handleClose();
-                  }}
-                  className="rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 py-3 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 transition-colors"
+                  onClick={handleClose}
+                  className="rounded-xl border border-border bg-card py-3 text-xs font-bold text-foreground hover:bg-muted transition-colors"
                 >
-                  Cancel Slot
+                  Go to Dashboard
                 </button>
               </div>
             </div>
@@ -427,9 +477,9 @@ export function SlotBookingModal({
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="flex items-center gap-1.5 rounded-xl bg-emerald-700 px-6 py-2.5 text-xs font-bold text-white shadow-lg"
+                className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-6 py-2.5 text-xs font-bold text-white shadow-lg active:scale-95 transition-all"
               >
-                Generate Token Pass <Check className="size-4" />
+                🎟️ Confirm & Generate Token Pass <Check className="size-4 stroke-[3]" />
               </button>
             )}
           </div>

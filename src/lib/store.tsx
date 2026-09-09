@@ -446,9 +446,9 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
       )
     );
 
-    // Add to queue
+    // Add to queue and ensure only newest token is marked as current farmer
     setQueue((prev) => [
-      ...prev,
+      ...prev.map((item) => (item.isCurrentFarmer ? { ...item, isCurrentFarmer: false } : item)),
       {
         queueNumber: newQueueNum,
         farmerName: `${user.name} (You)`,

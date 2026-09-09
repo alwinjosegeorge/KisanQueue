@@ -265,6 +265,7 @@ function KisanQueueApp() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [selectedCentreForBooking, setSelectedCentreForBooking] = useState<string | null>(null);
+  const [selectedCropForBooking, setSelectedCropForBooking] = useState<string | null>(null);
   const [assistedModalOpen, setAssistedModalOpen] = useState(false);
 
   useEffect(() => {
@@ -402,13 +403,15 @@ function KisanQueueApp() {
               </span>
             </div>
             <p className="relative mt-1 font-display text-3xl font-black text-secondary">
-              Token #{activeBooking?.queueNumber || 47}
+              {activeBooking ? `Token #${activeBooking.queueNumber}` : "No Token"}
             </p>
             <p className="relative mt-1 text-xs text-primary-foreground/80 truncate">
-              {activeBooking?.centreName || "Kottayam Procurement Centre"}
+              {activeBooking ? activeBooking.centreName : "Procurement Portal Ready"}
             </p>
             <p className="relative mt-0.5 text-[11px] text-primary-foreground/60">
-              Now serving: #{nowServing} · {Math.max(0, (activeBooking?.queueNumber || 47) - nowServing)} ahead
+              {activeBooking
+                ? `Now serving: #${nowServing} · ${Math.max(0, activeBooking.queueNumber - nowServing)} ahead`
+                : `Now serving: #${nowServing} · Ready to issue token`}
             </p>
           </div>
         </aside>
@@ -418,8 +421,9 @@ function KisanQueueApp() {
           <div className="phone-content">
             {farmerScreen === "home" && (
               <FarmerDashboard
-                onOpenBooking={() => {
+                onOpenBooking={(cropName) => {
                   setSelectedCentreForBooking(null);
+                  setSelectedCropForBooking(cropName || null);
                   setBookingModalOpen(true);
                 }}
                 onOpenLiveQueue={() => setFarmerScreen("queue")}
@@ -438,7 +442,10 @@ function KisanQueueApp() {
             {farmerScreen === "queue" && (
               <LiveQueueView
                 onBack={() => setFarmerScreen("home")}
-                onOpenReschedule={() => setFarmerScreen("bookings")}
+                onOpenReschedule={() => {
+                  setSelectedCentreForBooking(null);
+                  setBookingModalOpen(true);
+                }}
                 onOpenDirections={() => setFarmerScreen("map")}
               />
             )}
@@ -490,9 +497,12 @@ function KisanQueueApp() {
       <SlotBookingModal
         isOpen={bookingModalOpen}
         initialCentreName={selectedCentreForBooking}
+        initialCropName={selectedCropForBooking}
+        onNavigateToQueue={() => setFarmerScreen("queue")}
         onClose={() => {
           setBookingModalOpen(false);
           setSelectedCentreForBooking(null);
+          setSelectedCropForBooking(null);
         }}
       />
       <AssistedBookingModal isOpen={assistedModalOpen} onClose={() => setAssistedModalOpen(false)} />

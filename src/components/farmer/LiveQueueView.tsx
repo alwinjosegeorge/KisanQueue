@@ -24,9 +24,11 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
   const { user, activeBooking, centres, queue, nowServing, language, predictWaitingTime, cancelBooking } = useKisanQueue();
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || centres[0];
-  const userQueueNumber = activeBooking?.queueNumber || 47;
-  const prediction = predictWaitingTime(currentCentre.id, userQueueNumber);
-  const farmersAhead = Math.max(0, userQueueNumber - nowServing);
+  const userQueueNumber = activeBooking ? activeBooking.queueNumber : null;
+  const prediction = activeBooking
+    ? predictWaitingTime(currentCentre.id, activeBooking.queueNumber)
+    : { timeStr: "Immediate", minutesLeft: 0, delayMinutes: 0 };
+  const farmersAhead = activeBooking ? Math.max(0, activeBooking.queueNumber - nowServing) : 0;
 
   return (
     <div className="content-stack pt-2 space-y-4">
@@ -69,6 +71,24 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
         </div>
       )}
 
+      {/* No Active Token Notice */}
+      {!activeBooking && (
+        <div className="rounded-2xl border-2 border-primary/30 bg-primary/10 p-4 text-center space-y-2.5 shadow-sm">
+          <Sparkles className="size-6 text-primary mx-auto" />
+          <h3 className="font-bold text-sm text-foreground">You do not have an active queue token</h3>
+          <p className="text-xs text-muted-foreground">
+            Generate a digital token pass to secure your position in today's live procurement queue.
+          </p>
+          <button
+            type="button"
+            onClick={onOpenReschedule}
+            className="rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:opacity-90 transition-opacity"
+          >
+            ⚡ Generate Queue Token Now
+          </button>
+        </div>
+      )}
+
       {/* Live Counter Hero Ring */}
       <section className="queue-progress-card relative overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground shadow-xl">
         <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
@@ -89,9 +109,13 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
               <span className="block text-[10px] uppercase tracking-wider text-primary-foreground/80 font-bold">
                 Your Token
               </span>
-              <strong className="font-display text-5xl font-extrabold text-white">#{userQueueNumber}</strong>
+              <strong className="font-display text-5xl font-extrabold text-white">
+                {userQueueNumber ? `#${userQueueNumber}` : "—"}
+              </strong>
               <small className="block text-[10px] text-secondary mt-0.5 font-semibold">
-                {farmersAhead === 0 ? "Serving Now!" : `${farmersAhead} ahead`}
+                {activeBooking
+                  ? (farmersAhead === 0 ? "Serving Now!" : `${farmersAhead} ahead`)
+                  : "No Active Token"}
               </small>
             </div>
           </div>
@@ -99,17 +123,17 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
           <div className="grid grid-cols-3 gap-2 border-t border-white/15 pt-3 text-center text-xs">
             <div>
               <span className="text-[10px] text-primary-foreground/60 block">Queue Gap</span>
-              <strong>{farmersAhead} Farmers</strong>
+              <strong>{activeBooking ? `${farmersAhead} Farmers` : "—"}</strong>
             </div>
             <div>
               <span className="text-[10px] text-primary-foreground/60 block">Wait Time</span>
               <strong className={currentCentre.activeDelayMinutes > 0 ? "text-secondary" : ""}>
-                ~{prediction.minutesLeft} mins
+                {activeBooking ? `~${prediction.minutesLeft} mins` : "Ready"}
               </strong>
             </div>
             <div>
               <span className="text-[10px] text-primary-foreground/60 block">Expected Call</span>
-              <strong className="text-secondary">{prediction.timeStr}</strong>
+              <strong className="text-secondary">{activeBooking ? prediction.timeStr : "Immediate"}</strong>
             </div>
           </div>
         </div>
