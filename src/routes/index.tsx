@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   CalendarDays,
   UsersRound,
@@ -18,13 +18,18 @@ import {
   Sliders,
   LogOut,
   Sparkles,
+  Navigation,
+  PlayCircle,
 } from "lucide-react";
 
-import { KisanQueueProvider, useKisanQueue } from "@/lib/store";
+import { useKisanQueue } from "@/lib/store";
 import { useTranslation, t } from "@/lib/translations";
 import { DemoHeader } from "@/components/common/DemoHeader";
 import { NotificationDrawer } from "@/components/common/NotificationDrawer";
 import { AuthModal } from "@/components/auth/AuthModal";
+
+import heroImage from "@/assets/smartprocure-home.jpg";
+import splashImage from "@/assets/smartprocure-splash.jpg";
 
 // Farmer components
 import { FarmerDashboard } from "@/components/farmer/FarmerDashboard";
@@ -60,7 +65,7 @@ export const Route = createFileRoute("/")({
   component: KisanQueueApp,
 });
 
-type FarmerScreen = "home" | "bookings" | "queue" | "timeline" | "payment" | "map" | "profile";
+type FarmerScreen = "splash" | "onboarding" | "home" | "bookings" | "queue" | "timeline" | "payment" | "map" | "profile";
 
 const FARMER_NAV_ITEMS: { id: FarmerScreen; label: string; icon: typeof Leaf }[] = [
   { id: "home", label: "Home", icon: Sprout },
@@ -70,6 +75,27 @@ const FARMER_NAV_ITEMS: { id: FarmerScreen; label: string; icon: typeof Leaf }[]
   { id: "payment", label: "Payments", icon: IndianRupee },
   { id: "profile", label: "Profile", icon: UserRound },
 ];
+
+const ONBOARDING = [
+  {
+    eyebrow: "Your time matters",
+    title: "Skip the Queue",
+    copy: "Spend less time waiting at procurement centres.",
+    focus: "queue",
+  },
+  {
+    eyebrow: "Plan with confidence",
+    title: "Book Your Slot",
+    copy: "Choose the best time to bring your produce.",
+    focus: "slot",
+  },
+  {
+    eyebrow: "Arrive right on time",
+    title: "Know When to Arrive",
+    copy: "Track your queue and estimated waiting time.",
+    focus: "arrival",
+  },
+] as const;
 
 function Logo({ inverse = false }: { inverse?: boolean }) {
   return (
@@ -85,12 +111,137 @@ function Logo({ inverse = false }: { inverse?: boolean }) {
   );
 }
 
+function AppButton({
+  children,
+  tone = "primary",
+  onClick,
+  className = "",
+}: {
+  children: ReactNode;
+  tone?: "primary" | "soft" | "ghost" | "danger";
+  onClick?: () => void;
+  className?: string;
+}) {
+  return (
+    <button className={`app-button app-button-${tone} ${className}`} onClick={onClick}>
+      {children}
+    </button>
+  );
+}
+
+function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
+  return (
+    <main className="splash-screen">
+      <img
+        src={splashImage}
+        alt="Farmer with harvested grain at a procurement centre"
+        width={1088}
+        height={1600}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="splash-shade" />
+      <div className="relative z-10 flex min-h-[calc(100dvh-3.5rem)] flex-col px-6 pb-7 pt-8 sm:mx-auto sm:max-w-md">
+        <div className="flex items-center justify-between">
+          <Logo inverse />
+          <button
+            onClick={onSkip}
+            className="rounded-full bg-black/20 px-3 py-1 text-xs font-semibold text-primary-foreground/80 hover:bg-black/30 hover:text-white backdrop-blur-sm transition-all"
+          >
+            Skip →
+          </button>
+        </div>
+        <div className="mt-auto">
+          <p className="eyebrow text-secondary font-semibold">Kerala Agricultural Department</p>
+          <h1 className="mt-2 font-display text-6xl leading-[0.92] text-primary-foreground">
+            Kisan<br />Queue
+          </h1>
+          <p className="mt-4 text-sm leading-6 text-primary-foreground/80">
+            Digital procurement and fair, fast queue management for Kerala farmers.
+          </p>
+          <AppButton
+            tone="soft"
+            className="mt-7 w-full flex items-center justify-center gap-1.5 py-3 font-bold text-base shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all"
+            onClick={onNext}
+          >
+            Begin <ChevronRight className="size-4" />
+          </AppButton>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function Onboarding({
+  step,
+  onNext,
+  onSkip,
+}: {
+  step: number;
+  onNext: () => void;
+  onSkip: () => void;
+}) {
+  const item = ONBOARDING[step] ?? ONBOARDING[0];
+  return (
+    <main className="min-h-[calc(100dvh-3.5rem)] bg-background p-4 sm:grid sm:place-items-center">
+      <section className="relative mx-auto flex min-h-[calc(100dvh-5.5rem)] w-full max-w-md flex-col overflow-hidden rounded-[2rem] bg-primary p-5 text-primary-foreground shadow-float sm:min-h-[740px]">
+        <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
+        <div className="flex items-center justify-between">
+          <Logo inverse />
+          <button
+            className="text-xs font-semibold text-primary-foreground/70 hover:text-white transition-colors"
+            onClick={onSkip}
+          >
+            Skip
+          </button>
+        </div>
+        <div className="onboarding-visual mt-8">
+          <img
+            src={heroImage}
+            alt="Farmers arriving at a procurement centre"
+            width={1600}
+            height={912}
+            className="h-full w-full object-cover"
+          />
+          <div className={`journey-marker journey-${item.focus}`}>
+            <Navigation className="size-4" />
+          </div>
+          <div className="queue-ticket">
+            <span>YOUR TOKEN</span>
+            <strong>#47</strong>
+            <small>24 min</small>
+          </div>
+        </div>
+        <div className="mt-auto pt-8">
+          <p className="eyebrow text-secondary">{item.eyebrow}</p>
+          <h1 className="mt-3 font-display text-5xl leading-none">{item.title}</h1>
+          <p className="mt-4 max-w-xs text-sm leading-6 text-primary-foreground/70">{item.copy}</p>
+          <div className="mt-8 grid grid-cols-[1fr_auto] items-center gap-4">
+            <div className="flex gap-1.5">
+              {ONBOARDING.map((_, index) => (
+                <span
+                  key={index}
+                  className={index === step ? "pager-dot pager-dot-active" : "pager-dot"}
+                />
+              ))}
+            </div>
+            <AppButton tone="soft" onClick={onNext} className="flex items-center gap-1 font-semibold">
+              {step === 2 ? "Open KisanQueue" : "Next"}
+              <ChevronRight className="size-4" />
+            </AppButton>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function KisanQueueApp() {
   const { role, setRole, language, setLanguage, user, activeBooking, nowServing, largeText, highContrast } =
     useKisanQueue();
   const { t: translate } = useTranslation();
 
-  const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>("home");
+  const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>("splash");
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const [authOpen, setAuthOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -100,6 +251,56 @@ function KisanQueueApp() {
     setRole("farmer");
   }, [setRole]);
 
+  // If user is on Splash screen
+  if (farmerScreen === "splash") {
+    return (
+      <div
+        className={`min-h-screen flex flex-col bg-background text-foreground ${
+          largeText ? "text-lg" : ""
+        } ${highContrast ? "contrast-125" : ""}`}
+      >
+        <DemoHeader
+          onOpenAuth={() => setAuthOpen(true)}
+          onOpenNotifications={() => setNotificationsOpen(true)}
+        />
+        <Splash
+          onNext={() => setFarmerScreen("onboarding")}
+          onSkip={() => setFarmerScreen("home")}
+        />
+        <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
+        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+      </div>
+    );
+  }
+
+  // If user is on Onboarding screen
+  if (farmerScreen === "onboarding") {
+    return (
+      <div
+        className={`min-h-screen flex flex-col bg-background text-foreground ${
+          largeText ? "text-lg" : ""
+        } ${highContrast ? "contrast-125" : ""}`}
+      >
+        <DemoHeader
+          onOpenAuth={() => setAuthOpen(true)}
+          onOpenNotifications={() => setNotificationsOpen(true)}
+        />
+        <Onboarding
+          step={onboardingStep}
+          onSkip={() => setFarmerScreen("home")}
+          onNext={() =>
+            onboardingStep < 2
+              ? setOnboardingStep((v) => v + 1)
+              : setFarmerScreen("home")
+          }
+        />
+        <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
+        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+      </div>
+    );
+  }
+
+  // Main Farmer App
   return (
     <div
       className={`min-h-screen flex flex-col bg-background text-foreground ${
@@ -225,7 +426,10 @@ function KisanQueueApp() {
               )}
 
               {farmerScreen === "profile" && (
-                <FarmerProfileView onBack={() => setFarmerScreen("home")} />
+                <FarmerProfileView
+                  onBack={() => setFarmerScreen("home")}
+                  onReplayIntro={() => setFarmerScreen("splash")}
+                />
               )}
             </div>
 
@@ -274,7 +478,13 @@ function FarmerBottomNav({
   );
 }
 
-function FarmerProfileView({ onBack }: { onBack: () => void }) {
+function FarmerProfileView({
+  onBack,
+  onReplayIntro,
+}: {
+  onBack: () => void;
+  onReplayIntro: () => void;
+}) {
   const { user, language, setLanguage, setRole } = useKisanQueue();
   const navigate = useNavigate();
 
@@ -350,6 +560,20 @@ function FarmerProfileView({ onBack }: { onBack: () => void }) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Replay Intro Splash */}
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <button
+          onClick={onReplayIntro}
+          className="flex w-full items-center justify-between text-xs font-semibold text-foreground hover:text-primary transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <PlayCircle className="size-4 text-primary" />
+            <span>Replay Welcome Intro & Splash Screen</span>
+          </div>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </button>
       </div>
 
       {/* Support & Helpline */}
