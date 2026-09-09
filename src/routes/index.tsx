@@ -63,12 +63,12 @@ export const Route = createFileRoute("/")({
 
 type FarmerScreen = "splash" | "onboarding" | "home" | "bookings" | "queue" | "timeline" | "payment" | "map" | "profile";
 
-const FARMER_NAV_ITEMS: { id: FarmerScreen; label: string; icon: typeof Leaf }[] = [
-  { id: "home", label: "Home", icon: Sprout },
-  { id: "bookings", label: "Bookings", icon: CalendarDays },
-  { id: "map", label: "Map", icon: MapPin },
-  { id: "queue", label: "Queue", icon: UsersRound },
-  { id: "profile", label: "Profile", icon: UserRound },
+const FARMER_NAV_ITEMS: { id: FarmerScreen; label: string; navKey: any; icon: typeof Leaf }[] = [
+  { id: "home", label: "Home", navKey: "navHome", icon: Sprout },
+  { id: "bookings", label: "Bookings", navKey: "navBookings", icon: CalendarDays },
+  { id: "map", label: "Map", navKey: "navMap", icon: MapPin },
+  { id: "queue", label: "Queue", navKey: "navQueue", icon: UsersRound },
+  { id: "profile", label: "Profile", navKey: "navProfile", icon: UserRound },
 ];
 
 const ONBOARDING = [
@@ -367,7 +367,7 @@ function KisanQueueApp() {
             {FARMER_NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const active = farmerScreen === item.id;
-              const translatedLabel = t(language, item.id as any) || item.label;
+              const translatedLabel = t(language, item.navKey) || item.label;
               return (
                 <button
                   key={item.id}
@@ -540,9 +540,9 @@ function FarmerBottomNav({
   return (
     <nav className="bottom-nav" aria-label="Main navigation">
       <div className="bottom-nav-pill">
-        {FARMER_NAV_ITEMS.map(({ id, label, icon: Icon }) => {
+        {FARMER_NAV_ITEMS.map(({ id, label, navKey, icon: Icon }) => {
           const active = screen === id;
-          const translatedLabel = t(language, id as any) || label;
+          const translatedLabel = t(language, navKey) || label;
           return (
             <button
               key={id}
@@ -552,7 +552,8 @@ function FarmerBottomNav({
               aria-label={translatedLabel}
               title={translatedLabel}
             >
-              <Icon className="size-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
+              <Icon className="bottom-nav-icon" strokeWidth={active ? 2.5 : 2} />
+              <span className="bottom-nav-label">{translatedLabel}</span>
             </button>
           );
         })}

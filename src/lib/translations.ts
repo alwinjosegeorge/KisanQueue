@@ -33,6 +33,11 @@ export const translations = {
     procurement: "Procurement",
     payments: "Payments",
     profile: "Profile",
+    navHome: "Home",
+    navBookings: "Bookings",
+    navMap: "Map",
+    navQueue: "Queue",
+    navProfile: "Profile",
 
     // Farmer Home
     goodMorning: "Good Morning",
@@ -218,6 +223,11 @@ export const translations = {
     procurement: "സംഭരണം",
     payments: "പേയ്മെന്റ്",
     profile: "പ്രൊഫൈൽ",
+    navHome: "ഹോം",
+    navBookings: "ബുക്കിംഗ്",
+    navMap: "മാപ്പ്",
+    navQueue: "ക്യൂ",
+    navProfile: "പ്രൊഫൈൽ",
 
     // Farmer Home
     goodMorning: "സുപ്രഭാതം",
@@ -403,6 +413,11 @@ export const translations = {
     procurement: "खरीद",
     payments: "भुगतान",
     profile: "प्रोफाइल",
+    navHome: "होम",
+    navBookings: "बुकिंग",
+    navMap: "नक्शा",
+    navQueue: "कतार",
+    navProfile: "प्रोफाइल",
 
     // Farmer Home
     goodMorning: "शुभ प्रभात",
@@ -588,6 +603,11 @@ export const translations = {
     procurement: "கொள்முதல்",
     payments: "பணம் செலுத்தல்",
     profile: "சுயவிவரம்",
+    navHome: "முகப்பு",
+    navBookings: "பதிவுகள்",
+    navMap: "வரைபடம்",
+    navQueue: "வரிசை",
+    navProfile: "சுயவிவரம்",
 
     // Farmer Home
     goodMorning: "காலை வணக்கம்",
@@ -773,6 +793,11 @@ export const translations = {
     procurement: "సేకరణ",
     payments: "చెల్లింపులు",
     profile: "ప్రొఫైల్",
+    navHome: "హోమ్",
+    navBookings: "బుకింగ్స్",
+    navMap: "మ్యాప్",
+    navQueue: "క్యూ",
+    navProfile: "ప్రొఫైల్",
 
     // Farmer Home
     goodMorning: "శుభోదయం",
@@ -958,6 +983,11 @@ export const translations = {
     procurement: "ಖರೀದಿ",
     payments: "ಪಾವತಿಗಳು",
     profile: "ಪ್ರೊಫೈಲ್",
+    navHome: "ಮುಖಪುಟ",
+    navBookings: "ಬುಕಿಂಗ್ಸ್",
+    navMap: "ನಕ್ಷೆ",
+    navQueue: "ಸರತಿ",
+    navProfile: "ಪ್ರೊಫೈಲ್",
 
     // Farmer Home
     goodMorning: "ಶುಭೋದಯ",
@@ -1143,6 +1173,11 @@ export const translations = {
     procurement: "সংগ্রহ",
     payments: "পেমেন্ট",
     profile: "প্রোফাইল",
+    navHome: "হোম",
+    navBookings: "বুকিং",
+    navMap: "মানচিত্র",
+    navQueue: "লাইন",
+    navProfile: "প্রোফাইল",
 
     // Farmer Home
     goodMorning: "সুপ্রভাত",
@@ -1328,6 +1363,11 @@ export const translations = {
     procurement: "खरेदी",
     payments: "पेमेंट्स",
     profile: "प्रोफाइल",
+    navHome: "होम",
+    navBookings: "बुकिंग",
+    navMap: "नकाशा",
+    navQueue: "रांग",
+    navProfile: "प्रोफाइल",
 
     // Farmer Home
     goodMorning: "शुभ प्रभात",
