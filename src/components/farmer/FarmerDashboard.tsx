@@ -20,11 +20,7 @@ import {
   Sun,
   Wind,
   Droplets,
-  CheckCircle2,
-  Circle,
   Sprout,
-  ShieldCheck,
-  Check,
   Ticket,
 } from "lucide-react";
 import heroImage from "@/assets/smartprocure-home.jpg";
@@ -393,90 +389,6 @@ export function FarmerDashboard({
         </div>
       </section>
 
-      {/* My Tasks Section (Matching "My Task" checklist in reference image) */}
-      <section>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            {t(language, "todaysTasks")} (4)
-          </h3>
-          <button
-            type="button"
-            onClick={onOpenBookingsList}
-            className="text-xs font-semibold text-primary hover:underline"
-          >
-            {t(language, "seeAll")}
-          </button>
-        </div>
-
-        <div className="space-y-2">
-          <div
-            onClick={() => {
-              if (activeBooking) {
-                onOpenLiveQueue();
-              } else {
-                onOpenBooking();
-              }
-            }}
-            className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all cursor-pointer"
-          >
-            <div className="min-w-0 pr-2">
-              <h4 className="text-xs font-bold text-foreground">
-                {activeBooking ? t(language, "slotConfirmed") : t(language, "noSlotActive")}
-              </h4>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
-                {activeBooking
-                  ? `Token #${userQueueNumber} · ${activeBooking.centreName}`
-                  : t(language, "slotConfirmedSub")}
-              </p>
-              <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">
-                {activeBooking ? `08:30 AM · ${t(language, "verified")}` : `⚡ ${t(language, "tapToGenerate")}`}
-              </span>
-            </div>
-            <div className={`flex size-6 shrink-0 items-center justify-center rounded-full ${activeBooking ? "bg-emerald-600 text-white shadow-sm" : "border-2 border-dashed border-primary text-primary"}`}>
-              {activeBooking ? <Check className="size-3.5 stroke-[3]" /> : <Sparkles className="size-3.5" />}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
-            <div className="min-w-0 pr-2">
-              <h4 className="text-xs font-bold text-foreground">{t(language, "moistureTesting")}</h4>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
-                {t(language, "moistureTestingSub")}
-              </p>
-              <span className="text-[10px] text-primary/80 font-mono mt-0.5 block">09:15 AM · {t(language, "calibrated")}</span>
-            </div>
-            <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-sm">
-              <Check className="size-3.5 stroke-[3]" />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
-            <div className="min-w-0 pr-2">
-              <h4 className="text-xs font-bold text-foreground">{t(language, "gateEntry")}</h4>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
-                {t(language, "gateEntrySub")}
-              </p>
-              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">{t(language, "estimatedTime")}</span>
-            </div>
-            <div className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border text-muted-foreground">
-              <Circle className="size-3 text-muted-foreground" />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 transition-all">
-            <div className="min-w-0 pr-2">
-              <h4 className="text-xs font-bold text-foreground">{t(language, "dbtPayout")}</h4>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
-                {t(language, "dbtPayoutSub")}
-              </p>
-              <span className="text-[10px] text-muted-foreground font-mono mt-0.5 block">{t(language, "aadhaarLinked")}</span>
-            </div>
-            <div className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border text-muted-foreground">
-              <Circle className="size-3 text-muted-foreground" />
-            </div>
-          </div>
-        </div>
-      </section>
 
 
       {/* Quick Actions (SIH Priority 1-4) */}
