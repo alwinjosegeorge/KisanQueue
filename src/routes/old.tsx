@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useKisanQueue } from "@/lib/store";
 import { Language, ProcurementCentre, Booking } from "@/lib/types";
 import { SUPPORTED_LANGUAGES } from "@/lib/translations";
@@ -1173,6 +1173,44 @@ function getSingleBookingSpeech(
   }
 }
 
+// Helper to split long speech text into concise chunks (<130 chars) along sentence boundaries
+function splitSpeechChunks(text: string, maxLen: number = 130): string[] {
+  if (!text) return [];
+  const rawSentences = text
+    .split(/(?<=[.!?|।:\n])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const chunks: string[] = [];
+  let current = "";
+
+  for (const sentence of rawSentences) {
+    if ((current + " " + sentence).trim().length <= maxLen) {
+      current = (current + " " + sentence).trim();
+    } else {
+      if (current) chunks.push(current);
+      if (sentence.length > maxLen) {
+        const subParts = sentence.split(/(?<=[,·،;])\s+/);
+        let sub = "";
+        for (const part of subParts) {
+          if ((sub + " " + part).trim().length <= maxLen) {
+            sub = (sub + " " + part).trim();
+          } else {
+            if (sub) chunks.push(sub);
+            sub = part.trim();
+          }
+        }
+        if (sub) chunks.push(sub);
+        current = "";
+      } else {
+        current = sentence;
+      }
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks.length > 0 ? chunks : [text.slice(0, maxLen)];
+}
+
 function SeniorCitizenModePage() {
   const navigate = useNavigate();
   const queueContext = useKisanQueue();
@@ -1225,6 +1263,12 @@ function SeniorCitizenModePage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechNotice, setSpeechNotice] = useState<string>("");
 
+  // Refs for seamless audio queue playback
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speechQueueRef = useRef<string[]>([]);
+  const speechIndexRef = useRef<number>(0);
+  const activeLangRef = useRef<Language>("ml");
+
   // Booking selection state
   const [selectedCrop, setSelectedCrop] = useState(
     CROP_ITEMS[0] || { id: "paddy", names: { en: "Paddy", ml: "നെല്ല്" }, msp: 32, unit: "kg" }
@@ -1261,90 +1305,144 @@ function SeniorCitizenModePage() {
   const currentLang: Language = (language && UI_TEXTS[language]) ? language : "ml";
   const ui = UI_TEXTS[currentLang] || UI_TEXTS.ml || UI_TEXTS.en;
 
-  // Web Speech API Voice synthesis helper supporting all 8 languages
-  const speakInLanguage = (text: string, langToUse?: Language) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      setSpeechNotice("Speech synthesis not supported in this browser.");
-      return;
+  // Immediate audio stopper
+  const stopAudio = () => {
+    if (audioRef.current) {
+      try {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      } catch {}
+      audioRef.current = null;
     }
-
-    window.speechSynthesis.cancel();
-
-    if (isSpeaking) {
-      setIsSpeaking(false);
-      setSpeechNotice("");
-      return;
+    speechQueueRef.current = [];
+    speechIndexRef.current = 0;
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {}
     }
-
-    const currentLang = langToUse || language;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.85; // Slower, calm, clear cadence for elderly citizens
-    utterance.pitch = 1.0;
-
-    const bcpMap: Record<Language, string> = {
-      ml: "ml-IN",
-      hi: "hi-IN",
-      ta: "ta-IN",
-      te: "te-IN",
-      kn: "kn-IN",
-      bn: "bn-IN",
-      mr: "mr-IN",
-      en: "en-IN",
-    };
-    const targetCode = bcpMap[currentLang] || "en-IN";
-    utterance.lang = targetCode;
-
-    const voices = window.speechSynthesis.getVoices();
-    const langPrefix = currentLang.toLowerCase();
-    const langNames: Record<Language, string> = {
-      ml: "malayalam",
-      hi: "hindi",
-      ta: "tamil",
-      te: "telugu",
-      kn: "kannada",
-      bn: "bengali",
-      mr: "marathi",
-      en: "english",
-    };
-    const targetName = langNames[currentLang] || "english";
-
-    // Look for best matching regional voice
-    const matchedVoice = voices.find(
-      (v) =>
-        v.lang.toLowerCase().replace("_", "-").startsWith(targetCode.toLowerCase()) ||
-        v.lang.toLowerCase().startsWith(langPrefix) ||
-        v.name.toLowerCase().includes(targetName) ||
-        v.name.toLowerCase().includes(langPrefix)
-    );
-
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
-    } else {
-      const inVoice = voices.find((v) => v.lang.toLowerCase().includes("-in"));
-      if (inVoice) {
-        utterance.voice = inVoice;
-      }
-    }
-
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-      setSpeechNotice(text);
-    };
-
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      setSpeechNotice("");
-    };
-
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      setSpeechNotice("");
-    };
-
-    window.speechSynthesis.speak(utterance);
+    setIsSpeaking(false);
+    setSpeechNotice("");
   };
 
-  // Preload voices and clean up on unmount
+  // Browser Web Speech API fallback (only activated if network audio fails or offline)
+  const tryWebSpeechFallback = (remainingText: string, lang: Language) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setTimeout(() => {
+        setIsSpeaking(false);
+        setSpeechNotice("");
+      }, 3000);
+      return;
+    }
+
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(remainingText);
+      utterance.rate = 0.85;
+      utterance.pitch = 1.0;
+
+      const bcpMap: Record<Language, string> = {
+        ml: "ml-IN",
+        hi: "hi-IN",
+        ta: "ta-IN",
+        te: "te-IN",
+        kn: "kn-IN",
+        bn: "bn-IN",
+        mr: "mr-IN",
+        en: "en-IN",
+      };
+      const targetCode = bcpMap[lang] || "en-IN";
+      utterance.lang = targetCode;
+
+      const voices = window.speechSynthesis.getVoices();
+      const matched = voices.find(
+        (v) =>
+          v.lang.toLowerCase().replace("_", "-").startsWith(targetCode.toLowerCase()) ||
+          v.lang.toLowerCase().startsWith(lang.toLowerCase())
+      );
+
+      // ONLY use browser voice if it actually supports this language (never pronounce Malayalam in English voice)
+      if (matched || lang === "en") {
+        if (matched) utterance.voice = matched;
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          setSpeechNotice("");
+        };
+        utterance.onerror = () => {
+          setIsSpeaking(false);
+          setSpeechNotice("");
+        };
+        window.speechSynthesis.speak(utterance);
+      } else {
+        setTimeout(() => {
+          setIsSpeaking(false);
+          setSpeechNotice("");
+        }, 3500);
+      }
+    } catch {
+      setIsSpeaking(false);
+      setSpeechNotice("");
+    }
+  };
+
+  // High-fidelity multilingual audio engine supporting all 8 Indian languages
+  const speakInLanguage = (text: string, langToUse?: Language) => {
+    if (!text || typeof window === "undefined") return;
+
+    // Toggle off if user clicked the same speech button while it is active
+    if (isSpeaking && speechNotice === text) {
+      stopAudio();
+      return;
+    }
+
+    // Stop previous audio before starting new announcement
+    stopAudio();
+
+    const targetLang: Language = langToUse || language || "ml";
+    activeLangRef.current = targetLang;
+
+    const chunks = splitSpeechChunks(text, 130);
+    if (chunks.length === 0) return;
+
+    speechQueueRef.current = chunks;
+    speechIndexRef.current = 0;
+    setIsSpeaking(true);
+    setSpeechNotice(text);
+
+    const playNextChunk = (idx: number) => {
+      if (idx >= speechQueueRef.current.length) {
+        setIsSpeaking(false);
+        setSpeechNotice("");
+        if (audioRef.current) {
+          audioRef.current = null;
+        }
+        return;
+      }
+
+      speechIndexRef.current = idx;
+      const chunkText = speechQueueRef.current[idx];
+      const audioUrl = `/api/tts?tl=${encodeURIComponent(targetLang)}&text=${encodeURIComponent(chunkText)}`;
+
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        playNextChunk(idx + 1);
+      };
+
+      audio.onerror = () => {
+        tryWebSpeechFallback(speechQueueRef.current.slice(idx).join(" "), targetLang);
+      };
+
+      audio.play().catch(() => {
+        tryWebSpeechFallback(speechQueueRef.current.slice(idx).join(" "), targetLang);
+      });
+    };
+
+    playNextChunk(0);
+  };
+
+  // Preload voices and clean up audio on unmount
   useEffect(() => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.getVoices();
@@ -1353,9 +1451,7 @@ function SeniorCitizenModePage() {
       };
     }
     return () => {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopAudio();
     };
   }, []);
 
@@ -1454,10 +1550,21 @@ function SeniorCitizenModePage() {
           </div>
         </div>
 
-        {/* Real-time speaking banner */}
+        {/* Real-time speaking banner with Stop button */}
         {speechNotice && (
-          <div className="mx-auto mt-2 max-w-2xl rounded-2xl bg-emerald-100 border-2 border-emerald-300 p-2.5 text-center text-xs font-black text-emerald-950 shadow-inner">
-            🔊 {speechNotice}
+          <div className="mx-auto mt-2 max-w-2xl flex items-center justify-between gap-2 rounded-2xl bg-emerald-100 border-2 border-emerald-400 px-3.5 py-2 text-xs font-black text-emerald-950 shadow-md">
+            <span className="truncate flex items-center gap-1.5 min-w-0">
+              <span className="animate-bounce shrink-0">🔊</span>
+              <span className="truncate">{speechNotice}</span>
+            </span>
+            <button
+              type="button"
+              onClick={stopAudio}
+              className="shrink-0 flex items-center gap-1 rounded-xl bg-emerald-800 px-3 py-1 text-xs font-black text-white hover:bg-emerald-900 active:scale-95 shadow transition-all"
+            >
+              <span>⏹️</span>
+              <span>{ui.stopVoice || "ശബ്ദം നിർത്തുക"}</span>
+            </button>
           </div>
         )}
       </header>
@@ -2166,16 +2273,19 @@ function SeniorCitizenModePage() {
                       key={langItem.id}
                       type="button"
                       onClick={() => handleLanguageChange(langItem.id)}
-                      className={`flex flex-col items-center justify-center rounded-2xl py-3 px-2 text-center transition-all active:scale-95 ${
+                      className={`relative flex flex-col items-center justify-center rounded-2xl py-3 px-2 text-center transition-all active:scale-95 ${
                         isSelected
                           ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-500"
                           : "bg-stone-50 border-2 border-stone-200 text-stone-800 font-bold hover:bg-emerald-50 hover:border-emerald-300 shadow-sm"
                       }`}
-                      title={langItem.label}
+                      title={`${langItem.label} - Tap to listen voice`}
                     >
-                      <span className="block text-base leading-tight font-black">
-                        {langItem.native}
-                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs opacity-75">🔊</span>
+                        <span className="block text-base leading-tight font-black">
+                          {langItem.native}
+                        </span>
+                      </div>
                       <span
                         className={`block text-xs mt-0.5 ${
                           isSelected ? "text-emerald-100" : "text-stone-500"
