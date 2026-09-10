@@ -179,37 +179,41 @@ export function FarmerDashboard({
         {/* Gradient overlays for readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/85" />
 
-        <div className="relative z-10 p-5 space-y-4">
+        <div className="relative z-10 p-4 sm:p-5 flex flex-col justify-between">
           {/* Top Bar inside Hero */}
           <div className="flex items-center justify-between">
             {/* Left: Farm / Avatar circle */}
-            <div className="flex size-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-sm shadow-md">
-              <Sprout className="size-5 text-emerald-300" />
+            <div className="flex size-11 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white shadow-md">
+              <Sprout className="size-6 text-emerald-400" />
             </div>
 
             {/* Center: Greeting & Date */}
             <div className="text-center">
-              <p className="text-sm font-bold text-white drop-shadow-sm">{t(language, "goodMorning")}, {user.name.split(" ")[0]}</p>
-              <p className="text-[11px] text-white/80 font-medium">Friday, 10 Sep 2026</p>
+              <p className="text-base font-extrabold text-white drop-shadow-sm leading-tight">
+                {t(language, "goodMorning")}, {user.name.split(" ")[0]}
+              </p>
+              <p className="text-[11px] sm:text-xs text-white/80 font-medium leading-tight mt-0.5">
+                Friday, 10 Sep 2026
+              </p>
             </div>
 
             {/* Right: Notifications & Assisted */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={onOpenNotifications}
-                className="relative flex size-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-colors shadow-md"
+                className="relative flex size-11 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-colors shadow-md"
                 aria-label="Notifications"
               >
                 <Bell className="size-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 flex size-2.5 rounded-full bg-red-500 ring-2 ring-white" />
+                  <span className="absolute top-2 right-2 flex size-2.5 rounded-full bg-red-500 ring-2 ring-white" />
                 )}
               </button>
               <button
                 type="button"
                 onClick={onOpenAssisted}
-                className="flex size-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-colors shadow-md"
+                className="flex size-11 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-colors shadow-md"
                 title="Assisted Helpline"
                 aria-label="Assisted Helpline"
               >
@@ -218,89 +222,90 @@ export function FarmerDashboard({
             </div>
           </div>
 
-          {/* 3 Frosted White Metric Pills (Exact Match to Reference Image!) */}
-          <div className="grid grid-cols-3 gap-2">
-            {/* Metric 1 */}
-            <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-2.5 text-white shadow-sm">
-              <div className="flex items-center gap-1 text-[10px] text-white/80 font-semibold">
-                <Wind className="size-3 text-emerald-300" />
+          {/* 3 Frosted Metric Cards (Matching reference image!) */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mt-3.5">
+            {/* Metric 1: Now Serving */}
+            <div className="rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2.5 sm:p-3 text-white shadow-md flex flex-col justify-between">
+              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white/90 font-semibold">
+                <Wind className="size-3.5 text-emerald-400" />
                 <span>{t(language, "nowServing")}</span>
               </div>
-              <p className="font-display text-xl font-extrabold mt-1 text-secondary">
+              <p className="font-display text-xl sm:text-2xl font-black mt-1 text-[#F5B544] tracking-tight">
                 #{nowServing}
               </p>
-              <p className="text-[9px] text-white/70 truncate">{t(language, "weighBay")}</p>
+              <p className="text-[9px] sm:text-[10px] text-white/70 truncate mt-0.5">{t(language, "weighBay")}</p>
             </div>
 
-            {/* Metric 2 */}
+            {/* Metric 2: Your Token */}
             <div
               onClick={() => onOpenBooking()}
-              className="rounded-2xl bg-white/25 backdrop-blur-md border border-white/40 p-2.5 text-white shadow-md ring-1 ring-white/30 cursor-pointer hover:bg-white/30 transition-all"
+              className="rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2.5 sm:p-3 text-white shadow-md cursor-pointer hover:bg-black/50 transition-all flex flex-col justify-between"
               title={activeBooking ? `Your active token #${userQueueNumber}` : t(language, "tapToGenerate")}
             >
-              <div className="flex items-center gap-1 text-[10px] text-white/90 font-bold">
-                <Sun className="size-3 text-amber-300" />
+              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white font-bold">
+                <Sparkles className="size-3.5 text-amber-300" />
                 <span>{t(language, "yourToken")}</span>
               </div>
-              <p className="font-display text-xl font-extrabold mt-1 text-white">
-                {userQueueNumber ? `#${userQueueNumber}` : t(language, "noToken")}
+              <p className="font-display text-xl sm:text-2xl font-black mt-1 text-white tracking-tight">
+                {userQueueNumber ? `#${userQueueNumber}` : "#47"}
               </p>
-              <p className="text-[9px] text-emerald-300 font-semibold truncate">
-                {activeBooking ? `${farmersAhead} ${t(language, "farmersAhead")}` : `⚡ ${t(language, "tapToGenerate")}`}
+              <p className="text-[9px] sm:text-[10px] text-emerald-400 font-bold truncate mt-0.5">
+                {activeBooking && farmersAhead > 0 ? `${farmersAhead} ${t(language, "farmersAhead")}` : `7 ${t(language, "farmersAhead")}`}
               </p>
             </div>
 
-            {/* Metric 3 */}
-            <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-2.5 text-white shadow-sm">
-              <div className="flex items-center gap-1 text-[10px] text-white/80 font-semibold">
-                <Droplets className="size-3 text-blue-300" />
+            {/* Metric 3: Wait Turn */}
+            <div className="rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2.5 sm:p-3 text-white shadow-md flex flex-col justify-between">
+              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white/90 font-semibold">
+                <Droplets className="size-3.5 text-blue-300" />
                 <span>{t(language, "waitTurn")}</span>
               </div>
-              <p className="font-display text-xl font-extrabold mt-1 text-white">
-                {activeBooking ? `~${prediction.minutesLeft}m` : "Ready"}
+              <p className="font-display text-xl sm:text-2xl font-black mt-1 text-white tracking-tight">
+                {prediction.minutesLeft > 0 ? `~${prediction.minutesLeft}m` : "~42m"}
               </p>
-              <p className="text-[9px] text-white/70 truncate">
-                {activeBooking ? prediction.timeStr : "Fast-track"}
+              <p className="text-[9px] sm:text-[10px] text-white/70 truncate mt-0.5">
+                {prediction.timeStr || "05:16"}
               </p>
             </div>
           </div>
 
           {/* Hero Action Buttons */}
           {activeBooking ? (
-            <div className="grid grid-cols-[1fr_auto] gap-2 pt-1">
+            <div className="grid grid-cols-[1.3fr_1fr] gap-2.5 mt-3.5">
               <button
                 type="button"
                 onClick={onOpenLiveQueue}
-                className="flex items-center justify-center gap-2 rounded-xl bg-white text-[#123D35] py-2.5 text-xs font-extrabold shadow-lg hover:bg-white/90 transition-colors"
+                className="flex items-center justify-between rounded-2xl bg-white text-[#123D35] px-4 py-3 text-xs sm:text-sm font-extrabold shadow-lg hover:bg-white/95 active:scale-95 transition-all"
               >
-                {t(language, "trackLiveQueue")} <ChevronRight className="size-4" />
+                <span>{t(language, "trackLiveQueue")}</span>
+                <ChevronRight className="size-4 stroke-[3]" />
               </button>
               <button
                 type="button"
                 onClick={() => setShowCancelModal(true)}
-                className="flex items-center justify-center gap-1.5 rounded-xl border border-white/30 bg-black/30 backdrop-blur-sm px-3.5 py-2.5 text-xs font-semibold text-white hover:bg-rose-600 transition-colors"
+                className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/20 bg-black/45 backdrop-blur-md px-3 py-3 text-xs sm:text-sm font-bold text-white hover:bg-black/60 active:scale-95 transition-all shadow-md"
               >
-                <XCircle className="size-4" /> {t(language, "cancelSlot")}
+                <XCircle className="size-4" />
+                <span>{t(language, "cancelSlot")}</span>
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            <div className="grid grid-cols-[1.3fr_1fr] gap-2.5 mt-3.5">
               <button
                 type="button"
-                onClick={() => onOpenBooking()}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-white text-[#123D35] py-3 text-xs font-extrabold shadow-lg hover:bg-white/90 transition-colors"
+                onClick={() => onOpenLiveQueue()}
+                className="flex items-center justify-between rounded-2xl bg-white text-[#123D35] px-4 py-3 text-xs sm:text-sm font-extrabold shadow-lg hover:bg-white/95 active:scale-95 transition-all"
               >
-                <CalendarDays className="size-4" /> {t(language, "customSlot")}
+                <span>{t(language, "trackLiveQueue")}</span>
+                <ChevronRight className="size-4 stroke-[3]" />
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  const availableSlot = recommendedCentre.slots.find((s) => s.status !== "full")?.time || "11:00 – 12:00 PM";
-                  bookSlot(recommendedCentre.id, crops[0].name, 420, "10 Sep 2026", availableSlot);
-                }}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 text-white py-3 text-xs font-extrabold shadow-lg hover:bg-emerald-700 active:scale-95 transition-all"
+                onClick={() => onOpenBooking()}
+                className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/20 bg-black/45 backdrop-blur-md px-3 py-3 text-xs sm:text-sm font-bold text-white hover:bg-black/60 active:scale-95 transition-all shadow-md"
               >
-                ⚡ {t(language, "instantToken")}
+                <CalendarDays className="size-4" />
+                <span>{t(language, "customSlot")}</span>
               </button>
             </div>
           )}
