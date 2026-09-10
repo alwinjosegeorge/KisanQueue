@@ -1421,9 +1421,13 @@ function SeniorCitizenModePage() {
 
       speechIndexRef.current = idx;
       const chunkText = speechQueueRef.current[idx];
-      const audioUrl = `/api/tts?tl=${encodeURIComponent(targetLang)}&text=${encodeURIComponent(chunkText)}`;
+      const directGoogleUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${encodeURIComponent(
+        targetLang
+      )}&client=tw-ob&q=${encodeURIComponent(chunkText)}`;
 
-      const audio = new Audio(audioUrl);
+      const audio = document.createElement("audio");
+      audio.referrerPolicy = "no-referrer";
+      audio.src = directGoogleUrl;
       audioRef.current = audio;
 
       audio.onended = () => {
@@ -1431,7 +1435,26 @@ function SeniorCitizenModePage() {
       };
 
       audio.onerror = () => {
-        tryWebSpeechFallback(speechQueueRef.current.slice(idx).join(" "), targetLang);
+        // Fallback to local /api/tts endpoint
+        try {
+          const fallbackAudio = document.createElement("audio");
+          fallbackAudio.src = `/api/tts?tl=${encodeURIComponent(targetLang)}&text=${encodeURIComponent(chunkText)}`;
+          audioRef.current = fallbackAudio;
+
+          fallbackAudio.onended = () => {
+            playNextChunk(idx + 1);
+          };
+
+          fallbackAudio.onerror = () => {
+            tryWebSpeechFallback(speechQueueRef.current.slice(idx).join(" "), targetLang);
+          };
+
+          fallbackAudio.play().catch(() => {
+            tryWebSpeechFallback(speechQueueRef.current.slice(idx).join(" "), targetLang);
+          });
+        } catch {
+          tryWebSpeechFallback(speechQueueRef.current.slice(idx).join(" "), targetLang);
+        }
       };
 
       audio.play().catch(() => {
