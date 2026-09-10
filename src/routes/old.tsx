@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import React, { useState, useEffect } from "react";
 import { useKisanQueue } from "@/lib/store";
-import { Language, ProcurementCentre } from "@/lib/types";
+import { Language, ProcurementCentre, Booking } from "@/lib/types";
 import { SUPPORTED_LANGUAGES } from "@/lib/translations";
 import {
   Volume2,
@@ -21,6 +21,16 @@ import {
   Building2,
   Languages,
   Sparkles,
+  UserRound,
+  CalendarDays,
+  CreditCard,
+  Sprout,
+  ShieldCheck,
+  Landmark,
+  FileText,
+  HelpCircle,
+  LogOut,
+  ExternalLink,
 } from "lucide-react";
 
 // Crop image assets
@@ -41,7 +51,7 @@ export const Route = createFileRoute("/old")({
       {
         name: "description",
         content:
-          "Accessible senior citizen farmer queue management with 8 Indian languages and voice narration.",
+          "Accessible senior citizen farmer portal with token booking, bookings history, payments, profile, and voice assistance.",
       },
     ],
   }),
@@ -198,11 +208,16 @@ const CROP_ITEMS = [
 
 const PRESET_QUANTITIES = [50, 100, 250, 500];
 
+type SeniorTab = "token" | "bookings" | "payments" | "profile";
+
 // Multilingual UI Strings
 const UI_TEXTS: Record<
   Language,
   {
-    exitBtn: string;
+    tabToken: string;
+    tabBookings: string;
+    tabPayments: string;
+    tabProfile: string;
     seniorBadge: string;
     simpleService: string;
     textSize: string;
@@ -229,12 +244,9 @@ const UI_TEXTS: Record<
     step1Label: string;
     step2Label: string;
     by1kgBadge: string;
-    decrease10: string;
     decrease1: string;
     increase1: string;
-    increase10: string;
     kgLabel: string;
-    addFast: string;
     estimatedPayout: string;
     directDbt: string;
     step3Label: string;
@@ -257,10 +269,32 @@ const UI_TEXTS: Record<
     modalCancelSub: string;
     modalKeepBtn: string;
     modalConfirmCancelBtn: string;
+    switchStandard: string;
+    // Profile Strings
+    profileTitle: string;
+    aadhaarLinked: string;
+    farmerIdLabel: string;
+    mobileLabel: string;
+    panchayatLabel: string;
+    landholdingLabel: string;
+    cropsLabel: string;
+    bankLabel: string;
+    ifscLabel: string;
+    // Bookings Strings
+    bookingsTitle: string;
+    noBookings: string;
+    // Payments Strings
+    paymentsTitle: string;
+    totalReceived: string;
+    dbtVerified: string;
+    txnHistory: string;
   }
 > = {
   ml: {
-    exitBtn: "സാധാരണ മോഡ് (Exit)",
+    tabToken: "ടോക്കൺ",
+    tabBookings: "ബുക്കിംഗ്",
+    tabPayments: "പെയ്‌മെന്റ്",
+    tabProfile: "പ്രൊഫൈൽ",
     seniorBadge: "👵 60+ ജ്യേഷ്ഠ കിസാൻ",
     simpleService: "ലളിതമായ സേവനം",
     textSize: "അക്ഷരങ്ങൾ:",
@@ -287,12 +321,9 @@ const UI_TEXTS: Record<
     step1Label: "1. വിള തിരഞ്ഞെടുക്കുക:",
     step2Label: "2. തൂക്കം എത്ര കിലോഗ്രാം?:",
     by1kgBadge: "+1 kg വീതം കൂട്ടാം",
-    decrease10: "10 കിലോ കുറയ്ക്കുക",
     decrease1: "1 കിലോ കുറയ്ക്കുക (-1 kg)",
     increase1: "1 കിലോ കൂട്ടുക (+1 kg)",
-    increase10: "10 കിലോ കൂട്ടുക",
     kgLabel: "കിലോഗ്രാം (കിലോ)",
-    addFast: "കൂട്ടുക:",
     estimatedPayout: "കണക്കാക്കിയ തുക (Estimated MSP Bank Credit)",
     directDbt: "നേരിട്ട് ബാങ്കിലേക്ക് (DBT)",
     step3Label: "3. സംഭരണ കേന്ദ്രം തിരഞ്ഞെടുക്കുക:",
@@ -308,16 +339,35 @@ const UI_TEXTS: Record<
     freeHelpline: "കിസാൻ കോൾ സെന്ററിലേക്ക് സൗജന്യമായി വിളിക്കാം",
     callNow: "1800-425-1661 (വിളിക്കുക)",
     managerCall: "കേന്ദ്ര മാനേജർ: 9447123456",
-    returnBtn: "സാധാരണ വെബ്‌സൈറ്റിലേക്ക് മടങ്ങുക (Return)",
+    returnBtn: "സാധാരണ മോഡിലേക്ക് മാറുക",
     modalSuccessTitle: "ടോക്കൺ ലഭിച്ചു! (Success)",
     modalOkBtn: "ശരി, മനസ്സിലായി (OK)",
     modalCancelTitle: "ടോക്കൺ റദ്ദാക്കണമോ?",
     modalCancelSub: "ടോക്കൺ ഒഴിവാക്കിയാൽ ക്യൂവിൽ നിങ്ങളുടെ സ്ഥാനം നഷ്ടപ്പെടും.",
     modalKeepBtn: "വേണ്ട (Keep)",
     modalConfirmCancelBtn: "അതെ, റദ്ദാക്കുക",
+    switchStandard: "സാധാരണ മോഡിലേക്ക് മാറുക (Switch View)",
+    profileTitle: "കർഷക പ്രൊഫൈൽ",
+    aadhaarLinked: "ആധാർ ലിങ്ക് ചെയ്ത പ്രൊഫൈൽ",
+    farmerIdLabel: "കിസാൻ ഐഡി",
+    mobileLabel: "ഫോൺ നമ്പർ",
+    panchayatLabel: "ഗ്രാമപഞ്ചായത്ത്",
+    landholdingLabel: "കൃഷിഭൂമി",
+    cropsLabel: "പ്രധാന വിളകൾ",
+    bankLabel: "ബാങ്ക് അക്കൗണ്ട്",
+    ifscLabel: "ഐ.എഫ്.എസ്.സി",
+    bookingsTitle: "എന്റെ ടോക്കണുകൾ & ബുക്കിംഗുകൾ",
+    noBookings: "ബുക്കിംഗുകൾ ഒന്നും കണ്ടെത്തിയില്ല",
+    paymentsTitle: "ബാങ്ക് താങ്ങുവില പെയ്‌മെന്റ് (MSP DBT)",
+    totalReceived: "നേരിട്ട് അക്കൗണ്ടിലെത്തിയ ആകെ തുക",
+    dbtVerified: "പി.എഫ്.എം.എസ് വഴി ബാങ്കിലേക്ക് കൈമാറി",
+    txnHistory: "കഴിഞ്ഞ പേയ്മെന്റുകൾ",
   },
   hi: {
-    exitBtn: "सामान्य मोड (Exit)",
+    tabToken: "टोकन",
+    tabBookings: "बुकिंग",
+    tabPayments: "भुगतान",
+    tabProfile: "प्रोफाइल",
     seniorBadge: "👵 60+ ज्येष्ठ किसान",
     simpleService: "सरल सेवा (Light UI)",
     textSize: "अक्षर आकार:",
@@ -344,12 +394,9 @@ const UI_TEXTS: Record<
     step1Label: "1. फसल चुनें:",
     step2Label: "2. वज़न कितने किलोग्राम?:",
     by1kgBadge: "+1 kg जोड़ सकते हैं",
-    decrease10: "10 किलो घटाएं",
     decrease1: "1 किलो घटाएं (-1 kg)",
     increase1: "1 किलो बढ़ाएं (+1 kg)",
-    increase10: "10 किलो बढ़ाएं",
     kgLabel: "किलोग्राम (किलो)",
-    addFast: "बढ़ाएं:",
     estimatedPayout: "अनुमानित राशि (MSP Bank Transfer)",
     directDbt: "सीधे बैंक खाते में (DBT)",
     step3Label: "3. खरीद केंद्र चुनें:",
@@ -365,16 +412,35 @@ const UI_TEXTS: Record<
     freeHelpline: "किसान कॉल सेंटर पर टोल-फ्री कॉल करें",
     callNow: "1800-425-1661 (कॉल करें)",
     managerCall: "केंद्र प्रबंधक: 9447123456",
-    returnBtn: "सामान्य पोर्टल पर लौटें (Return)",
+    returnBtn: "सामान्य मोड में जाएं",
     modalSuccessTitle: "टोकन प्राप्त हुआ! (Success)",
     modalOkBtn: "ठीक है, समझ गया (OK)",
     modalCancelTitle: "टोकन रद्द करना चाहते हैं?",
     modalCancelSub: "टोकन रद्द करने पर कतार में आपका स्थान समाप्त हो जाएगा।",
     modalKeepBtn: "नहीं, रखें (Keep)",
     modalConfirmCancelBtn: "हाँ, रद्द करें",
+    switchStandard: "सामान्य मोड पर स्विच करें",
+    profileTitle: "किसान प्रोफाइल",
+    aadhaarLinked: "आधार लिंक सत्यापित",
+    farmerIdLabel: "किसान आईडी",
+    mobileLabel: "मोबाइल नंबर",
+    panchayatLabel: "ग्राम पंचायत",
+    landholdingLabel: "कृषि भूमि",
+    cropsLabel: "मुख्य फसलें",
+    bankLabel: "बैंक खाता",
+    ifscLabel: "आईएफएससी कोड",
+    bookingsTitle: "मेरी बुकिंग और टोकन",
+    noBookings: "कोई बुकिंग उपलब्ध नहीं है",
+    paymentsTitle: "न्यूनतम समर्थन मूल्य भुगतान (DBT)",
+    totalReceived: "सीधे खाते में प्राप्त कुल राशि",
+    dbtVerified: "PFMS द्वारा सीधे बैंक में जमा",
+    txnHistory: "हालिया लेन-देन विवरण",
   },
   ta: {
-    exitBtn: "சாதாரண பயன்முறை (Exit)",
+    tabToken: "டோக்கன்",
+    tabBookings: "பதிவுகள்",
+    tabPayments: "கொடுப்பனவு",
+    tabProfile: "சுயவிவரம்",
     seniorBadge: "👵 60+ மூத்த விவசாயி",
     simpleService: "எளிய சேவை",
     textSize: "எழுத்து அளவு:",
@@ -401,12 +467,9 @@ const UI_TEXTS: Record<
     step1Label: "1. பயிரைத் தேர்ந்தெடுக்கவும்:",
     step2Label: "2. எடை எத்தனை கிலோகிராம்?:",
     by1kgBadge: "+1 kg வீதம் கூட்டலாம்",
-    decrease10: "10 கிலோ குறைக்கவும்",
     decrease1: "1 கிலோ குறைக்கவும் (-1 kg)",
     increase1: "1 கிலோ கூட்டவும் (+1 kg)",
-    increase10: "10 கிலோ கூட்டவும்",
     kgLabel: "கிலோகிராம் (கிலோ)",
-    addFast: "கூட்டவும்:",
     estimatedPayout: "மதிப்பிடப்பட்ட தொகை (MSP Bank Credit)",
     directDbt: "நேரடி வங்கி பரிமாற்றம் (DBT)",
     step3Label: "3. கொள்முதல் மையத்தைத் தேர்ந்தெடுக்கவும்:",
@@ -422,16 +485,35 @@ const UI_TEXTS: Record<
     freeHelpline: "கிசான் கால் சென்டருக்கு இலவச அழைப்பு",
     callNow: "1800-425-1661 (அழைக்கவும்)",
     managerCall: "மைய மேலாளர்: 9447123456",
-    returnBtn: "சாதாரண இணையதளத்திற்கு திரும்பவும் (Return)",
+    returnBtn: "சாதாரண பயன்முறைக்கு செல்லவும்",
     modalSuccessTitle: "டோக்கன் கிடைத்தது! (Success)",
     modalOkBtn: "சரி, புரிந்தது (OK)",
     modalCancelTitle: "டோக்கனை ரத்து செய்யவா?",
     modalCancelSub: "டோக்கனை ரத்து செய்தால் வரிசையில் இடம் இழக்கப்படும்.",
     modalKeepBtn: "வேண்டாம் (Keep)",
     modalConfirmCancelBtn: "ஆம், ரத்து செய்",
+    switchStandard: "சாதாரண பயன்முறைக்கு மாறவும்",
+    profileTitle: "விவசாயி சுயவிவரம்",
+    aadhaarLinked: "ஆதார் இணைக்கப்பட்ட கணக்கு",
+    farmerIdLabel: "விவசாயி ஐடி",
+    mobileLabel: "கைபேசி எண்",
+    panchayatLabel: "கிராம பஞ்சாயத்து",
+    landholdingLabel: "விவசாய நிலம்",
+    cropsLabel: "முதன்மை பயிர்கள்",
+    bankLabel: "வங்கி கணக்கு",
+    ifscLabel: "IFSC குறியீடு",
+    bookingsTitle: "என் பதிவுகள் & டோக்கன்கள்",
+    noBookings: "பதிவுகள் எதுவும் இல்லை",
+    paymentsTitle: "வங்கி ஆதரவு விலை கொடுப்பனவு (DBT)",
+    totalReceived: "நேரடியாக வங்கியில் பெறப்பட்ட தொகை",
+    dbtVerified: "PFMS வழியாக வங்கிக்கு மாற்றப்பட்டது",
+    txnHistory: "பரிவர்த்தனை வரலாறு",
   },
   te: {
-    exitBtn: "సాధారణ మోడ్ (Exit)",
+    tabToken: "టోకెన్",
+    tabBookings: "బుకింగ్‌లు",
+    tabPayments: "చెల్లింపులు",
+    tabProfile: "ప్రొఫైల్",
     seniorBadge: "👵 60+ సీనియర్ రైతు",
     simpleService: "సరళమైన సేవ",
     textSize: "అక్షర పరిమాణం:",
@@ -458,12 +540,9 @@ const UI_TEXTS: Record<
     step1Label: "1. పంటను ఎంచుకోండి:",
     step2Label: "2. బరువు ఎన్ని కిలోగ్రాములు?:",
     by1kgBadge: "+1 kg చొప్పున పెంచవచ్చు",
-    decrease10: "10 కిలోలు తగ్గించండి",
     decrease1: "1 కిలో తగ్గించండి (-1 kg)",
     increase1: "1 కిలో పెంచండి (+1 kg)",
-    increase10: "10 కిలోలు పెంచండి",
     kgLabel: "కిలోగ్రాములు (కేజీ)",
-    addFast: "పెంచండి:",
     estimatedPayout: "అంచనా మొత్తం (MSP Bank Credit)",
     directDbt: "నేరుగా బ్యాంక్ ఖాతాకు (DBT)",
     step3Label: "3. కొనుగోలు కేంద్రాన్ని ఎంచుకోండి:",
@@ -479,16 +558,35 @@ const UI_TEXTS: Record<
     freeHelpline: "కిసాన్ కాల్ సెంటర్‌కు ఉచిత కాల్ చేయండి",
     callNow: "1800-425-1661 (కాల్ చేయండి)",
     managerCall: "కేంద్ర మేనేజర్: 9447123456",
-    returnBtn: "సాధారణ పోర్టల్‌కు తిరిగి వెళ్లండి (Return)",
+    returnBtn: "సాధారణ మోడ్‌కు మారండి",
     modalSuccessTitle: "టోకెన్ లభించింది! (Success)",
     modalOkBtn: "సరే, అర్థమైంది (OK)",
     modalCancelTitle: "టోకెన్ రద్దు చేయాలనుకుంటున్నారా?",
     modalCancelSub: "టోకెన్ రద్దు చేస్తే క్యూలో మీ స్థానం కోల్పోతారు.",
     modalKeepBtn: "వద్దు (Keep)",
     modalConfirmCancelBtn: "అవును, రద్దు చేయండి",
+    switchStandard: "సాధారణ మోడ్‌కు మారండి",
+    profileTitle: "రైతు ప్రొఫైల్",
+    aadhaarLinked: "ఆధార్ అనుసంధాన ధృవీకరణ",
+    farmerIdLabel: "రైతు ఐడి",
+    mobileLabel: "ఫోన్ నంబర్",
+    panchayatLabel: "గ్రామ పంచాయతీ",
+    landholdingLabel: "వ్యవసాయ భూమి",
+    cropsLabel: "ప్రధాన పంటలు",
+    bankLabel: "బ్యాంక్ ఖాతా",
+    ifscLabel: "IFSC కోడ్",
+    bookingsTitle: "నా బుకింగ్‌లు మరియు టోకెన్లు",
+    noBookings: "బుకింగ్‌లు ఏవీ కనుగొనబడలేదు",
+    paymentsTitle: "మద్దతు ధర చెల్లింపులు (DBT)",
+    totalReceived: "బ్యాంక్ ఖాతాలో జమ అయిన మొత్తం",
+    dbtVerified: "PFMS ద్వారా నేరుగా బదిలీ",
+    txnHistory: "లావాదేవీల చరిత్ర",
   },
   kn: {
-    exitBtn: "ಸಾಮಾನ್ಯ ಮೋಡ್ (Exit)",
+    tabToken: "ಟೋಕನ್",
+    tabBookings: "ಬುಕಿಂಗ್",
+    tabPayments: "ಪಾವತಿ",
+    tabProfile: "ಪ್ರೊಫೈಲ್",
     seniorBadge: "👵 60+ ಹಿರಿಯ ಕಿಸಾನ್",
     simpleService: "ಸರಳ ಸೇವೆ",
     textSize: "ಅಕ್ಷರ ಗಾತ್ರ:",
@@ -515,12 +613,9 @@ const UI_TEXTS: Record<
     step1Label: "1. ಬೆಳೆ ಆಯ್ಕೆಮಾಡಿ:",
     step2Label: "2. ತೂಕ ಎಷ್ಟು ಕಿಲೋಗ್ರಾಂ?:",
     by1kgBadge: "+1 kg ಯಂತೆ ಹೆಚ್ಚಿಸಬಹುದು",
-    decrease10: "10 ಕೆಜಿ ಕಡಿಮೆ ಮಾಡಿ",
     decrease1: "1 ಕೆಜಿ ಕಡಿಮೆ ಮಾಡಿ (-1 kg)",
     increase1: "1 ಕೆಜಿ ಹೆಚ್ಚಿಸಿ (+1 kg)",
-    increase10: "10 ಕೆಜಿ ಹೆಚ್ಚಿಸಿ",
     kgLabel: "ಕಿಲೋಗ್ರಾಂ (ಕೆಜಿ)",
-    addFast: "ಹೆಚ್ಚಿಸಿ:",
     estimatedPayout: "ಅಂದಾಜು ಮೊತ್ತ (MSP Bank Credit)",
     directDbt: "ನೇರವಾಗಿ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ (DBT)",
     step3Label: "3. ಖರೀದಿ ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
@@ -536,16 +631,35 @@ const UI_TEXTS: Record<
     freeHelpline: "ಕಿಸಾನ್ ಕಾಲ್ ಸೆಂಟರ್‌ಗೆ ಉಚಿತ ಕರೆ ಮಾಡಿ",
     callNow: "1800-425-1661 (ಕರೆ ಮಾಡಿ)",
     managerCall: "ಕೇಂದ್ರ ವ್ಯವಸ್ಥಾಪಕ: 9447123456",
-    returnBtn: "ಸಾಮಾನ್ಯ ಪೋರ್ಟಲ್‌ಗೆ ಹಿಂತಿರುಗಿ (Return)",
+    returnBtn: "ಸಾಮಾನ್ಯ ಮೋಡ್‌ಗೆ ಹಿಂತಿರುಗಿ",
     modalSuccessTitle: "ಟೋಕನ್ ದೊರೆತಿದೆ! (Success)",
     modalOkBtn: "ಸರಿ, ಅರ್ಥವಾಯಿತು (OK)",
     modalCancelTitle: "ಟೋಕನ್ ರದ್ದುಮಾಡಬೇಕೇ?",
     modalCancelSub: "ಟೋಕನ್ ರದ್ದುಮಾಡಿದರೆ ಸರದಿಯಲ್ಲಿ ನಿಮ್ಮ ಸ್ಥಾನ ಕಳೆದುಕೊಳ್ಳುವಿರಿ.",
     modalKeepBtn: "ಬೇಡ (Keep)",
     modalConfirmCancelBtn: "ಹೌದು, ರದ್ದುಮಾಡಿ",
+    switchStandard: "ಸಾಮಾನ್ಯ ಮೋಡ್‌ಗೆ ಬದಲಿಸಿ",
+    profileTitle: "ರೈತ ಪ್ರೊಫೈಲ್",
+    aadhaarLinked: "ಆಧಾರ್ ಲಿಂಕ್ ದೃಢೀಕರಿಸಲಾಗಿದೆ",
+    farmerIdLabel: "ಕಿಸಾನ್ ಐಡಿ",
+    mobileLabel: "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    panchayatLabel: "ಗ್ರಾಮ ಪಂಚಾಯತ್",
+    landholdingLabel: "ಕೃಷಿ ಜಮೀನು",
+    cropsLabel: "ಪ್ರಮುಖ ಬೆಳೆಗಳು",
+    bankLabel: "ಬ್ಯಾಂಕ್ ಖಾತೆ",
+    ifscLabel: "IFSC ಕೋಡ್",
+    bookingsTitle: "ನನ್ನ ಬುಕಿಂಗ್‌ಗಳು ಮತ್ತು ಟೋಕನ್‌ಗಳು",
+    noBookings: "ಯಾವುದೇ ಬುಕಿಂಗ್ ಲಭ್ಯವಿಲ್ಲ",
+    paymentsTitle: "ಬೆಂಬಲ ಬೆಲೆ ಪಾವತಿಗಳು (DBT)",
+    totalReceived: "ಖಾತೆಗೆ ನೇರವಾಗಿ ಜಮೆಯಾದ ಮೊತ್ತ",
+    dbtVerified: "PFMS ಮೂಲಕ ವರ್ಗಾಯಿಸಲಾಗಿದೆ",
+    txnHistory: "ಹಿಂದಿನ ಪಾವತಿಗಳ ವಿವರ",
   },
   bn: {
-    exitBtn: "সাধারণ মোড (Exit)",
+    tabToken: "টোকেন",
+    tabBookings: "বুকিং",
+    tabPayments: "পেমেন্ট",
+    tabProfile: "প্রোফাইল",
     seniorBadge: "👵 ৬০+ প্রবীণ কিষাণ",
     simpleService: "সহজ পরিষেবা",
     textSize: "হরফের আকার:",
@@ -572,12 +686,9 @@ const UI_TEXTS: Record<
     step1Label: "১. ফসল নির্বাচন করুন:",
     step2Label: "২. ওজন কত কিলোগ্রাম?:",
     by1kgBadge: "+১ kg করে বাড়ানো যাবে",
-    decrease10: "১০ কেজি কমান",
     decrease1: "১ কেজি কমান (-১ kg)",
     increase1: "১ কেজি বাড়ান (+১ kg)",
-    increase10: "১০ কেজি বাড়ান",
     kgLabel: "কিলোগ্রাম (কেজি)",
-    addFast: "বাড়ান:",
     estimatedPayout: "আনুমানিক মোট টাকা (MSP Bank Transfer)",
     directDbt: "সরাসরি ব্যাংক অ্যাকাউন্টে (DBT)",
     step3Label: "৩. সংগ্রহ কেন্দ্র নির্বাচন করুন:",
@@ -593,16 +704,35 @@ const UI_TEXTS: Record<
     freeHelpline: "কিষাণ কল সেন্টারে টোল-ফ্রি কল করুন",
     callNow: "1800-425-1661 (কল করুন)",
     managerCall: "কেন্দ্র ম্যানেজার: 9447123456",
-    returnBtn: "সাধারণ পোর্টালে ফিরুন (Return)",
+    returnBtn: "সাধারণ মোডে ফিরে যান",
     modalSuccessTitle: "টোকেন পাওয়া গেছে! (Success)",
     modalOkBtn: "ঠিক আছে, বুঝেছি (OK)",
     modalCancelTitle: "টোকেন বাতিল করতে চান?",
     modalCancelSub: "টোকেন বাতিল করলে লাইনে আপনার স্থান নষ্ট হবে।",
     modalKeepBtn: "না (Keep)",
     modalConfirmCancelBtn: "হ্যাঁ, বাতিল করুন",
+    switchStandard: "সাধারণ মোডে যান",
+    profileTitle: "কৃষক প্রোফাইল",
+    aadhaarLinked: "আধার যুক্ত ব্যাংক হিসাব",
+    farmerIdLabel: "কিষাণ আইডি",
+    mobileLabel: "মোবাইল নম্বর",
+    panchayatLabel: "গ্রাম পঞ্চায়েত",
+    landholdingLabel: "কৃষিজমি",
+    cropsLabel: "প্রধান ফসল",
+    bankLabel: "ব্যাংক অ্যাকাউন্ট",
+    ifscLabel: "আইএফএসসি কোড",
+    bookingsTitle: "আমার বুকিং ও টোকেন",
+    noBookings: "কোনো বুকিং পাওয়া যায়নি",
+    paymentsTitle: "সহায়তা মূল্য ব্যাংক পেমেন্ট (DBT)",
+    totalReceived: "ব্যাংক অ্যাকাউন্টে প্রাপ্ত মোট অর্থ",
+    dbtVerified: "PFMS মারফত সরাসরি স্থানান্তর",
+    txnHistory: "লেনদেন ইতিহাস",
   },
   mr: {
-    exitBtn: "सामान्य मोड (Exit)",
+    tabToken: "टोकन",
+    tabBookings: "बुकिंग",
+    tabPayments: "पेमेंट",
+    tabProfile: "प्रोफाइल",
     seniorBadge: "👵 ६०+ ज्येष्ठ किसान",
     simpleService: "सोपी सेवा",
     textSize: "अक्षरांचा आकार:",
@@ -629,12 +759,9 @@ const UI_TEXTS: Record<
     step1Label: "१. पीक निवडा:",
     step2Label: "२. वजन किती किलोग्रॅम?:",
     by1kgBadge: "+१ kg प्रमाणे वाढवू शकता",
-    decrease10: "१० किलो कमी करा",
     decrease1: "१ किलो कमी करा (-१ kg)",
     increase1: "१ किलो वाढवा (+१ kg)",
-    increase10: "१० किलो वाढवा",
     kgLabel: "किलोग्रॅम (किलो)",
-    addFast: "वाढवा:",
     estimatedPayout: "अंदाजे रक्कम (MSP Bank Transfer)",
     directDbt: "थेट बँक खात्यात (DBT)",
     step3Label: "३. खरेदी केंद्र निवडा:",
@@ -650,16 +777,35 @@ const UI_TEXTS: Record<
     freeHelpline: "किसान कॉल सेंटरवर मोफत कॉल करा",
     callNow: "1800-425-1661 (कॉल करा)",
     managerCall: "केंद्र व्यवस्थापक: 9447123456",
-    returnBtn: "सामान्य पोर्टलवर परत जा (Return)",
+    returnBtn: "सामान्य मोडवर जा",
     modalSuccessTitle: "टोकन मिळाले! (Success)",
     modalOkBtn: "ठीक आहे, समजले (OK)",
     modalCancelTitle: "टोकन रद्द करायचे आहे का?",
     modalCancelSub: "टोकन रद्द केल्यास रांगेतील स्थान समाप्त होईल.",
     modalKeepBtn: "नको (Keep)",
     modalConfirmCancelBtn: "होय, रद्द करा",
+    switchStandard: "सामान्य मोडवर जा",
+    profileTitle: "शेतकरी प्रोफाइल",
+    aadhaarLinked: "आधार लिंक बँक खाते",
+    farmerIdLabel: "किसान आयडी",
+    mobileLabel: "मोबाईल नंबर",
+    panchayatLabel: "ग्रामपंचायत",
+    landholdingLabel: "शेती जमीन",
+    cropsLabel: "प्रमुख पिके",
+    bankLabel: "बँक खाते",
+    ifscLabel: "आयएफएससी कोड",
+    bookingsTitle: "माझे टोकन्स आणि बुकिंग्ज",
+    noBookings: "कोणतेही बुकिंग उपलब्ध नाही",
+    paymentsTitle: "हमीभाव बँक जमा रक्कम (DBT)",
+    totalReceived: "थेट खात्यात प्राप्त झालेली रक्कम",
+    dbtVerified: "PFMS द्वारे थेट हस्तांतरित",
+    txnHistory: "मागील व्यवहार",
   },
   en: {
-    exitBtn: "Standard Mode (Exit)",
+    tabToken: "Token",
+    tabBookings: "Bookings",
+    tabPayments: "Payments",
+    tabProfile: "Profile",
     seniorBadge: "👵 60+ Senior Farmer",
     simpleService: "Senior Assistance Mode",
     textSize: "Text Size:",
@@ -686,12 +832,9 @@ const UI_TEXTS: Record<
     step1Label: "1. Select Harvest Crop:",
     step2Label: "2. Quantity in Kilograms (kg):",
     by1kgBadge: "+1 kg adjustment",
-    decrease10: "Decrease 10 kg",
     decrease1: "Decrease 1 kg (-1 kg)",
     increase1: "Increase 1 kg (+1 kg)",
-    increase10: "Increase 10 kg",
     kgLabel: "Kilograms (kg)",
-    addFast: "Quick Add:",
     estimatedPayout: "Estimated Bank Credit (MSP Direct Payment)",
     directDbt: "Direct Benefit Transfer (DBT)",
     step3Label: "3. Select Procurement Centre:",
@@ -707,13 +850,29 @@ const UI_TEXTS: Record<
     freeHelpline: "Call Kisan Call Centre Toll-Free",
     callNow: "1800-425-1661 (Call Now)",
     managerCall: "Centre Manager: 9447123456",
-    returnBtn: "Return to Standard Portal (Exit)",
+    returnBtn: "Switch to Standard View",
     modalSuccessTitle: "Token Booked! (Success)",
     modalOkBtn: "OK, Understood",
     modalCancelTitle: "Cancel this token?",
     modalCancelSub: "Cancelling will release your place in the live queue.",
     modalKeepBtn: "Keep Token",
     modalConfirmCancelBtn: "Yes, Cancel Token",
+    switchStandard: "Switch to Standard View",
+    profileTitle: "Farmer Profile",
+    aadhaarLinked: "Aadhaar Linked & Verified",
+    farmerIdLabel: "Farmer ID",
+    mobileLabel: "Mobile Number",
+    panchayatLabel: "Village Panchayat",
+    landholdingLabel: "Agricultural Land",
+    cropsLabel: "Primary Crops",
+    bankLabel: "Bank Account",
+    ifscLabel: "IFSC Code",
+    bookingsTitle: "My Bookings & Digital Passes",
+    noBookings: "No bookings found",
+    paymentsTitle: "Direct MSP Bank Settlements (DBT)",
+    totalReceived: "Total MSP Settled Directly to Bank",
+    dbtVerified: "PFMS Direct Benefit Transfer Verified",
+    txnHistory: "Settlement History",
   },
 };
 
@@ -793,12 +952,16 @@ function SeniorCitizenModePage() {
     language,
     setLanguage,
     activeBooking,
+    bookings,
     nowServing,
     predictWaitingTime,
     centres,
     bookSlot,
     cancelBooking,
   } = useKisanQueue();
+
+  // Active tab state
+  const [currentTab, setCurrentTab] = useState<SeniorTab>("token");
 
   // Accessibility state
   const [fontScale, setFontScale] = useState<"normal" | "large" | "huge">("large");
@@ -989,35 +1152,43 @@ function SeniorCitizenModePage() {
 
   return (
     // STRICT PURE LIGHT THEME ONLY (no dark mode classes)
-    <div className={`min-h-screen bg-[#F7FAF6] text-stone-900 pb-24 ${scaleClass}`}>
-      {/* Top Banner: Easy Exit & Senior Mode Title */}
-      <header className="sticky top-0 z-40 border-b border-amber-200 bg-white/95 px-4 py-3 shadow-md backdrop-blur-md">
+    <div className={`min-h-screen bg-[#F7FAF6] text-stone-900 pb-28 ${scaleClass}`}>
+      {/* Top Header: Clean, Dignified Senior Header with Subtle Portal Switch */}
+      <header className="sticky top-0 z-40 border-b border-emerald-100 bg-white/95 px-4 py-3 shadow-sm backdrop-blur-md">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
-          {/* Back to normal portal */}
+          {/* Brand & Senior Title */}
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-10 items-center justify-center rounded-2xl bg-emerald-700 text-white font-black shadow-md text-lg">
+              🌾
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-display text-lg font-black text-emerald-950 tracking-tight">
+                  KisanQueue
+                </span>
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
+                  {ui.seniorBadge}
+                </span>
+              </div>
+              <p className="text-[11px] font-bold text-stone-600">
+                {ui.simpleService}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Action: Clean Switch to Standard Mode */}
           <button
             onClick={() => navigate({ to: "/" })}
-            className="flex items-center gap-2 rounded-2xl border-2 border-emerald-300 bg-emerald-50 px-4 py-2 font-black text-emerald-950 shadow-sm transition-all hover:bg-emerald-100 active:scale-95"
-            title={ui.exitBtn}
+            className="flex items-center gap-1.5 rounded-xl border border-stone-300 bg-stone-50 px-3 py-1.5 text-xs font-bold text-stone-700 hover:bg-stone-100 transition-colors shadow-sm"
+            title={ui.switchStandard}
           >
-            <ArrowLeft className="size-6 shrink-0 text-emerald-800" />
-            <span className="text-base font-black sm:text-lg">
-              {ui.exitBtn}
-            </span>
+            <span>സാധാരണ മോഡ്</span>
+            <ExternalLink className="size-3.5 text-stone-500" />
           </button>
-
-          {/* Senior badge */}
-          <div className="text-right">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-3 py-1 text-xs font-black text-white shadow">
-              {ui.seniorBadge}
-            </span>
-            <p className="text-[11px] font-bold text-stone-600 mt-0.5">
-              {ui.simpleService}
-            </p>
-          </div>
         </div>
 
-        {/* 8 Indian Languages Selector Strip (User Requested) */}
-        <div className="mx-auto mt-2 max-w-2xl border-t border-amber-100 pt-2">
+        {/* 8 Indian Languages Selector Strip */}
+        <div className="mx-auto mt-2 max-w-2xl border-t border-emerald-50 pt-2">
           <div className="flex items-center justify-between mb-1.5">
             <span className="flex items-center gap-1 text-xs font-black uppercase tracking-wider text-emerald-900">
               <Languages className="size-3.5 text-emerald-700" />
@@ -1039,7 +1210,7 @@ function SeniorCitizenModePage() {
                   className={`rounded-xl py-2 px-1 text-center transition-all active:scale-95 ${
                     isSelected
                       ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-500"
-                      : "bg-white border border-stone-300 text-stone-800 font-bold hover:bg-emerald-50 shadow-sm"
+                      : "bg-white border border-stone-200 text-stone-800 font-bold hover:bg-emerald-50 shadow-sm"
                   }`}
                   title={langItem.label}
                 >
@@ -1056,7 +1227,7 @@ function SeniorCitizenModePage() {
         </div>
 
         {/* Accessibility Toolbar: Text Size + Voice Narration */}
-        <div className="mx-auto mt-2 flex max-w-2xl flex-wrap items-center justify-between gap-2 border-t border-stone-200/80 pt-2">
+        <div className="mx-auto mt-2 flex max-w-2xl flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-2">
           {/* Text Size Stepper */}
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-extrabold uppercase tracking-wider text-stone-700">
@@ -1097,6 +1268,26 @@ function SeniorCitizenModePage() {
           {/* Voice Reading Trigger */}
           <button
             onClick={() => {
+              if (currentTab === "profile") {
+                const profileSpeech = `${user.name}, ${ui.farmerIdLabel}: ${user.farmerId}. ${ui.panchayatLabel}: ${user.village}, ${user.district}. ${ui.cropsLabel}: ${user.primaryCrop}. ${ui.bankLabel}: ${user.bankAccount}. ${ui.aadhaarLinked}.`;
+                speakInLanguage(profileSpeech);
+                return;
+              }
+
+              if (currentTab === "payments") {
+                const paySpeech = `${ui.paymentsTitle}. ${ui.totalReceived}: ₹13,440. ${ui.dbtVerified}. ${ui.bankLabel}: ${user.bankAccount}.`;
+                speakInLanguage(paySpeech);
+                return;
+              }
+
+              if (currentTab === "bookings") {
+                const count = bookings.length;
+                const bookSpeech = `${ui.bookingsTitle}. ${count} ${ui.waitingCount}. ${activeBooking ? `സജീവ ടോക്കൺ #${activeBooking.queueNumber}` : ""}`;
+                speakInLanguage(bookSpeech);
+                return;
+              }
+
+              // Token tab
               if (activeBooking) {
                 const centreTitle = getCentreTranslatedName(activeBooking.centreName, language);
                 let speech = "";
@@ -1110,52 +1301,13 @@ function SeniorCitizenModePage() {
                   case "ta":
                     speech = `உங்கள் டோக்கன் எண் ${activeBooking.queueNumber}. மையம்: ${centreTitle}. இப்போது அழைக்கப்படுவது ${nowServing}. உங்கள் முன் ${farmersAhead} விவசாயிகள் உள்ளனர். காத்திருப்பு நேரம் சுமார் ${prediction.minutesLeft} நிமிடங்கள்.`;
                     break;
-                  case "te":
-                    speech = `మీ టోకెన్ సంఖ్య ${activeBooking.queueNumber}. కేంద్రం: ${centreTitle}. ప్రస్తుతం పిలుస్తున్న సంఖ్య ${nowServing}. మీ ముందు ${farmersAhead} మంది రైతులు ఉన్నారు. నిరీక్షణ సమయం సుమారు ${prediction.minutesLeft} నిమిషాలు.`;
-                    break;
-                  case "kn":
-                    speech = `ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ ${activeBooking.queueNumber}. ಕೇಂದ್ರ: ${centreTitle}. ಈಗ ಕರೆಯುತ್ತಿರುವ ಸಂಖ್ಯೆ ${nowServing}. ನಿಮ್ಮ ಮುಂದೆ ${farmersAhead} ರೈತರಿದ್ದಾರೆ. ಕಾಯುವ ಸಮಯ ಸುಮಾರು ${prediction.minutesLeft} ನಿಮಿಷಗಳು.`;
-                    break;
-                  case "bn":
-                    speech = `আপনার টোকেন নম্বর ${activeBooking.queueNumber}। কেন্দ্র: ${centreTitle}। এখন ডাকা হচ্ছে ${nowServing}। আপনার আগে ${farmersAhead} জন কৃষক আছেন। অপেক্ষার সময় প্রায় ${prediction.minutesLeft} মিনিট।`;
-                    break;
-                  case "mr":
-                    speech = `तुमचा टोकन नंबर ${activeBooking.queueNumber} आहे. केंद्र: ${centreTitle}. सध्या नंबर ${nowServing} सुरू आहे. तुमच्या पुढे ${farmersAhead} शेतकरी आहेत. प्रतीक्षेची वेळ सुमारे ${prediction.minutesLeft} मिनिटे आहे.`;
-                    break;
                   default:
                     speech = `Your Token Number is ${activeBooking.queueNumber} at ${centreTitle}. Now serving is ${nowServing}. There are ${farmersAhead} farmers ahead of you. Estimated wait is ${prediction.minutesLeft} minutes.`;
                     break;
                 }
                 speakInLanguage(speech);
               } else {
-                let speech = "";
-                switch (language) {
-                  case "ml":
-                    speech = "നിങ്ങൾക്ക് നിലവിൽ ടോക്കൺ ഇല്ല. താഴെ നിന്ന് വിളയും, തൂക്കവും, സംഭരണ കേന്ദ്രവും തിരഞ്ഞെടുത്ത് പച്ച ബട്ടൺ അമർത്തി ടോക്കൺ എടുക്കുക. സഹായത്തിന് 1800 425 1661 എന്ന നമ്പറിലേക്ക് വിളിക്കാം.";
-                    break;
-                  case "hi":
-                    speech = "वर्तमान में आपके पास कोई सक्रिय टोकन नहीं है। नीचे अपनी फसल, वज़न और खरीद केंद्र चुनें और हरा बटन दबाकर टोकन प्राप्त करें। सहायता के लिए 1800 425 1661 पर कॉल करें।";
-                    break;
-                  case "ta":
-                    speech = "தற்போது உங்களிடம் டோக்கன் இல்லை. கீழே பயிர், எடை மற்றும் கொள்முதல் மையத்தைத் தேர்ந்தெடுத்து பச்சை பொத்தானை அழுத்தி டோக்கன் பெறவும். உதவிக்கு 1800 425 1661 என்ற எண்ணை அழைக்கவும்.";
-                    break;
-                  case "te":
-                    speech = "ప్రస్తుతం మీ వద్ద టోకెన్ లేదు. కింద పంట, బరువు మరియు కొనుగోలు కేంద్రాన్ని ఎంచుకుని పచ్చ బటన్ నొక్కి టోకెన్ పొందండి. సహాయం కోసం 1800 425 1661 కు కాల్ చేయండి.";
-                    break;
-                  case "kn":
-                    speech = "ಪ್ರಸ್ತುತ ನಿಮ್ಮ ಬಳಿ ಯಾವುದೇ ಟೋಕನ್ ಇಲ್ಲ. ಕೆಳಗೆ ಬೆಳೆ, ತೂಕ ಮತ್ತು ಖರೀದಿ ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ ಹಸಿರು ಬಟನ್ ಒತ್ತಿ ಟೋಕನ್ ಪಡೆಯಿರಿ. ಸಹಾಯಕ್ಕಾಗಿ 1800 425 1661 ಗೆ ಕರೆ ಮಾಡಿ.";
-                    break;
-                  case "bn":
-                    speech = "বর্তমানে আপনার কাছে কোনো টোকেন নেই। নিচে ফসল, ওজন এবং সংগ্রহ কেন্দ্র নির্বাচন করে সবুজ বোতাম টিপে টোকেন নিন। সহায়তার জন্য 1800 425 1661 নম্বরে কল করুন।";
-                    break;
-                  case "mr":
-                    speech = "सध्या तुमच्याकडे कोणतेही टोकन नाही. खाली पीक, वजन आणि खरेदी केंद्र निवडून हिरवे बटण दाबा व टोकन मिळवा. मदतीसाठी 1800 425 1661 वर कॉल करा.";
-                    break;
-                  default:
-                    speech = "You do not have an active token. Select your crop, weight, and centre below, then tap the green button to book a token, or call toll-free 1800-425-1661.";
-                    break;
-                }
-                speakInLanguage(speech);
+                speakInLanguage(ui.noTokenSub);
               }
             }}
             className={`flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-black shadow-md transition-transform active:scale-95 ${
@@ -1187,559 +1339,802 @@ function SeniorCitizenModePage() {
       </header>
 
       <main className="mx-auto max-w-2xl px-4 pt-4 space-y-6">
-        {/* Welcome Greeting Banner */}
-        <section className="rounded-3xl bg-emerald-800 p-5 text-white shadow-xl">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-200">
-                {ui.greeting}
-              </span>
-              <h1 className="text-2xl font-black sm:text-3xl text-white">
-                {ui.appTitle}
-              </h1>
-              <p className="text-sm text-emerald-100 font-medium">
-                {ui.appSub}
-              </p>
-            </div>
-            <div className="flex size-16 shrink-0 items-center justify-center rounded-3xl bg-white/20 text-3xl shadow-inner backdrop-blur-md">
-              🌾
-            </div>
-          </div>
-        </section>
+        {/* ============================================================ */}
+        {/* TAB 1: TOKEN / BOOKING & LIVE QUEUE */}
+        {/* ============================================================ */}
+        {currentTab === "token" && (
+          <>
+            {/* Welcome Greeting Banner */}
+            <section className="rounded-3xl bg-emerald-800 p-5 text-white shadow-xl">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-200">
+                    {ui.greeting}
+                  </span>
+                  <h1 className="text-2xl font-black sm:text-3xl text-white">
+                    {ui.appTitle}
+                  </h1>
+                  <p className="text-sm text-emerald-100 font-medium">
+                    {ui.appSub}
+                  </p>
+                </div>
+                <div className="flex size-16 shrink-0 items-center justify-center rounded-3xl bg-white/20 text-3xl shadow-inner backdrop-blur-md">
+                  🌾
+                </div>
+              </div>
+            </section>
 
-        {/* SECTION 1: ACTIVE TOKEN STATUS CARD (GIANT & CLEAR) */}
-        {activeBooking ? (
-          <section className="relative overflow-hidden rounded-[32px] border-4 border-emerald-500 bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between border-b pb-4 border-stone-200">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3.5 py-1 text-sm font-black text-emerald-800">
-                <CheckCircle2 className="size-5 text-emerald-700" />
-                {ui.activeTokenTitle}
-              </span>
-              <span className="text-sm font-bold text-stone-600 font-mono">
-                {activeBooking.date}
-              </span>
-            </div>
+            {/* ACTIVE TOKEN STATUS CARD */}
+            {activeBooking ? (
+              <section className="relative overflow-hidden rounded-[32px] border-4 border-emerald-500 bg-white p-6 shadow-xl">
+                <div className="flex items-center justify-between border-b pb-4 border-stone-200">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3.5 py-1 text-sm font-black text-emerald-800">
+                    <CheckCircle2 className="size-5 text-emerald-700" />
+                    {ui.activeTokenTitle}
+                  </span>
+                  <span className="text-sm font-bold text-stone-600 font-mono">
+                    {activeBooking.date}
+                  </span>
+                </div>
 
-            {/* Giant Token Metric */}
-            <div className="my-6 text-center">
-              <p className="text-base font-bold text-stone-600">
-                {ui.tokenNumberLabel}
-              </p>
-              <div className="my-2 inline-block rounded-3xl bg-emerald-50 border-3 border-emerald-500 px-8 py-4 shadow-md">
-                <p className="font-display text-6xl font-black text-emerald-800 tracking-tight sm:text-7xl">
-                  #{activeBooking.queueNumber}
+                {/* Giant Token Metric */}
+                <div className="my-6 text-center">
+                  <p className="text-base font-bold text-stone-600">
+                    {ui.tokenNumberLabel}
+                  </p>
+                  <div className="my-2 inline-block rounded-3xl bg-emerald-50 border-3 border-emerald-500 px-8 py-4 shadow-md">
+                    <p className="font-display text-6xl font-black text-emerald-800 tracking-tight sm:text-7xl">
+                      #{activeBooking.queueNumber}
+                    </p>
+                  </div>
+                  <p className="text-sm font-black text-stone-800">
+                    {activeBooking.crop} · {activeBooking.quantityKg} kg
+                  </p>
+                </div>
+
+                {/* Queue Metrics Comparison */}
+                <div className="grid grid-cols-2 gap-3 rounded-2xl bg-amber-50 p-4 border border-amber-200">
+                  <div className="text-center border-r border-amber-300 pr-2">
+                    <span className="text-xs font-black text-stone-600 block">
+                      {ui.nowServing}
+                    </span>
+                    <span className="font-display text-3xl font-black text-amber-900">
+                      #{nowServing}
+                    </span>
+                    <span className="text-[11px] font-bold text-stone-600 block">
+                      {ui.gateInfo}
+                    </span>
+                  </div>
+                  <div className="text-center pl-2">
+                    <span className="text-xs font-black text-stone-600 block">
+                      {ui.aheadOfYou}
+                    </span>
+                    <span className="font-display text-3xl font-black text-stone-900">
+                      {farmersAhead} {ui.waitingCount}
+                    </span>
+                    <span className="text-[11px] font-bold text-stone-600 block">
+                      ~{prediction.minutesLeft} {ui.waitMin}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Centre Location */}
+                <div className="mt-4 flex items-start gap-3 rounded-2xl bg-stone-100 p-3.5 text-stone-900">
+                  <Building2 className="size-6 text-emerald-700 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="block text-base font-black">
+                      {getCentreTranslatedName(activeBooking.centreName, language)}
+                    </strong>
+                    <p className="text-xs text-stone-600">
+                      {activeCentreForDisplay.location || activeCentreForDisplay.address}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Voice & Action Buttons */}
+                <div className="mt-5 space-y-3">
+                  <button
+                    onClick={() => {
+                      const centreTitle = getCentreTranslatedName(activeBooking.centreName, language);
+                      const speech = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber} ആണ്. കേന്ദ്രം: ${centreTitle}. ഇപ്പോൾ വിളിക്കുന്നത് നമ്പർ ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്.`;
+                      speakInLanguage(speech);
+                    }}
+                    className="flex w-full items-center justify-center gap-3 rounded-2xl bg-emerald-700 py-4 font-black text-white shadow-lg hover:bg-emerald-800 active:scale-95 transition-all text-lg"
+                  >
+                    <Volume2 className="size-6" />
+                    <span>{ui.listenTokenDetails}</span>
+                  </button>
+
+                  <div className="flex gap-2">
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        activeBooking.centreName + " Kerala"
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-3.5 font-bold text-stone-800 hover:bg-stone-50 shadow-sm"
+                    >
+                      <MapPin className="size-5 text-emerald-700" />
+                      <span>{ui.getDirections}</span>
+                    </a>
+
+                    <button
+                      onClick={() => setShowCancelModal(true)}
+                      className="flex items-center justify-center gap-1.5 rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3.5 font-bold text-red-700 hover:bg-red-100 transition-colors"
+                    >
+                      <X className="size-5" />
+                      <span>{ui.cancelBtn}</span>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            ) : (
+              /* NO TOKEN NOTICE */
+              <div className="rounded-3xl border-2 border-dashed border-stone-300 bg-white p-5 text-center shadow-sm">
+                <Ticket className="mx-auto size-12 text-stone-400" />
+                <h2 className="mt-2 text-xl font-black text-stone-800">
+                  {ui.noTokenTitle}
+                </h2>
+                <p className="mt-1 text-sm font-medium text-stone-600">
+                  {ui.noTokenSub}
                 </p>
               </div>
-              <p className="text-sm font-black text-stone-800">
-                {activeBooking.crop} · {activeBooking.quantityKg} kg
-              </p>
-            </div>
+            )}
 
-            {/* Queue Metrics Comparison */}
-            <div className="grid grid-cols-2 gap-3 rounded-2xl bg-amber-50 p-4 border border-amber-200">
-              <div className="text-center border-r border-amber-300 pr-2">
-                <span className="text-xs font-black text-stone-600 block">
-                  {ui.nowServing}
-                </span>
-                <span className="font-display text-3xl font-black text-amber-900">
-                  #{nowServing}
-                </span>
-                <span className="text-[11px] font-bold text-stone-600 block">
-                  {ui.gateInfo}
-                </span>
-              </div>
-              <div className="text-center pl-2">
-                <span className="text-xs font-black text-stone-600 block">
-                  {ui.aheadOfYou}
-                </span>
-                <span className="font-display text-3xl font-black text-stone-900">
-                  {farmersAhead} {ui.waitingCount}
-                </span>
-                <span className="text-[11px] font-bold text-stone-600 block">
-                  ~{prediction.minutesLeft} {ui.waitMin}
-                </span>
-              </div>
-            </div>
-
-            {/* Centre Location */}
-            <div className="mt-4 flex items-start gap-3 rounded-2xl bg-stone-100 p-3.5 text-stone-900">
-              <Building2 className="size-6 text-emerald-700 shrink-0 mt-0.5" />
-              <div>
-                <strong className="block text-base font-black">
-                  {getCentreTranslatedName(activeBooking.centreName, language)}
-                </strong>
-                <p className="text-xs text-stone-600">
-                  {activeCentreForDisplay.location || activeCentreForDisplay.address}
-                </p>
-              </div>
-            </div>
-
-            {/* Voice & Action Buttons */}
-            <div className="mt-5 space-y-3">
-              <button
-                onClick={() => {
-                  const centreTitle = getCentreTranslatedName(activeBooking.centreName, language);
-                  let speech = "";
-                  switch (language) {
-                    case "ml":
-                      speech = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber} ആണ്. കേന്ദ്രം: ${centreTitle}. ഇപ്പോൾ വിളിക്കുന്നത് നമ്പർ ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്. ഏകദേശം ${prediction.minutesLeft} മിനിറ്റിനകം ഊഴം എത്തും.`;
-                      break;
-                    case "hi":
-                      speech = `आपका टोकन नंबर ${activeBooking.queueNumber} है। केंद्र: ${centreTitle}। अभी नंबर ${nowServing} बुलाया जा रहा है। आपके आगे ${farmersAhead} किसान हैं। लगभग ${prediction.minutesLeft} मिनट में आपकी बारी आएगी।`;
-                      break;
-                    case "ta":
-                      speech = `உங்கள் டோக்கன் எண் ${activeBooking.queueNumber}. மையம்: ${centreTitle}. இப்போது அழைக்கப்படுவது ${nowServing}. உங்கள் முன் ${farmersAhead} விவசாயிகள் உள்ளனர். சுமார் ${prediction.minutesLeft} நிமிடங்களில் உங்கள் முறை வரும்.`;
-                      break;
-                    case "te":
-                      speech = `మీ టోకెన్ సంఖ్య ${activeBooking.queueNumber}. కేంద్రం: ${centreTitle}. ప్రస్తుతం పిలుస్తున్న సంఖ్య ${nowServing}. మీ ముందు ${farmersAhead} మంది రైతులు ఉన్నారు. సుమారు ${prediction.minutesLeft} నిమిషాల్లో మీ వంతు వస్తుంది.`;
-                      break;
-                    case "kn":
-                      speech = `ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ ${activeBooking.queueNumber}. ಕೇಂದ್ರ: ${centreTitle}. ಈಗ ಕರೆಯುತ್ತಿರುವ ಸಂಖ್ಯೆ ${nowServing}. ನಿಮ್ಮ ಮುಂದೆ ${farmersAhead} ರೈತರಿದ್ದಾರೆ. ಸುಮಾರು ${prediction.minutesLeft} ನಿಮಿಷಗಳಲ್ಲಿ ನಿಮ್ಮ ಸರದಿ ಬರಲಿದೆ.`;
-                      break;
-                    case "bn":
-                      speech = `আপনার টোকেন নম্বর ${activeBooking.queueNumber}। কেন্দ্র: ${centreTitle}। এখন ডাকা হচ্ছে ${nowServing}। আপনার আগে ${farmersAhead} জন কৃষক আছেন। প্রায় ${prediction.minutesLeft} মিনিটের মধ্যে আপনার পালা আসবে।`;
-                      break;
-                    case "mr":
-                      speech = `तुमचा टोकन नंबर ${activeBooking.queueNumber} आहे. केंद्र: ${centreTitle}. सध्या नंबर ${nowServing} सुरू आहे. तुमच्या पुढे ${farmersAhead} शेतकरी आहेत. सुमारे ${prediction.minutesLeft} मिनिटांत तुमची पाळी येईल.`;
-                      break;
-                    default:
-                      speech = `Your Token Number is ${activeBooking.queueNumber} at ${centreTitle}. Currently serving token is ${nowServing}. There are ${farmersAhead} farmers ahead of you. Estimated wait is ${prediction.minutesLeft} minutes.`;
-                      break;
-                  }
-                  speakInLanguage(speech);
-                }}
-                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-emerald-700 py-4 font-black text-white shadow-lg hover:bg-emerald-800 active:scale-95 transition-all text-lg"
-              >
-                <Volume2 className="size-6" />
-                <span>{ui.listenTokenDetails}</span>
-              </button>
-
-              <div className="flex gap-2">
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    activeBooking.centreName + " Kerala"
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-3.5 font-bold text-stone-800 hover:bg-stone-50 shadow-sm"
+            {/* INSTANT TOKEN BOOKING FORM */}
+            <section className="rounded-[32px] border-2 border-emerald-200 bg-white p-6 shadow-xl space-y-6">
+              <div className="flex items-center justify-between border-b pb-4 border-stone-200">
+                <div>
+                  <span className="text-xs font-black uppercase tracking-wider text-emerald-700">
+                    {ui.step123}
+                  </span>
+                  <h2 className="text-2xl font-black text-stone-900">
+                    {ui.bookNewTokenTitle}
+                  </h2>
+                </div>
+                <button
+                  onClick={() => speakInLanguage(ui.noTokenSub)}
+                  className="flex items-center gap-1.5 rounded-2xl bg-amber-100 border border-amber-300 px-3 py-2 text-xs font-black text-amber-900 hover:bg-amber-200"
                 >
-                  <MapPin className="size-5 text-emerald-700" />
-                  <span>{ui.getDirections}</span>
+                  <Volume2 className="size-4" />
+                  <span>{ui.helpVoiceBtn}</span>
+                </button>
+              </div>
+
+              {/* STEP 1: CROP SELECTOR */}
+              <div className="space-y-2.5">
+                <label className="block text-base font-black text-stone-800">
+                  {ui.step1Label}
+                </label>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {CROP_ITEMS.map((crop) => {
+                    const isSelected = selectedCrop.id === crop.id;
+                    const localizedCropName = crop.names[language] || crop.names.en;
+                    return (
+                      <button
+                        key={crop.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCrop(crop);
+                          speakInLanguage(`${localizedCropName}, ₹${crop.msp} / ${crop.unit}`);
+                        }}
+                        className={`relative flex flex-col items-center rounded-2xl p-3 text-left transition-all border-2 active:scale-95 ${
+                          isSelected
+                            ? "border-emerald-600 bg-emerald-50 ring-4 ring-emerald-500/20 shadow-md"
+                            : "border-stone-200 bg-stone-50 hover:bg-stone-100"
+                        }`}
+                      >
+                        {isSelected && (
+                          <span className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-emerald-600 text-white shadow">
+                            <Check className="size-4 stroke-[3]" />
+                          </span>
+                        )}
+                        <img
+                          src={crop.image}
+                          alt={crop.names.en}
+                          className="size-16 rounded-xl object-cover shadow-sm"
+                        />
+                        <span className="mt-2 text-center text-sm font-black text-stone-900 leading-tight">
+                          {localizedCropName}
+                        </span>
+                        <span className="mt-0.5 text-xs font-extrabold text-emerald-700">
+                          ₹{crop.msp} / {crop.unit}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* STEP 2: QUANTITY SELECTOR (+1 / -1) */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-base font-black text-stone-800">
+                    {ui.step2Label}
+                  </label>
+                  <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
+                    {ui.by1kgBadge}
+                  </span>
+                </div>
+
+                {/* Clean, Giant +1 / -1 Stepper Controls */}
+                <div className="flex items-center justify-between gap-4 rounded-3xl bg-emerald-50/70 border-2 border-emerald-300 p-3 shadow-inner">
+                  {/* -1 kg Main Button */}
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="flex size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
+                    title={ui.decrease1}
+                  >
+                    <Minus className="size-8 stroke-[3]" />
+                  </button>
+
+                  {/* Number Value Display & Edit */}
+                  <div className="text-center px-2">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <input
+                        type="number"
+                        min="1"
+                        max="50000"
+                        value={quantity}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          if (!isNaN(val) && val > 0) setQuantity(val);
+                          else if (e.target.value === "") setQuantity(1);
+                        }}
+                        className="w-28 text-center font-display text-5xl font-black text-emerald-950 bg-transparent border-b-2 border-emerald-500 focus:outline-none focus:border-emerald-700"
+                      />
+                      <span className="text-2xl font-black text-stone-600">kg</span>
+                    </div>
+                    <span className="text-xs font-bold text-emerald-700 block mt-0.5">
+                      {ui.kgLabel}
+                    </span>
+                  </div>
+
+                  {/* +1 kg Main Button */}
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => q + 1)}
+                    className="flex size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
+                    title={ui.increase1}
+                  >
+                    <Plus className="size-8 stroke-[3]" />
+                  </button>
+                </div>
+
+                {/* Fast Preset Chips */}
+                <div className="grid grid-cols-4 gap-2 pt-1">
+                  {PRESET_QUANTITIES.map((val) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setQuantity(val)}
+                      className={`rounded-2xl py-3 text-center text-sm font-black border transition-all active:scale-95 ${
+                        quantity === val
+                          ? "bg-emerald-700 text-white border-emerald-800 shadow"
+                          : "bg-white text-stone-800 border-stone-300 hover:bg-stone-50"
+                      }`}
+                    >
+                      {val} kg
+                    </button>
+                  ))}
+                </div>
+
+                {/* Calculated Estimated MSP Payout */}
+                <div className="flex items-center justify-between rounded-2xl bg-emerald-50 border border-emerald-200 p-4">
+                  <div>
+                    <span className="text-xs font-bold text-emerald-800 block">
+                      {ui.estimatedPayout}
+                    </span>
+                    <p className="text-xs text-stone-600">
+                      {quantity} kg × ₹{selectedCrop.msp} / kg
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-display text-2xl font-black text-emerald-800">
+                      ₹{(quantity * selectedCrop.msp).toLocaleString("en-IN")}
+                    </span>
+                    <span className="block text-[10px] font-bold text-stone-500">
+                      {ui.directDbt}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* STEP 3: CENTRE SELECTOR */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-base font-black text-stone-800">
+                    {ui.step3Label}
+                  </label>
+                  <span className="text-xs font-bold text-emerald-800">
+                    {centres.length} {ui.centresAvailable}
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {centres.map((centre) => {
+                    const isSelected = selectedCentre.id === centre.id;
+                    const centreTitle = getCentreTranslatedName(centre.name, language);
+                    return (
+                      <div
+                        key={centre.id}
+                        onClick={() => {
+                          setSelectedCentre(centre);
+                          speakInLanguage(`${centreTitle}, ${centre.distanceKm} km`);
+                        }}
+                        className={`flex items-start justify-between gap-3 rounded-2xl p-4 border-2 cursor-pointer transition-all active:scale-98 ${
+                          isSelected
+                            ? "border-emerald-600 bg-emerald-50 ring-4 ring-emerald-500/20 shadow-md"
+                            : "border-stone-200 bg-stone-50 hover:bg-white"
+                        }`}
+                      >
+                        <div className="flex items-start gap-3 min-w-0">
+                          <div
+                            className={`flex size-10 shrink-0 items-center justify-center rounded-xl font-bold shadow-sm ${
+                              isSelected
+                                ? "bg-emerald-700 text-white"
+                                : "bg-white text-stone-600 border border-stone-300"
+                            }`}
+                          >
+                            {isSelected ? <Check className="size-5 stroke-[3]" /> : <Building2 className="size-5" />}
+                          </div>
+
+                          <div className="min-w-0">
+                            <strong className="block text-sm font-black text-stone-900 leading-tight">
+                              {centreTitle}
+                            </strong>
+                            <p className="text-xs text-stone-600 mt-0.5">
+                              {centre.location || centre.address}
+                            </p>
+                            <p className="text-xs font-bold text-emerald-700 mt-1 flex items-center gap-2">
+                              <span>📍 {centre.distanceKm} km</span>
+                              <span>·</span>
+                              <span>⏰ {centre.workingHours}</span>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <span
+                            className={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase shadow-sm ${
+                              centre.status === "normal"
+                                ? "bg-emerald-200 text-emerald-900 border border-emerald-300"
+                                : centre.status === "busy"
+                                ? "bg-amber-200 text-amber-900 border border-amber-300"
+                                : "bg-red-200 text-red-900 border border-red-300"
+                            }`}
+                          >
+                            {centre.status === "normal"
+                              ? ui.fastQueue
+                              : centre.status === "busy"
+                              ? ui.normalQueue
+                              : ui.busyQueue}
+                          </span>
+                          <p className="text-[11px] font-bold text-stone-600 mt-1">
+                            {centre.currentQueueLength} {ui.waitingCount}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* GIANT 1-TAP CONFIRM BUTTON */}
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={handleInstantBook}
+                  className="flex w-full items-center justify-center gap-3 rounded-3xl bg-emerald-700 py-5 px-6 font-black text-white shadow-2xl hover:bg-emerald-800 active:scale-95 transition-all text-xl sm:text-2xl border-4 border-emerald-500/60"
+                >
+                  <Ticket className="size-8" />
+                  <span>{ui.confirmButton}</span>
+                </button>
+                <p className="mt-2 text-center text-xs font-bold text-stone-600">
+                  {getCentreTranslatedName(selectedCentre.name, language)} - {ui.todayIssuedSub}
+                </p>
+              </div>
+            </section>
+
+            {/* DIRECT TOLL-FREE CALL HELPLINE CARD */}
+            <section className="rounded-3xl border-2 border-emerald-300 bg-emerald-50 p-5 shadow-md space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-700 text-white shadow">
+                  <Phone className="size-7" />
+                </div>
+                <div>
+                  <span className="text-xs font-black uppercase tracking-wider text-emerald-800">
+                    {ui.needAssistance}
+                  </span>
+                  <h3 className="text-xl font-black text-stone-900">
+                    {ui.callForToken}
+                  </h3>
+                  <p className="text-xs text-stone-600 font-medium">
+                    {ui.freeHelpline}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2.5 pt-2 sm:grid-cols-2">
+                <a
+                  href="tel:18004251661"
+                  className="flex items-center justify-center gap-3 rounded-2xl bg-emerald-700 py-4 px-4 font-black text-white shadow hover:bg-emerald-800 active:scale-95 transition-all text-base"
+                >
+                  <Phone className="size-6" />
+                  <span>{ui.callNow}</span>
                 </a>
 
-                <button
-                  onClick={() => setShowCancelModal(true)}
-                  className="flex items-center justify-center gap-1.5 rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3.5 font-bold text-red-700 hover:bg-red-100 transition-colors"
+                <a
+                  href="tel:+919447123456"
+                  className="flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-4 px-4 font-black text-stone-800 shadow-sm hover:bg-stone-50 active:scale-95 transition-all text-base"
                 >
-                  <X className="size-5" />
-                  <span>{ui.cancelBtn}</span>
-                </button>
+                  <Phone className="size-5 text-emerald-700" />
+                  <span>{ui.managerCall}</span>
+                </a>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* ============================================================ */}
+        {/* TAB 2: MY BOOKINGS & PASSES */}
+        {/* ============================================================ */}
+        {currentTab === "bookings" && (
+          <section className="space-y-4 animate-in fade-in">
+            <div className="rounded-3xl bg-white p-5 border-2 border-emerald-200 shadow-md">
+              <div className="flex items-center justify-between border-b pb-3 border-stone-200">
+                <div className="flex items-center gap-2.5">
+                  <CalendarDays className="size-6 text-emerald-700" />
+                  <h2 className="text-xl font-black text-stone-900">
+                    {ui.bookingsTitle}
+                  </h2>
+                </div>
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800">
+                  {bookings.length} {ui.waitingCount}
+                </span>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {bookings.length === 0 ? (
+                  <p className="text-center text-stone-500 py-8 font-bold">
+                    {ui.noBookings}
+                  </p>
+                ) : (
+                  bookings.map((b) => (
+                    <div
+                      key={b.id}
+                      className="rounded-2xl border-2 border-stone-200 bg-stone-50 p-4 space-y-2.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-display text-2xl font-black text-emerald-900">
+                          #{b.queueNumber}
+                        </span>
+                        <span
+                          className={`rounded-full px-3 py-0.5 text-xs font-black uppercase ${
+                            b.status === "confirmed"
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                              : "bg-stone-200 text-stone-700"
+                          }`}
+                        >
+                          {b.status}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 text-xs font-bold text-stone-700">
+                        <p className="text-sm font-black text-stone-900">
+                          {b.crop} · {b.quantityKg} kg
+                        </p>
+                        <p className="flex items-center gap-1.5 text-stone-600">
+                          <Building2 className="size-3.5 text-emerald-700" />
+                          <span>{getCentreTranslatedName(b.centreName, language)}</span>
+                        </p>
+                        <p className="flex items-center gap-1.5 text-stone-600">
+                          <Clock className="size-3.5 text-emerald-700" />
+                          <span>{b.date} · {b.slotTime}</span>
+                        </p>
+                        <p className="font-mono text-[11px] text-stone-500 pt-1">
+                          ID: {b.id} · MSP: ₹{b.mspPerKg}/kg · Total: ₹{b.totalAmount.toLocaleString("en-IN")}
+                        </p>
+                      </div>
+
+                      {b.status === "confirmed" && (
+                        <div className="pt-2 flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const bSpeech = `ടോക്കൺ #${b.queueNumber}. ${b.centreName}. ${b.crop}, ${b.quantityKg} കിലോ. തീയതി ${b.date}.`;
+                              speakInLanguage(bSpeech);
+                            }}
+                            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 py-2 text-xs font-black text-white shadow-sm"
+                          >
+                            <Volume2 className="size-4" />
+                            <span>കേൾക്കുക</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              cancelBooking(b.id);
+                              speakInLanguage("ടോക്കൺ വിജയകരമായി റദ്ദാക്കി.");
+                            }}
+                            className="px-3 rounded-xl border border-red-300 bg-red-50 text-xs font-bold text-red-700 hover:bg-red-100"
+                          >
+                            റദ്ദാക്കുക
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </section>
-        ) : (
-          /* NO TOKEN NOTICE */
-          <div className="rounded-3xl border-2 border-dashed border-stone-300 bg-white p-5 text-center shadow-sm">
-            <Ticket className="mx-auto size-12 text-stone-400" />
-            <h2 className="mt-2 text-xl font-black text-stone-800">
-              {ui.noTokenTitle}
-            </h2>
-            <p className="mt-1 text-sm font-medium text-stone-600">
-              {ui.noTokenSub}
-            </p>
-          </div>
         )}
 
-        {/* SECTION 2: INSTANT TOKEN BOOKING FORM */}
-        <section className="rounded-[32px] border-2 border-emerald-200 bg-white p-6 shadow-xl space-y-6">
-          <div className="flex items-center justify-between border-b pb-4 border-stone-200">
-            <div>
-              <span className="text-xs font-black uppercase tracking-wider text-emerald-700">
-                {ui.step123}
-              </span>
-              <h2 className="text-2xl font-black text-stone-900">
-                {ui.bookNewTokenTitle}
-              </h2>
-            </div>
-            <button
-              onClick={() => {
-                let speech = "";
-                switch (language) {
-                  case "ml":
-                    speech = "പുതിയ ടോക്കൺ എടുക്കുന്നതിനായി ആദ്യം വിള തിരഞ്ഞെടുക്കുക. തുടർന്ന് എത്ര കിലോ ഉണ്ടെന്ന് 1 കിലോ വീതം കൂട്ടുകയോ കുറയ്ക്കുകയോ ചെയ്യാം. ശേഷം സംഭരണ കേന്ദ്രം തിരഞ്ഞെടുത്ത് താഴെയുള്ള വലിയ പച്ച ബട്ടൺ അമർത്തുക.";
-                    break;
-                  case "hi":
-                    speech = "नया टोकन प्राप्त करने के लिए पहले फसल चुनें। फिर 1 किलो के हिसाब से वज़न तय करें। उसके बाद खरीद केंद्र चुनकर नीचे दिया गया बड़ा हरा बटन दबाएं।";
-                    break;
-                  case "ta":
-                    speech = "புதிய டோக்கன் எடுக்க முதலில் பயிரைத் தேர்ந்தெடுக்கவும். பின்னர் 1 கிலோ வீதம் எடையை மாற்றலாம். பிறகு கொள்முதல் மையத்தைத் தேர்ந்தெடுத்து கீழே உள்ள பெரிய பச்சை பொத்தானை அழுத்தவும்.";
-                    break;
-                  case "te":
-                    speech = "కొత్త టోకెన్ పొందడానికి ముందుగా పంటను ఎంచుకోండి. తర్వాత 1 కిలో చొప్పున బరువు నిర్ణయించండి. ఆపై కొనుగోలు కేంద్రాన్ని ఎంచుకుని కింద ఉన్న పెద్ద పచ్చ బటన్ నొక్కండి.";
-                    break;
-                  case "kn":
-                    speech = "ಹೊಸ ಟೋಕನ್ ಪಡೆಯಲು ಮೊದಲು ಬೆಳೆ ಆಯ್ಕೆಮಾಡಿ. ನಂತರ 1 ಕೆಜಿಯಂತೆ ತೂಕ ಹೊಂದಿಸಿ. ಬಳಿಕ ಖರೀದಿ ಕೇಂದ್ರ ಆರಿಸಿ ಕೆಳಗಿನ ದೊಡ್ಡ ಹಸಿರು ಬಟನ್ ಒತ್ತಿ.";
-                    break;
-                  case "bn":
-                    speech = "নতুন টোকেন নিতে প্রথমে ফসল বেছে নিন। তারপর ১ কেজি করে ওজন ঠিক করুন। এরপর সংগ্রহ কেন্দ্র নির্বাচন করে নিচের বড় সবুজ বোতাম টিপুন।";
-                    break;
-                  case "mr":
-                    speech = "नवीन टोकन मिळवण्यासाठी प्रथम पीक निवडा. नंतर १ किलोच्या हिशोबाने वजन ठरवा. त्यानंतर खरेदी केंद्र निवडून खालील मोठे हिरवे बटण दाबा.";
-                    break;
-                  default:
-                    speech = "To book a new token, first select your crop, adjust weight by 1 kg increments, pick your procurement centre, and tap the big green button at the bottom.";
-                    break;
-                }
-                speakInLanguage(speech);
-              }}
-              className="flex items-center gap-1.5 rounded-2xl bg-amber-100 border border-amber-300 px-3 py-2 text-xs font-black text-amber-900 hover:bg-amber-200"
-            >
-              <Volume2 className="size-4" />
-              <span>{ui.helpVoiceBtn}</span>
-            </button>
-          </div>
-
-          {/* STEP 1: CROP SELECTOR */}
-          <div className="space-y-2.5">
-            <label className="block text-base font-black text-stone-800">
-              {ui.step1Label}
-            </label>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {CROP_ITEMS.map((crop) => {
-                const isSelected = selectedCrop.id === crop.id;
-                const localizedCropName = crop.names[language] || crop.names.en;
-                return (
-                  <button
-                    key={crop.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedCrop(crop);
-                      let cropSpeech = "";
-                      switch (language) {
-                        case "ml":
-                          cropSpeech = `${localizedCropName} തിരഞ്ഞെടുത്തു. താങ്ങുവില കിലോയ്ക്ക് ${crop.msp} രൂപ.`;
-                          break;
-                        case "hi":
-                          cropSpeech = `${localizedCropName} चुना गया। समर्थन मूल्य ₹${crop.msp} प्रति किलो है।`;
-                          break;
-                        case "ta":
-                          cropSpeech = `${localizedCropName} தேர்ந்தெடுக்கப்பட்டது. ஆதரவு விலை கிலோவிற்கு ₹${crop.msp}.`;
-                          break;
-                        case "te":
-                          cropSpeech = `${localizedCropName} ఎంపిక చేయబడింది. మద్దతు ధర కిలోకు ₹${crop.msp}.`;
-                          break;
-                        case "kn":
-                          cropSpeech = `${localizedCropName} ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ಬೆಂಬಲ ಬೆಲೆ ಪ್ರತಿ ಕೆಜಿಗೆ ₹${crop.msp}.`;
-                          break;
-                        case "bn":
-                          cropSpeech = `${localizedCropName} নির্বাচিত হয়েছে। সমর্থন মূল্য প্রতি কেজি ₹${crop.msp}।`;
-                          break;
-                        case "mr":
-                          cropSpeech = `${localizedCropName} निवडले आहे. हमीभाव ₹${crop.msp} प्रति किलो आहे.`;
-                          break;
-                        default:
-                          cropSpeech = `Selected ${localizedCropName}. Support price is ₹${crop.msp} per kg.`;
-                          break;
-                      }
-                      speakInLanguage(cropSpeech);
-                    }}
-                    className={`relative flex flex-col items-center rounded-2xl p-3 text-left transition-all border-2 active:scale-95 ${
-                      isSelected
-                        ? "border-emerald-600 bg-emerald-50 ring-4 ring-emerald-500/20 shadow-md"
-                        : "border-stone-200 bg-stone-50 hover:bg-stone-100"
-                    }`}
-                  >
-                    {isSelected && (
-                      <span className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-emerald-600 text-white shadow">
-                        <Check className="size-4 stroke-[3]" />
-                      </span>
-                    )}
-                    <img
-                      src={crop.image}
-                      alt={crop.names.en}
-                      className="size-16 rounded-xl object-cover shadow-sm"
-                    />
-                    <span className="mt-2 text-center text-sm font-black text-stone-900 leading-tight">
-                      {localizedCropName}
-                    </span>
-                    <span className="mt-0.5 text-xs font-extrabold text-emerald-700">
-                      ₹{crop.msp} / {crop.unit}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* STEP 2: QUANTITY SELECTOR (+1 KG / -1 KG STEPPER) */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-base font-black text-stone-800">
-                {ui.step2Label}
-              </label>
-              <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
-                {ui.by1kgBadge}
-              </span>
-            </div>
-
-            {/* Clean, Giant +1 / -1 Stepper Controls */}
-            <div className="flex items-center justify-between gap-4 rounded-3xl bg-emerald-50/70 border-2 border-emerald-300 p-3 shadow-inner">
-              {/* -1 kg Main Button */}
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
-                title={ui.decrease1}
-              >
-                <Minus className="size-8 stroke-[3]" />
-              </button>
-
-              {/* Number Value Display & Edit */}
-              <div className="text-center px-2">
-                <div className="flex items-baseline justify-center gap-1">
-                  <input
-                    type="number"
-                    min="1"
-                    max="50000"
-                    value={quantity}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value, 10);
-                      if (!isNaN(val) && val > 0) setQuantity(val);
-                      else if (e.target.value === "") setQuantity(1);
-                    }}
-                    className="w-28 text-center font-display text-5xl font-black text-emerald-950 bg-transparent border-b-2 border-emerald-500 focus:outline-none focus:border-emerald-700"
-                  />
-                  <span className="text-2xl font-black text-stone-600">kg</span>
-                </div>
-                <span className="text-xs font-bold text-emerald-700 block mt-0.5">
-                  {ui.kgLabel}
+        {/* ============================================================ */}
+        {/* TAB 3: MSP PAYMENTS & SETTLEMENT */}
+        {/* ============================================================ */}
+        {currentTab === "payments" && (
+          <section className="space-y-4 animate-in fade-in">
+            {/* Giant Settlement Card */}
+            <div className="rounded-3xl bg-emerald-800 p-6 text-white shadow-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-emerald-200">
+                  {ui.dbtVerified}
+                </span>
+                <span className="flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-black">
+                  <ShieldCheck className="size-4" /> PFMS DBT
                 </span>
               </div>
 
-              {/* +1 kg Main Button */}
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => q + 1)}
-                className="flex size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
-                title={ui.increase1}
-              >
-                <Plus className="size-8 stroke-[3]" />
-              </button>
-            </div>
-
-            {/* Fast Preset Chips */}
-            <div className="grid grid-cols-4 gap-2 pt-1">
-              {PRESET_QUANTITIES.map((val) => (
-                <button
-                  key={val}
-                  type="button"
-                  onClick={() => setQuantity(val)}
-                  className={`rounded-2xl py-3 text-center text-sm font-black border transition-all active:scale-95 ${
-                    quantity === val
-                      ? "bg-emerald-700 text-white border-emerald-800 shadow"
-                      : "bg-white text-stone-800 border-stone-300 hover:bg-stone-50"
-                  }`}
-                >
-                  {val} kg
-                </button>
-              ))}
-            </div>
-
-            {/* Calculated Estimated MSP Payout */}
-            <div className="flex items-center justify-between rounded-2xl bg-emerald-50 border border-emerald-200 p-4">
               <div>
-                <span className="text-xs font-bold text-emerald-800 block">
-                  {ui.estimatedPayout}
+                <span className="text-xs text-emerald-100 font-bold block">
+                  {ui.totalReceived}
                 </span>
-                <p className="text-xs text-stone-600">
-                  {quantity} kg × ₹{selectedCrop.msp} / kg
+                <p className="font-display text-5xl font-black text-white mt-1">
+                  ₹13,440
+                </p>
+                <p className="text-xs text-emerald-200 mt-1 font-medium">
+                  നെല്ല് സംഭരണം · 420 kg @ ₹32/kg MSP നിരക്ക്
                 </p>
               </div>
-              <div className="text-right">
-                <span className="font-display text-2xl font-black text-emerald-800">
-                  ₹{(quantity * selectedCrop.msp).toLocaleString("en-IN")}
-                </span>
-                <span className="block text-[10px] font-bold text-stone-500">
-                  {ui.directDbt}
-                </span>
+
+              <div className="border-t border-white/20 pt-3 grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-emerald-200 text-[10px] block">{ui.bankLabel}</span>
+                  <strong className="font-mono">{user.bankAccount || "SBI **** 4891"}</strong>
+                </div>
+                <div>
+                  <span className="text-emerald-200 text-[10px] block">{ui.ifscLabel}</span>
+                  <strong className="font-mono">{user.ifsc || "SBIN0070123"}</strong>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* STEP 3: CENTRE SELECTOR */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-base font-black text-stone-800">
-                {ui.step3Label}
-              </label>
-              <span className="text-xs font-bold text-emerald-800">
-                {centres.length} {ui.centresAvailable}
-              </span>
-            </div>
-
-            <div className="space-y-2.5">
-              {centres.map((centre) => {
-                const isSelected = selectedCentre.id === centre.id;
-                const centreTitle = getCentreTranslatedName(centre.name, language);
-                return (
-                  <div
-                    key={centre.id}
-                    onClick={() => {
-                      setSelectedCentre(centre);
-                      let centreSpeech = "";
-                      switch (language) {
-                        case "ml":
-                          centreSpeech = `${centreTitle} സംഭരണ കേന്ദ്രം തിരഞ്ഞെടുത്തു. ദൂരം ${centre.distanceKm} കിലോമീറ്റർ.`;
-                          break;
-                        case "hi":
-                          centreSpeech = `${centreTitle} खरीद केंद्र चुना गया। दूरी ${centre.distanceKm} किलोमीटर है।`;
-                          break;
-                        case "ta":
-                          centreSpeech = `${centreTitle} கொள்முதல் மையம் தேர்ந்தெடுக்கப்பட்டது. தூரம் ${centre.distanceKm} கி.மீ.`;
-                          break;
-                        case "te":
-                          centreSpeech = `${centreTitle} కొనుగోలు కేంద్రం ఎంపిక చేయబడింది. దూరం ${centre.distanceKm} కి.మీ.`;
-                          break;
-                        case "kn":
-                          centreSpeech = `${centreTitle} ಖರೀದಿ ಕೇಂದ್ರ ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ದೂರ ${centre.distanceKm} ಕಿ.ಮೀ.`;
-                          break;
-                        case "bn":
-                          centreSpeech = `${centreTitle} সংগ্রহ কেন্দ্র নির্বাচিত হয়েছে। দূরত্ব ${centre.distanceKm} কিমি।`;
-                          break;
-                        case "mr":
-                          centreSpeech = `${centreTitle} खरेदी केंद्र निवडले आहे. अंतर ${centre.distanceKm} किमी आहे.`;
-                          break;
-                        default:
-                          centreSpeech = `Selected ${centreTitle}. Distance is ${centre.distanceKm} kilometers.`;
-                          break;
-                      }
-                      speakInLanguage(centreSpeech);
-                    }}
-                    className={`flex items-start justify-between gap-3 rounded-2xl p-4 border-2 cursor-pointer transition-all active:scale-98 ${
-                      isSelected
-                        ? "border-emerald-600 bg-emerald-50 ring-4 ring-emerald-500/20 shadow-md"
-                        : "border-stone-200 bg-stone-50 hover:bg-white"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3 min-w-0">
-                      <div
-                        className={`flex size-10 shrink-0 items-center justify-center rounded-xl font-bold shadow-sm ${
-                          isSelected
-                            ? "bg-emerald-700 text-white"
-                            : "bg-white text-stone-600 border border-stone-300"
-                        }`}
-                      >
-                        {isSelected ? <Check className="size-5 stroke-[3]" /> : <Building2 className="size-5" />}
-                      </div>
-
-                      <div className="min-w-0">
-                        <strong className="block text-sm font-black text-stone-900 leading-tight">
-                          {centreTitle}
-                        </strong>
-                        <p className="text-xs text-stone-600 mt-0.5">
-                          {centre.location || centre.address}
-                        </p>
-                        <p className="text-xs font-bold text-emerald-700 mt-1 flex items-center gap-2">
-                          <span>📍 {centre.distanceKm} km</span>
-                          <span>·</span>
-                          <span>⏰ {centre.workingHours}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="text-right shrink-0">
-                      <span
-                        className={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase shadow-sm ${
-                          centre.status === "normal"
-                            ? "bg-emerald-200 text-emerald-900 border border-emerald-300"
-                            : centre.status === "busy"
-                            ? "bg-amber-200 text-amber-900 border border-amber-300"
-                            : "bg-red-200 text-red-900 border border-red-300"
-                        }`}
-                      >
-                        {centre.status === "normal"
-                          ? ui.fastQueue
-                          : centre.status === "busy"
-                          ? ui.normalQueue
-                          : ui.busyQueue}
-                      </span>
-                      <p className="text-[11px] font-bold text-stone-600 mt-1">
-                        {centre.currentQueueLength} {ui.waitingCount}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* GIANT 1-TAP CONFIRM BUTTON */}
-          <div className="pt-3">
-            <button
-              type="button"
-              onClick={handleInstantBook}
-              className="flex w-full items-center justify-center gap-3 rounded-3xl bg-emerald-700 py-5 px-6 font-black text-white shadow-2xl hover:bg-emerald-800 active:scale-95 transition-all text-xl sm:text-2xl border-4 border-emerald-500/60"
-            >
-              <Ticket className="size-8" />
-              <span>{ui.confirmButton}</span>
-            </button>
-            <p className="mt-2 text-center text-xs font-bold text-stone-600">
-              {getCentreTranslatedName(selectedCentre.name, language)} - {ui.todayIssuedSub}
-            </p>
-          </div>
-        </section>
-
-        {/* SECTION 4: DIRECT TOLL-FREE CALL HELPLINE CARD */}
-        <section className="rounded-3xl border-2 border-emerald-300 bg-emerald-50 p-5 shadow-md space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-700 text-white shadow">
-              <Phone className="size-7" />
-            </div>
-            <div>
-              <span className="text-xs font-black uppercase tracking-wider text-emerald-800">
-                {ui.needAssistance}
-              </span>
-              <h3 className="text-xl font-black text-stone-900">
-                {ui.callForToken}
+            {/* Past Transactions List */}
+            <div className="rounded-3xl bg-white p-5 border-2 border-emerald-200 shadow-md space-y-3">
+              <h3 className="text-base font-black text-stone-900">
+                {ui.txnHistory}
               </h3>
-              <p className="text-xs text-stone-600 font-medium">
-                {ui.freeHelpline}
-              </p>
+
+              <div className="space-y-2">
+                <div className="rounded-2xl bg-stone-50 p-3.5 border border-stone-200 flex items-center justify-between">
+                  <div>
+                    <strong className="block text-sm font-black text-stone-900">
+                      നെല്ല് സംഭരണം (Paddy)
+                    </strong>
+                    <span className="text-xs text-stone-600 block">
+                      കോട്ടയം സംഭരണ കേന്ദ്രം · 420 kg
+                    </span>
+                    <span className="text-[10px] font-mono text-stone-500">
+                      TXN80472291 · 08 Sep 2026
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-base font-black text-emerald-800 block">
+                      +₹13,440
+                    </span>
+                    <span className="inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
+                      വിജയകരം
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl bg-stone-50 p-3.5 border border-stone-200 flex items-center justify-between">
+                  <div>
+                    <strong className="block text-sm font-black text-stone-900">
+                      പച്ചത്തേങ്ങ (Raw Coconut)
+                    </strong>
+                    <span className="text-xs text-stone-600 block">
+                      ചങ്ങനാശ്ശേരി സംഭരണ കേന്ദ്രം · 250 kg
+                    </span>
+                    <span className="text-[10px] font-mono text-stone-500">
+                      TXN74198205 · 14 Aug 2026
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-base font-black text-emerald-800 block">
+                      +₹9,500
+                    </span>
+                    <span className="inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
+                      വിജയകരം
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
+        )}
 
-          <div className="grid grid-cols-1 gap-2.5 pt-2 sm:grid-cols-2">
-            {/* Toll Free Button */}
-            <a
-              href="tel:18004251661"
-              className="flex items-center justify-center gap-3 rounded-2xl bg-emerald-700 py-4 px-4 font-black text-white shadow hover:bg-emerald-800 active:scale-95 transition-all text-base"
-            >
-              <Phone className="size-6" />
-              <span>{ui.callNow}</span>
-            </a>
+        {/* ============================================================ */}
+        {/* TAB 4: FARMER PROFILE (USER REQUESTED FEATURE) */}
+        {/* ============================================================ */}
+        {currentTab === "profile" && (
+          <section className="space-y-4 animate-in fade-in">
+            {/* Farmer Card */}
+            <div className="rounded-3xl bg-emerald-800 p-6 text-white shadow-xl space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-emerald-200">
+                  {ui.profileTitle}
+                </span>
+                <span className="flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-black">
+                  <ShieldCheck className="size-4" /> {ui.aadhaarLinked}
+                </span>
+              </div>
 
-            {/* Centre Manager Direct Call */}
-            <a
-              href="tel:+919447123456"
-              className="flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-4 px-4 font-black text-stone-800 shadow-sm hover:bg-stone-50 active:scale-95 transition-all text-base"
-            >
-              <Phone className="size-5 text-emerald-700" />
-              <span>{ui.managerCall}</span>
-            </a>
-          </div>
-        </section>
+              <div className="flex items-center gap-4">
+                <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-950 font-display text-2xl font-black text-emerald-200 shadow-inner">
+                  {user.name.slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-white leading-tight">
+                    {user.name}
+                  </h2>
+                  <p className="text-xs text-emerald-200 font-mono mt-0.5">
+                    {ui.farmerIdLabel}: {user.farmerId || "KL-KTM-26047"}
+                  </p>
+                  <p className="text-xs text-emerald-100 mt-0.5">
+                    {user.mobile}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-        {/* Bottom Back Button */}
-        <div className="pt-4 text-center">
+            {/* Agricultural Registry Details */}
+            <div className="rounded-3xl bg-white p-5 border-2 border-emerald-200 shadow-md space-y-3">
+              <h3 className="text-base font-black text-stone-900 border-b pb-2 border-stone-200">
+                കാർഷിക വിവരങ്ങൾ (Farm Registry)
+              </h3>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="rounded-2xl bg-stone-50 p-3 border border-stone-200">
+                  <span className="text-[11px] font-bold text-stone-500 block">
+                    {ui.panchayatLabel}
+                  </span>
+                  <strong className="text-sm font-black text-stone-900">
+                    {user.village}, {user.district}
+                  </strong>
+                </div>
+
+                <div className="rounded-2xl bg-stone-50 p-3 border border-stone-200">
+                  <span className="text-[11px] font-bold text-stone-500 block">
+                    {ui.landholdingLabel}
+                  </span>
+                  <strong className="text-sm font-black text-stone-900">
+                    2.4 Acres (കുമരകം)
+                  </strong>
+                </div>
+
+                <div className="rounded-2xl bg-stone-50 p-3 border border-stone-200 col-span-2">
+                  <span className="text-[11px] font-bold text-stone-500 block">
+                    {ui.cropsLabel}
+                  </span>
+                  <strong className="text-sm font-black text-stone-900">
+                    {user.primaryCrop || "നെല്ല് (Paddy), തേങ്ങ (Coconut), റബ്ബർ (Rubber)"}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct Benefit Transfer Bank Account */}
+            <div className="rounded-3xl bg-white p-5 border-2 border-emerald-200 shadow-md space-y-3">
+              <div className="flex items-center gap-2">
+                <Landmark className="size-5 text-emerald-700" />
+                <h3 className="text-base font-black text-stone-900">
+                  ബാങ്ക് അക്കൗണ്ട് വിവരങ്ങൾ (PFMS DBT)
+                </h3>
+              </div>
+
+              <div className="rounded-2xl bg-emerald-50 p-4 border border-emerald-200 space-y-1 text-xs">
+                <span className="text-[11px] font-bold text-emerald-800 block">
+                  {ui.bankLabel}
+                </span>
+                <p className="text-base font-black font-mono text-emerald-950">
+                  {user.bankAccount || "State Bank of India **** 4891"}
+                </p>
+                <p className="text-xs font-mono text-stone-600">
+                  IFSC: {user.ifsc || "SBIN0070123"} · ശാഖ: തിരുനക്കര, കോട്ടയം
+                </p>
+              </div>
+            </div>
+
+            {/* Switch to Standard View button inside profile */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/" })}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-4 font-black text-stone-800 shadow-sm hover:bg-stone-50 active:scale-95 transition-all text-base"
+              >
+                <span>{ui.switchStandard}</span>
+                <ExternalLink className="size-4" />
+              </button>
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* ============================================================ */}
+      {/* SENIOR TACTILE BOTTOM NAVIGATION BAR (USER REQUESTED FEATURE) */}
+      {/* ============================================================ */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t-2 border-emerald-200 bg-white/98 px-2 py-2 shadow-2xl backdrop-blur-md">
+        <div className="mx-auto flex max-w-2xl items-center justify-around gap-1">
+          {/* Tab 1: Token */}
           <button
-            onClick={() => navigate({ to: "/" })}
-            className="inline-flex items-center gap-2 rounded-2xl border-2 border-stone-300 bg-white px-6 py-3 font-extrabold text-stone-800 shadow-sm hover:bg-stone-100 active:scale-95 transition-all text-base"
+            type="button"
+            onClick={() => setCurrentTab("token")}
+            className={`flex flex-1 flex-col items-center justify-center rounded-2xl py-2.5 transition-all active:scale-95 ${
+              currentTab === "token"
+                ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-600"
+                : "text-stone-600 hover:bg-emerald-50 font-bold"
+            }`}
           >
-            <ArrowLeft className="size-5" />
-            <span>{ui.returnBtn}</span>
+            <Ticket className="size-6" strokeWidth={currentTab === "token" ? 2.5 : 2} />
+            <span className="text-xs font-black mt-0.5">{ui.tabToken}</span>
+          </button>
+
+          {/* Tab 2: Bookings */}
+          <button
+            type="button"
+            onClick={() => setCurrentTab("bookings")}
+            className={`flex flex-1 flex-col items-center justify-center rounded-2xl py-2.5 transition-all active:scale-95 ${
+              currentTab === "bookings"
+                ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-600"
+                : "text-stone-600 hover:bg-emerald-50 font-bold"
+            }`}
+          >
+            <CalendarDays className="size-6" strokeWidth={currentTab === "bookings" ? 2.5 : 2} />
+            <span className="text-xs font-black mt-0.5">{ui.tabBookings}</span>
+          </button>
+
+          {/* Tab 3: Payments */}
+          <button
+            type="button"
+            onClick={() => setCurrentTab("payments")}
+            className={`flex flex-1 flex-col items-center justify-center rounded-2xl py-2.5 transition-all active:scale-95 ${
+              currentTab === "payments"
+                ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-600"
+                : "text-stone-600 hover:bg-emerald-50 font-bold"
+            }`}
+          >
+            <CreditCard className="size-6" strokeWidth={currentTab === "payments" ? 2.5 : 2} />
+            <span className="text-xs font-black mt-0.5">{ui.tabPayments}</span>
+          </button>
+
+          {/* Tab 4: Profile */}
+          <button
+            type="button"
+            onClick={() => setCurrentTab("profile")}
+            className={`flex flex-1 flex-col items-center justify-center rounded-2xl py-2.5 transition-all active:scale-95 ${
+              currentTab === "profile"
+                ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-600"
+                : "text-stone-600 hover:bg-emerald-50 font-bold"
+            }`}
+          >
+            <UserRound className="size-6" strokeWidth={currentTab === "profile" ? 2.5 : 2} />
+            <span className="text-xs font-black mt-0.5">{ui.tabProfile}</span>
           </button>
         </div>
-      </main>
+      </nav>
 
       {/* MODAL 1: BOOKING CONFIRMATION SUCCESS */}
       {bookingSuccessModal && activeBooking && (
@@ -1803,18 +2198,7 @@ function SeniorCitizenModePage() {
                 onClick={() => {
                   cancelBooking(activeBooking.id);
                   setShowCancelModal(false);
-                  let cancelSpeech = "";
-                  switch (language) {
-                    case "ml": cancelSpeech = "നിങ്ങളുടെ ടോക്കൺ വിജയകരമായി റദ്ദാക്കി."; break;
-                    case "hi": cancelSpeech = "आपका टोकन सफलतापूर्वक रद्द कर दिया गया है।"; break;
-                    case "ta": cancelSpeech = "உங்கள் டோக்கன் வெற்றிகரமாக ரத்து செய்யப்பட்டது."; break;
-                    case "te": cancelSpeech = "మీ టోకెన్ విజయవంతంగా రద్దు చేయబడింది."; break;
-                    case "kn": cancelSpeech = "ನಿಮ್ಮ ಟೋಕನ್ ಯಶಸ್ವಿಯಾಗಿ ರದ್ದುಗೊಂಡಿದೆ."; break;
-                    case "bn": cancelSpeech = "আপনার টোকেন সফলভাবে বাতিল করা হয়েছে।"; break;
-                    case "mr": cancelSpeech = "तुमचे टोकन यशस्वीपणे रद्द केले आहे."; break;
-                    default: cancelSpeech = "Your token has been successfully cancelled."; break;
-                  }
-                  speakInLanguage(cancelSpeech);
+                  speakInLanguage("ടോക്കൺ വിജയകരമായി റദ്ദാക്കി.");
                 }}
                 className="flex-1 rounded-2xl bg-red-600 py-3 font-black text-white shadow hover:bg-red-700 active:scale-95"
               >
