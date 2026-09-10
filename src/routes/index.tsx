@@ -39,6 +39,7 @@ import { MyBookingsView } from "@/components/farmer/MyBookingsView";
 import { ProcurementTimelineView } from "@/components/farmer/ProcurementTimelineView";
 import { PaymentTrackingView } from "@/components/farmer/PaymentTrackingView";
 import { CentreMapView } from "@/components/farmer/CentreMapView";
+import { KisanQueueAIChatbot } from "@/components/KisanQueueAIChatbot";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -513,6 +514,7 @@ function KisanQueueApp() {
         }}
       />
       <AssistedBookingModal isOpen={assistedModalOpen} onClose={() => setAssistedModalOpen(false)} />
+      <KisanQueueAIChatbot />
     </div>
   );
 }

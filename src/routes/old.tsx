@@ -43,6 +43,7 @@ import cropArecanut from "@/assets/crop-arecanut.jpg";
 import cropNutmeg from "@/assets/crop-nutmeg.jpg";
 import cropCoffee from "@/assets/crop-coffee.jpg";
 import cropBanana from "@/assets/crop-banana.jpg";
+import { KisanQueueAIChatbot } from "@/components/KisanQueueAIChatbot";
 
 export const Route = createFileRoute("/old")({
   head: () => ({
@@ -2616,6 +2617,9 @@ function SeniorCitizenModePage() {
           </div>
         </div>
       )}
+
+      {/* Kisan Queue AI Voice Chatbot */}
+      <KisanQueueAIChatbot isSeniorMode={true} />
     </div>
   );
 }
