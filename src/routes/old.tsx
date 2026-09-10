@@ -1407,16 +1407,6 @@ function SeniorCitizenModePage() {
               </p>
             </div>
           </div>
-
-          {/* Right Action: Clean Switch to Standard Mode */}
-          <button
-            onClick={() => navigate({ to: "/" })}
-            className="flex items-center gap-1.5 rounded-xl border border-stone-300 bg-stone-50 px-3 py-1.5 text-xs font-bold text-stone-700 hover:bg-stone-100 transition-colors shadow-sm"
-            title={ui.switchStandard}
-          >
-            <span>{ui.switchStandard}</span>
-            <ExternalLink className="size-3.5 text-stone-500" />
-          </button>
         </div>
 
         {/* Accessibility Toolbar: Text Size + Voice Narration */}
