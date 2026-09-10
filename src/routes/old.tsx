@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import React, { useState, useEffect } from "react";
 import { useKisanQueue } from "@/lib/store";
-import { ProcurementCentre } from "@/lib/types";
+import { Language, ProcurementCentre } from "@/lib/types";
+import { SUPPORTED_LANGUAGES } from "@/lib/translations";
 import {
   Volume2,
   VolumeX,
@@ -18,6 +19,7 @@ import {
   CheckCircle2,
   X,
   Building2,
+  Languages,
   Sparkles,
 } from "lucide-react";
 
@@ -35,117 +37,761 @@ import cropBanana from "@/assets/crop-banana.jpg";
 export const Route = createFileRoute("/old")({
   head: () => ({
     meta: [
-      { title: "ജ്യേഷ്ഠ കിസാൻ മോഡ് (60+) — KisanQueue Senior Citizen Mode" },
+      { title: "Senior Citizen Mode (60+) — KisanQueue" },
       {
         name: "description",
         content:
-          "മുതിർന്ന കർഷകർക്കായി വലിയ അക്ഷരങ്ങളും ശബ്ദ സഹായവും അടങ്ങിയ ലളിതമായ ക്യൂ ടോക്കൺ സംവിധാനം.",
+          "Accessible senior citizen farmer queue management with 8 Indian languages and voice narration.",
       },
     ],
   }),
   component: SeniorCitizenModePage,
 });
 
+// Crop dictionary with 8 languages
 const CROP_ITEMS = [
   {
     id: "paddy",
-    nameMl: "നെല്ല് (Paddy)",
-    nameEn: "Paddy",
+    names: {
+      ml: "നെല്ല് (Paddy)",
+      hi: "धान (Paddy)",
+      ta: "நெல் (Paddy)",
+      te: "వరి (Paddy)",
+      kn: "ಭತ್ತ (Paddy)",
+      bn: "ধান (Paddy)",
+      mr: "भात (Paddy)",
+      en: "Paddy",
+    },
     msp: 32,
     image: cropPaddy,
     unit: "kg",
-    badge: "സർക്കാർ താങ്ങുവില",
   },
   {
     id: "coconut",
-    nameMl: "തേങ്ങ (Coconut)",
-    nameEn: "Raw Coconut",
+    names: {
+      ml: "തേങ്ങ (Coconut)",
+      hi: "नारियल (Coconut)",
+      ta: "தேங்காய் (Coconut)",
+      te: "కొబ్బరి (Coconut)",
+      kn: "ತೆಂಗಿನಕಾಯಿ (Coconut)",
+      bn: "নারকেল (Coconut)",
+      mr: "नारळ (Coconut)",
+      en: "Raw Coconut",
+    },
     msp: 38,
     image: cropCoconut,
     unit: "kg",
-    badge: "കേരഫെഡ് നിരക്ക്",
   },
   {
     id: "rubber",
-    nameMl: "റബ്ബർ (Rubber RSS4)",
-    nameEn: "Rubber RSS4",
+    names: {
+      ml: "റബ്ബർ (Rubber RSS4)",
+      hi: "रबर (Rubber RSS4)",
+      ta: "ரப்பர் (Rubber RSS4)",
+      te: "రబ్బరు (Rubber RSS4)",
+      kn: "ರಬ್ಬರ್ (Rubber RSS4)",
+      bn: "রবার (Rubber RSS4)",
+      mr: "रबर (Rubber RSS4)",
+      en: "Rubber RSS4",
+    },
     msp: 180,
     image: cropRubber,
     unit: "kg",
-    badge: "ബോർഡ് സബ്സിഡി",
   },
   {
     id: "pepper",
-    nameMl: "കുരുമുളക് (Black Pepper)",
-    nameEn: "Black Pepper",
+    names: {
+      ml: "കുരുമുളക് (Pepper)",
+      hi: "काली मिर्च (Black Pepper)",
+      ta: "மிளகு (Black Pepper)",
+      te: "మిరియాలు (Black Pepper)",
+      kn: "ಕಾಳುಮೆಣಸು (Black Pepper)",
+      bn: "গোলমরিচ (Black Pepper)",
+      mr: "काळी मिरी (Black Pepper)",
+      en: "Black Pepper",
+    },
     msp: 520,
     image: cropPepper,
     unit: "kg",
-    badge: "ഗ്രേഡ് A",
   },
   {
     id: "cardamom",
-    nameMl: "ഏലം (Cardamom)",
-    nameEn: "Cardamom",
+    names: {
+      ml: "ഏലം (Cardamom)",
+      hi: "इलायची (Cardamom)",
+      ta: "ஏலக்காய் (Cardamom)",
+      te: "యాలకులు (Cardamom)",
+      kn: "ಏಲಕ್ಕಿ (Cardamom)",
+      bn: "এলাচ (Cardamom)",
+      mr: "वेलची (Cardamom)",
+      en: "Cardamom",
+    },
     msp: 1850,
     image: cropCardamom,
     unit: "kg",
-    badge: "പ്രീമിയം 8mm+",
   },
   {
     id: "arecanut",
-    nameMl: "അടയ്ക്ക (Areca Nut)",
-    nameEn: "Areca Nut",
+    names: {
+      ml: "അടയ്ക്ക (Areca Nut)",
+      hi: "सुपारी (Areca Nut)",
+      ta: "பாக்கு (Areca Nut)",
+      te: "పోకచెక్క (Areca Nut)",
+      kn: "ಅಡಿಕೆ (Areca Nut)",
+      bn: "সুপারি (Areca Nut)",
+      mr: "सुपारी (Areca Nut)",
+      en: "Areca Nut",
+    },
     msp: 360,
     image: cropArecanut,
     unit: "kg",
-    badge: "ക്യാമ്പ്കോ നിരക്ക്",
   },
   {
     id: "nutmeg",
-    nameMl: "ജാതിക്ക (Nutmeg)",
-    nameEn: "Nutmeg & Mace",
+    names: {
+      ml: "ജാതിക്ക (Nutmeg)",
+      hi: "जायफल (Nutmeg)",
+      ta: "ஜாதிக்காய் (Nutmeg)",
+      te: "జాజికాయ (Nutmeg)",
+      kn: "ಜಾಯಿಕಾಯಿ (Nutmeg)",
+      bn: "জায়ফল (Nutmeg)",
+      mr: "जायफळ (Nutmeg)",
+      en: "Nutmeg & Mace",
+    },
     msp: 280,
     image: cropNutmeg,
     unit: "kg",
-    badge: "ഉണക്ക ജാതിക്ക",
   },
   {
     id: "coffee",
-    nameMl: "കാപ്പി (Coffee)",
-    nameEn: "Robusta Coffee",
+    names: {
+      ml: "കാപ്പി (Coffee)",
+      hi: "कॉफ़ी (Coffee)",
+      ta: "காபி (Coffee)",
+      te: "కాఫీ (Coffee)",
+      kn: "ಕಾಫಿ (Coffee)",
+      bn: "কফি (Coffee)",
+      mr: "कॉफी (Coffee)",
+      en: "Robusta Coffee",
+    },
     msp: 210,
     image: cropCoffee,
     unit: "kg",
-    badge: "വയനാട് ചെറി",
   },
   {
     id: "banana",
-    nameMl: "നേന്ത്രക്കായ (Banana)",
-    nameEn: "Nendran Banana",
+    names: {
+      ml: "നേന്ത്രക്കായ (Banana)",
+      hi: "केला (Banana)",
+      ta: "வாழைக்காய் (Banana)",
+      te: "అరటికాయ (Banana)",
+      kn: "ಬಾಳೆಹಣ್ಣು (Banana)",
+      bn: "কলা (Banana)",
+      mr: "केळी (Banana)",
+      en: "Nendran Banana",
+    },
     msp: 42,
     image: cropBanana,
     unit: "kg",
-    badge: "വി.എഫ്.പി.സി.കെ",
   },
 ];
 
 const PRESET_QUANTITIES = [50, 100, 250, 500];
 
-// Helper to provide friendly Malayalam names for centres
-function getCentreMalayalamTitle(centreName: string) {
-  if (centreName.includes("Kottayam")) return "കോട്ടയം സംഭരണ കേന്ദ്രം (Kottayam)";
-  if (centreName.includes("Pala")) return "പാലാ സംഭരണ കേന്ദ്രം (Pala)";
-  if (centreName.includes("Changanassery")) return "ചങ്ങനാശ്ശേരി സംഭരണ കേന്ദ്രം (Changanassery)";
-  if (centreName.includes("Alappuzha")) return "ആലപ്പുഴ സംഭരണ കേന്ദ്രം (Alappuzha)";
+// Multilingual UI Strings
+const UI_TEXTS: Record<
+  Language,
+  {
+    exitBtn: string;
+    seniorBadge: string;
+    simpleService: string;
+    textSize: string;
+    selectLanguage: string;
+    listenAloud: string;
+    stopVoice: string;
+    greeting: string;
+    appTitle: string;
+    appSub: string;
+    activeTokenTitle: string;
+    tokenNumberLabel: string;
+    nowServing: string;
+    gateInfo: string;
+    aheadOfYou: string;
+    waitMin: string;
+    listenTokenDetails: string;
+    getDirections: string;
+    cancelBtn: string;
+    noTokenTitle: string;
+    noTokenSub: string;
+    step123: string;
+    bookNewTokenTitle: string;
+    helpVoiceBtn: string;
+    step1Label: string;
+    step2Label: string;
+    by1kgBadge: string;
+    decrease10: string;
+    decrease1: string;
+    increase1: string;
+    increase10: string;
+    kgLabel: string;
+    addFast: string;
+    estimatedPayout: string;
+    directDbt: string;
+    step3Label: string;
+    centresAvailable: string;
+    fastQueue: string;
+    normalQueue: string;
+    busyQueue: string;
+    waitingCount: string;
+    confirmButton: string;
+    todayIssuedSub: string;
+    needAssistance: string;
+    callForToken: string;
+    freeHelpline: string;
+    callNow: string;
+    managerCall: string;
+    returnBtn: string;
+    modalSuccessTitle: string;
+    modalOkBtn: string;
+    modalCancelTitle: string;
+    modalCancelSub: string;
+    modalKeepBtn: string;
+    modalConfirmCancelBtn: string;
+  }
+> = {
+  ml: {
+    exitBtn: "സാധാരണ മോഡ് (Exit)",
+    seniorBadge: "👵 60+ ജ്യേഷ്ഠ കിസാൻ",
+    simpleService: "ലളിതമായ സേവനം",
+    textSize: "അക്ഷരങ്ങൾ:",
+    selectLanguage: "ഭാഷ തിരഞ്ഞെടുക്കുക:",
+    listenAloud: "ശബ്ദത്തിൽ കേൾക്കുക",
+    stopVoice: "ശബ്ദം നിർത്തുക",
+    greeting: "നമസ്കാരം, കർഷക സുഹൃത്തേ",
+    appTitle: "കിസാൻ ക്യൂ സഹായി",
+    appSub: "വരിനിൽക്കാതെ എളുപ്പത്തിൽ ടോക്കൺ എടുക്കാം",
+    activeTokenTitle: "നിങ്ങളുടെ ടോക്കൺ സജീവം (Active)",
+    tokenNumberLabel: "നിങ്ങളുടെ ടോക്കൺ നമ്പർ",
+    nowServing: "ഇപ്പോൾ വിളിക്കുന്നത്",
+    gateInfo: "(ഗേറ്റ് 1 ൽ)",
+    aheadOfYou: "നിങ്ങളുടെ മുന്നിൽ",
+    waitMin: "മിനിറ്റ് കാത്തിരിപ്പ്",
+    listenTokenDetails: "ഈ വിവരങ്ങൾ ശബ്ദത്തിൽ കേൾക്കുക",
+    getDirections: "വഴി അറിയുക (Map)",
+    cancelBtn: "റദ്ദാക്കുക",
+    noTokenTitle: "ഇപ്പോൾ നിങ്ങളുടെ പക്കൽ ടോക്കൺ ഇല്ല",
+    noTokenSub: "താഴെ നിങ്ങളുടെ വിളയും, തൂക്കവും, സംഭരണ കേന്ദ്രവും തിരഞ്ഞെടുത്ത് പച്ച ബട്ടൺ അമർത്തുക.",
+    step123: "സ്റ്റെപ്പ് 1, 2 & 3",
+    bookNewTokenTitle: "🌾 പുതിയ ടോക്കൺ എടുക്കുക",
+    helpVoiceBtn: "സഹായം കേൾക്കുക",
+    step1Label: "1. വിള തിരഞ്ഞെടുക്കുക:",
+    step2Label: "2. തൂക്കം എത്ര കിലോഗ്രാം?:",
+    by1kgBadge: "+1 kg വീതം കൂട്ടാം",
+    decrease10: "10 കിലോ കുറയ്ക്കുക",
+    decrease1: "1 കിലോ കുറയ്ക്കുക (-1 kg)",
+    increase1: "1 കിലോ കൂട്ടുക (+1 kg)",
+    increase10: "10 കിലോ കൂട്ടുക",
+    kgLabel: "കിലോഗ്രാം (കിലോ)",
+    addFast: "കൂട്ടുക:",
+    estimatedPayout: "കണക്കാക്കിയ തുക (Estimated MSP Bank Credit)",
+    directDbt: "നേരിട്ട് ബാങ്കിലേക്ക് (DBT)",
+    step3Label: "3. സംഭരണ കേന്ദ്രം തിരഞ്ഞെടുക്കുക:",
+    centresAvailable: "കേന്ദ്രങ്ങൾ ലഭ്യമാണ്",
+    fastQueue: "🟢 വേഗത്തിൽ",
+    normalQueue: "🟡 സാധാരണ",
+    busyQueue: "🟠 തിരക്ക്",
+    waitingCount: "പേർ ക്യൂവിൽ",
+    confirmButton: "✅ ടോക്കൺ എടുക്കുക (CONFIRM)",
+    todayIssuedSub: "ഇന്നത്തെ തീയതിയിൽ തൽക്ഷണം ടോക്കൺ നമ്പർ നൽകും",
+    needAssistance: "സഹായം വേണോ? (Need Assistance?)",
+    callForToken: "ഫോണിൽ വിളിച്ച് ടോക്കൺ എടുക്കാം",
+    freeHelpline: "കിസാൻ കോൾ സെന്ററിലേക്ക് സൗജന്യമായി വിളിക്കാം",
+    callNow: "1800-425-1661 (വിളിക്കുക)",
+    managerCall: "കേന്ദ്ര മാനേജർ: 9447123456",
+    returnBtn: "സാധാരണ വെബ്‌സൈറ്റിലേക്ക് മടങ്ങുക (Return)",
+    modalSuccessTitle: "ടോക്കൺ ലഭിച്ചു! (Success)",
+    modalOkBtn: "ശരി, മനസ്സിലായി (OK)",
+    modalCancelTitle: "ടോക്കൺ റദ്ദാക്കണമോ?",
+    modalCancelSub: "ടോക്കൺ ഒഴിവാക്കിയാൽ ക്യൂവിൽ നിങ്ങളുടെ സ്ഥാനം നഷ്ടപ്പെടും.",
+    modalKeepBtn: "വേണ്ട (Keep)",
+    modalConfirmCancelBtn: "അതെ, റദ്ദാക്കുക",
+  },
+  hi: {
+    exitBtn: "सामान्य मोड (Exit)",
+    seniorBadge: "👵 60+ ज्येष्ठ किसान",
+    simpleService: "सरल सेवा (Light UI)",
+    textSize: "अक्षर आकार:",
+    selectLanguage: "भाषा चुनें:",
+    listenAloud: "आवाज़ में सुनें",
+    stopVoice: "आवाज़ रोकें",
+    greeting: "नमस्ते, किसान साथी",
+    appTitle: "किसान कतार सहायक",
+    appSub: "बिना लंबी कतार के आसानी से टोकन प्राप्त करें",
+    activeTokenTitle: "आपका टोकन सक्रिय है (Active)",
+    tokenNumberLabel: "आपका टोकन नंबर",
+    nowServing: "अभी बुलाया जा रहा है",
+    gateInfo: "(गेट 1 पर)",
+    aheadOfYou: "आपके आगे",
+    waitMin: "मिनट प्रतीक्षा",
+    listenTokenDetails: "यह जानकारी आवाज़ में सुनें",
+    getDirections: "रास्ता देखें (Map)",
+    cancelBtn: "रद्द करें",
+    noTokenTitle: "वर्तमान में आपके पास कोई टोकन नहीं है",
+    noTokenSub: "नीचे अपनी फसल, वज़न और खरीद केंद्र चुनें और हरा बटन दबाएं।",
+    step123: "स्टेप 1, 2 और 3",
+    bookNewTokenTitle: "🌾 नया टोकन प्राप्त करें",
+    helpVoiceBtn: "मदद सुनें",
+    step1Label: "1. फसल चुनें:",
+    step2Label: "2. वज़न कितने किलोग्राम?:",
+    by1kgBadge: "+1 kg जोड़ सकते हैं",
+    decrease10: "10 किलो घटाएं",
+    decrease1: "1 किलो घटाएं (-1 kg)",
+    increase1: "1 किलो बढ़ाएं (+1 kg)",
+    increase10: "10 किलो बढ़ाएं",
+    kgLabel: "किलोग्राम (किलो)",
+    addFast: "बढ़ाएं:",
+    estimatedPayout: "अनुमानित राशि (MSP Bank Transfer)",
+    directDbt: "सीधे बैंक खाते में (DBT)",
+    step3Label: "3. खरीद केंद्र चुनें:",
+    centresAvailable: "केंद्र उपलब्ध हैं",
+    fastQueue: "🟢 तेज़ गति",
+    normalQueue: "🟡 सामान्य",
+    busyQueue: "🟠 भीड़",
+    waitingCount: "किसान कतार में",
+    confirmButton: "✅ टोकन बुक करें (CONFIRM)",
+    todayIssuedSub: "आज की तारीख में तुरंत टोकन नंबर जारी होगा",
+    needAssistance: "मदद चाहिए? (Need Assistance?)",
+    callForToken: "फोन करके टोकन प्राप्त करें",
+    freeHelpline: "किसान कॉल सेंटर पर टोल-फ्री कॉल करें",
+    callNow: "1800-425-1661 (कॉल करें)",
+    managerCall: "केंद्र प्रबंधक: 9447123456",
+    returnBtn: "सामान्य पोर्टल पर लौटें (Return)",
+    modalSuccessTitle: "टोकन प्राप्त हुआ! (Success)",
+    modalOkBtn: "ठीक है, समझ गया (OK)",
+    modalCancelTitle: "टोकन रद्द करना चाहते हैं?",
+    modalCancelSub: "टोकन रद्द करने पर कतार में आपका स्थान समाप्त हो जाएगा।",
+    modalKeepBtn: "नहीं, रखें (Keep)",
+    modalConfirmCancelBtn: "हाँ, रद्द करें",
+  },
+  ta: {
+    exitBtn: "சாதாரண பயன்முறை (Exit)",
+    seniorBadge: "👵 60+ மூத்த விவசாயி",
+    simpleService: "எளிய சேவை",
+    textSize: "எழுத்து அளவு:",
+    selectLanguage: "மொழியைத் தேர்ந்தெடுக்கவும்:",
+    listenAloud: "குரலில் கேட்கவும்",
+    stopVoice: "குரலை நிறுத்தவும்",
+    greeting: "வணக்கம், விவசாய நண்பரே",
+    appTitle: "விவசாயி வரிசை உதவியாளர்",
+    appSub: "நீண்ட வரிசையின்றி எளிதாக டோக்கன் பெறுங்கள்",
+    activeTokenTitle: "உங்கள் டோக்கன் செயலில் உள்ளது (Active)",
+    tokenNumberLabel: "உங்கள் டோக்கன் எண்",
+    nowServing: "இப்போது அழைக்கப்படுவது",
+    gateInfo: "(கேட் 1 இல்)",
+    aheadOfYou: "உங்கள் முன்",
+    waitMin: "நிமிட காத்திருப்பு",
+    listenTokenDetails: "இத்தகவலை குரலில் கேட்கவும்",
+    getDirections: "வழி காட்டு (Map)",
+    cancelBtn: "ரத்து செய்",
+    noTokenTitle: "தற்போது உங்களிடம் டோக்கன் இல்லை",
+    noTokenSub: "கீழே பயிர், எடை மற்றும் மையத்தைத் தேர்ந்தெடுத்து பச்சை பொத்தானை அழுத்தவும்.",
+    step123: "படி 1, 2 மற்றும் 3",
+    bookNewTokenTitle: "🌾 புதிய டோக்கன் எடுக்கவும்",
+    helpVoiceBtn: "உதவி கேட்கவும்",
+    step1Label: "1. பயிரைத் தேர்ந்தெடுக்கவும்:",
+    step2Label: "2. எடை எத்தனை கிலோகிராம்?:",
+    by1kgBadge: "+1 kg வீதம் கூட்டலாம்",
+    decrease10: "10 கிலோ குறைக்கவும்",
+    decrease1: "1 கிலோ குறைக்கவும் (-1 kg)",
+    increase1: "1 கிலோ கூட்டவும் (+1 kg)",
+    increase10: "10 கிலோ கூட்டவும்",
+    kgLabel: "கிலோகிராம் (கிலோ)",
+    addFast: "கூட்டவும்:",
+    estimatedPayout: "மதிப்பிடப்பட்ட தொகை (MSP Bank Credit)",
+    directDbt: "நேரடி வங்கி பரிமாற்றம் (DBT)",
+    step3Label: "3. கொள்முதல் மையத்தைத் தேர்ந்தெடுக்கவும்:",
+    centresAvailable: "மையங்கள் உள்ளன",
+    fastQueue: "🟢 விரைவானது",
+    normalQueue: "🟡 இயல்பானது",
+    busyQueue: "🟠 கூட்டம்",
+    waitingCount: "விவசாயிகள் வரிசையில்",
+    confirmButton: "✅ டோக்கன் எடுக்கவும் (CONFIRM)",
+    todayIssuedSub: "இன்றைய தேதியில் உடனடியாக டோக்கன் வழங்கப்படும்",
+    needAssistance: "உதவி தேவையா? (Need Assistance?)",
+    callForToken: "போன் செய்து டோக்கன் பெறலாம்",
+    freeHelpline: "கிசான் கால் சென்டருக்கு இலவச அழைப்பு",
+    callNow: "1800-425-1661 (அழைக்கவும்)",
+    managerCall: "மைய மேலாளர்: 9447123456",
+    returnBtn: "சாதாரண இணையதளத்திற்கு திரும்பவும் (Return)",
+    modalSuccessTitle: "டோக்கன் கிடைத்தது! (Success)",
+    modalOkBtn: "சரி, புரிந்தது (OK)",
+    modalCancelTitle: "டோக்கனை ரத்து செய்யவா?",
+    modalCancelSub: "டோக்கனை ரத்து செய்தால் வரிசையில் இடம் இழக்கப்படும்.",
+    modalKeepBtn: "வேண்டாம் (Keep)",
+    modalConfirmCancelBtn: "ஆம், ரத்து செய்",
+  },
+  te: {
+    exitBtn: "సాధారణ మోడ్ (Exit)",
+    seniorBadge: "👵 60+ సీనియర్ రైతు",
+    simpleService: "సరళమైన సేవ",
+    textSize: "అక్షర పరిమాణం:",
+    selectLanguage: "భాషను ఎంచుకోండి:",
+    listenAloud: "వాయిస్‌లో వినండి",
+    stopVoice: "వాయిస్ ఆపండి",
+    greeting: "నమస్కారం, రైతు మిత్రమా",
+    appTitle: "రైతు క్యూ సహాయకుడు",
+    appSub: "పొడవైన వరుసలు లేకుండా సులభంగా టోకెన్ పొందండి",
+    activeTokenTitle: "మీ టోకెన్ సక్రియంగా ఉంది (Active)",
+    tokenNumberLabel: "మీ టోకెన్ సంఖ్య",
+    nowServing: "ప్రస్తుతం పిలుస్తున్న సంఖ్య",
+    gateInfo: "(గేట్ 1 వద్ద)",
+    aheadOfYou: "మీ ముందు",
+    waitMin: "నిమిషాల నిరీక్షణ",
+    listenTokenDetails: "ఈ వివరాలను వాయిస్‌లో వినండి",
+    getDirections: "మార్గం చూడండి (Map)",
+    cancelBtn: "రద్దు చేయండి",
+    noTokenTitle: "ప్రస్తుతం మీ వద్ద టోకెన్ లేదు",
+    noTokenSub: "కింద పంట, బరువు మరియు కేంద్రాన్ని ఎంచుకుని పచ్చ బటన్ నొక్కండి.",
+    step123: "దశ 1, 2 మరియు 3",
+    bookNewTokenTitle: "🌾 కొత్త టోకెన్ పొందండి",
+    helpVoiceBtn: "సహాయం వినండి",
+    step1Label: "1. పంటను ఎంచుకోండి:",
+    step2Label: "2. బరువు ఎన్ని కిలోగ్రాములు?:",
+    by1kgBadge: "+1 kg చొప్పున పెంచవచ్చు",
+    decrease10: "10 కిలోలు తగ్గించండి",
+    decrease1: "1 కిలో తగ్గించండి (-1 kg)",
+    increase1: "1 కిలో పెంచండి (+1 kg)",
+    increase10: "10 కిలోలు పెంచండి",
+    kgLabel: "కిలోగ్రాములు (కేజీ)",
+    addFast: "పెంచండి:",
+    estimatedPayout: "అంచనా మొత్తం (MSP Bank Credit)",
+    directDbt: "నేరుగా బ్యాంక్ ఖాతాకు (DBT)",
+    step3Label: "3. కొనుగోలు కేంద్రాన్ని ఎంచుకోండి:",
+    centresAvailable: "కేంద్రాలు అందుబాటులో ఉన్నాయి",
+    fastQueue: "🟢 వేగంగా",
+    normalQueue: "🟡 సాధారణం",
+    busyQueue: "🟠 రద్దీ",
+    waitingCount: "రైతులు క్యూలో ఉన్నారు",
+    confirmButton: "✅ టోకెన్ పొందండి (CONFIRM)",
+    todayIssuedSub: "నేటి తేదీలో వెంటనే టోకెన్ సంఖ్య జారీ చేయబడుతుంది",
+    needAssistance: "సహాయం కావాలా? (Need Assistance?)",
+    callForToken: "ఫోన్ చేసి టోకెన్ పొందండి",
+    freeHelpline: "కిసాన్ కాల్ సెంటర్‌కు ఉచిత కాల్ చేయండి",
+    callNow: "1800-425-1661 (కాల్ చేయండి)",
+    managerCall: "కేంద్ర మేనేజర్: 9447123456",
+    returnBtn: "సాధారణ పోర్టల్‌కు తిరిగి వెళ్లండి (Return)",
+    modalSuccessTitle: "టోకెన్ లభించింది! (Success)",
+    modalOkBtn: "సరే, అర్థమైంది (OK)",
+    modalCancelTitle: "టోకెన్ రద్దు చేయాలనుకుంటున్నారా?",
+    modalCancelSub: "టోకెన్ రద్దు చేస్తే క్యూలో మీ స్థానం కోల్పోతారు.",
+    modalKeepBtn: "వద్దు (Keep)",
+    modalConfirmCancelBtn: "అవును, రద్దు చేయండి",
+  },
+  kn: {
+    exitBtn: "ಸಾಮಾನ್ಯ ಮೋಡ್ (Exit)",
+    seniorBadge: "👵 60+ ಹಿರಿಯ ಕಿಸಾನ್",
+    simpleService: "ಸರಳ ಸೇವೆ",
+    textSize: "ಅಕ್ಷರ ಗಾತ್ರ:",
+    selectLanguage: "ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+    listenAloud: "ಧ್ವನಿಯಲ್ಲಿ ಕೇಳಿ",
+    stopVoice: "ಧ್ವನಿ ನಿಲ್ಲಿಸಿ",
+    greeting: "ನಮಸ್ಕಾರ, ರೈತ ಮಿತ್ರರೇ",
+    appTitle: "ರೈತ ಸರತಿ ಸಾಲು ಸಹಾಯಕ",
+    appSub: "ಉದ್ದನೆಯ ಸಾಲುಗಳಿಲ್ಲದೆ ಸುಲಭವಾಗಿ ಟೋಕನ್ ಪಡೆಯಿರಿ",
+    activeTokenTitle: "ನಿಮ್ಮ ಟೋಕನ್ ಸಕ್ರಿಯವಾಗಿದೆ (Active)",
+    tokenNumberLabel: "ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ",
+    nowServing: "ಈಗ ಕರೆಯುತ್ತಿರುವ ಸಂಖ್ಯೆ",
+    gateInfo: "(ಗೇಟ್ 1 ರಲ್ಲಿ)",
+    aheadOfYou: "ನಿಮ್ಮ ಮುಂದೆ",
+    waitMin: "ನಿಮಿಷಗಳ ಕಾಯುವಿಕೆ",
+    listenTokenDetails: "ಈ ವಿವರಗಳನ್ನು ಧ್ವನಿಯಲ್ಲಿ ಕೇಳಿ",
+    getDirections: "ಮಾರ್ಗ ನೋಡಿ (Map)",
+    cancelBtn: "ರದ್ದುಮಾಡಿ",
+    noTokenTitle: "ಪ್ರಸ್ತುತ ನಿಮ್ಮ ಬಳಿ ಟೋಕನ್ ಇಲ್ಲ",
+    noTokenSub: "ಕೆಳಗೆ ಬೆಳೆ, ತೂಕ ಮತ್ತು ಖರೀದಿ ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ ಹಸಿರು ಬಟನ್ ಒತ್ತಿ.",
+    step123: "ಹಂತ 1, 2 ಮತ್ತು 3",
+    bookNewTokenTitle: "🌾 ಹೊಸ ಟೋಕನ್ ಪಡೆಯಿರಿ",
+    helpVoiceBtn: "ಸಹಾಯ ಆಲಿಸಿ",
+    step1Label: "1. ಬೆಳೆ ಆಯ್ಕೆಮಾಡಿ:",
+    step2Label: "2. ತೂಕ ಎಷ್ಟು ಕಿಲೋಗ್ರಾಂ?:",
+    by1kgBadge: "+1 kg ಯಂತೆ ಹೆಚ್ಚಿಸಬಹುದು",
+    decrease10: "10 ಕೆಜಿ ಕಡಿಮೆ ಮಾಡಿ",
+    decrease1: "1 ಕೆಜಿ ಕಡಿಮೆ ಮಾಡಿ (-1 kg)",
+    increase1: "1 ಕೆಜಿ ಹೆಚ್ಚಿಸಿ (+1 kg)",
+    increase10: "10 ಕೆಜಿ ಹೆಚ್ಚಿಸಿ",
+    kgLabel: "ಕಿಲೋಗ್ರಾಂ (ಕೆಜಿ)",
+    addFast: "ಹೆಚ್ಚಿಸಿ:",
+    estimatedPayout: "ಅಂದಾಜು ಮೊತ್ತ (MSP Bank Credit)",
+    directDbt: "ನೇರವಾಗಿ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ (DBT)",
+    step3Label: "3. ಖರೀದಿ ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+    centresAvailable: "ಕೇಂದ್ರಗಳು ಲಭ್ಯವಿದೆ",
+    fastQueue: "🟢 ವೇಗವಾಗಿ",
+    normalQueue: "🟡 ಸಾಮಾನ್ಯ",
+    busyQueue: "🟠 ರದ್ದಿ",
+    waitingCount: "ರೈತರು ಸಾಲಿನಲ್ಲಿದ್ದಾರೆ",
+    confirmButton: "✅ ಟೋಕನ್ ಪಡೆಯಿರಿ (CONFIRM)",
+    todayIssuedSub: "ಇಂದಿನ ದಿನಾಂಕದಲ್ಲಿ ತಕ್ಷಣವೇ ಟೋಕನ್ ನೀಡಲಾಗುವುದು",
+    needAssistance: "ಸಹಾಯ ಬೇಕೇ? (Need Assistance?)",
+    callForToken: "ಕರೆ ಮಾಡಿ ಟೋಕನ್ ಪಡೆಯಿರಿ",
+    freeHelpline: "ಕಿಸಾನ್ ಕಾಲ್ ಸೆಂಟರ್‌ಗೆ ಉಚಿತ ಕರೆ ಮಾಡಿ",
+    callNow: "1800-425-1661 (ಕರೆ ಮಾಡಿ)",
+    managerCall: "ಕೇಂದ್ರ ವ್ಯವಸ್ಥಾಪಕ: 9447123456",
+    returnBtn: "ಸಾಮಾನ್ಯ ಪೋರ್ಟಲ್‌ಗೆ ಹಿಂತಿರುಗಿ (Return)",
+    modalSuccessTitle: "ಟೋಕನ್ ದೊರೆತಿದೆ! (Success)",
+    modalOkBtn: "ಸರಿ, ಅರ್ಥವಾಯಿತು (OK)",
+    modalCancelTitle: "ಟೋಕನ್ ರದ್ದುಮಾಡಬೇಕೇ?",
+    modalCancelSub: "ಟೋಕನ್ ರದ್ದುಮಾಡಿದರೆ ಸರದಿಯಲ್ಲಿ ನಿಮ್ಮ ಸ್ಥಾನ ಕಳೆದುಕೊಳ್ಳುವಿರಿ.",
+    modalKeepBtn: "ಬೇಡ (Keep)",
+    modalConfirmCancelBtn: "ಹೌದು, ರದ್ದುಮಾಡಿ",
+  },
+  bn: {
+    exitBtn: "সাধারণ মোড (Exit)",
+    seniorBadge: "👵 ৬০+ প্রবীণ কিষাণ",
+    simpleService: "সহজ পরিষেবা",
+    textSize: "হরফের আকার:",
+    selectLanguage: "ভাষা নির্বাচন করুন:",
+    listenAloud: "শব্দে শুনুন",
+    stopVoice: "শব্দ থামান",
+    greeting: "নমস্কার, কৃষক ভাই",
+    appTitle: "কিষাণ কিউ সহকারী",
+    appSub: "লম্বা লাইন ছাড়াই সহজে টোকেন সংগ্রহ করুন",
+    activeTokenTitle: "আপনার টোকেন সক্রিয় আছে (Active)",
+    tokenNumberLabel: "আপনার টোকেন নম্বর",
+    nowServing: "এখন ডাকা হচ্ছে",
+    gateInfo: "(গেট ১-এ)",
+    aheadOfYou: "আপনার আগে",
+    waitMin: "মিনিট অপেক্ষা",
+    listenTokenDetails: "এই তথ্য শব্দে শুনুন",
+    getDirections: "মানচিত্র দেখুন (Map)",
+    cancelBtn: "বাতিল করুন",
+    noTokenTitle: "বর্তমানে আপনার কাছে কোনো টোকেন নেই",
+    noTokenSub: "নিচে ফসল, ওজন ও সংগ্রহ কেন্দ্র বেছে নিয়ে সবুজ বোতাম টিপুন।",
+    step123: "ধাপ ১, ২ এবং ৩",
+    bookNewTokenTitle: "🌾 নতুন টোকেন নিন",
+    helpVoiceBtn: "সাহায্য শুনুন",
+    step1Label: "১. ফসল নির্বাচন করুন:",
+    step2Label: "২. ওজন কত কিলোগ্রাম?:",
+    by1kgBadge: "+১ kg করে বাড়ানো যাবে",
+    decrease10: "১০ কেজি কমান",
+    decrease1: "১ কেজি কমান (-১ kg)",
+    increase1: "১ কেজি বাড়ান (+১ kg)",
+    increase10: "১০ কেজি বাড়ান",
+    kgLabel: "কিলোগ্রাম (কেজি)",
+    addFast: "বাড়ান:",
+    estimatedPayout: "আনুমানিক মোট টাকা (MSP Bank Transfer)",
+    directDbt: "সরাসরি ব্যাংক অ্যাকাউন্টে (DBT)",
+    step3Label: "৩. সংগ্রহ কেন্দ্র নির্বাচন করুন:",
+    centresAvailable: "কেন্দ্র উপলব্ধ আছে",
+    fastQueue: "🟢 দ্রুত গতি",
+    normalQueue: "🟡 স্বাভাবিক",
+    busyQueue: "🟠 ভিড়",
+    waitingCount: "জন কৃষক লাইনে আছেন",
+    confirmButton: "✅ টোকেন নিন (CONFIRM)",
+    todayIssuedSub: "আজকের তারিখে অবিলম্বে টোকেন নম্বর জারি হবে",
+    needAssistance: "সাহায্য প্রয়োজন? (Need Assistance?)",
+    callForToken: "ফোন করে টোকেন নিন",
+    freeHelpline: "কিষাণ কল সেন্টারে টোল-ফ্রি কল করুন",
+    callNow: "1800-425-1661 (কল করুন)",
+    managerCall: "কেন্দ্র ম্যানেজার: 9447123456",
+    returnBtn: "সাধারণ পোর্টালে ফিরুন (Return)",
+    modalSuccessTitle: "টোকেন পাওয়া গেছে! (Success)",
+    modalOkBtn: "ঠিক আছে, বুঝেছি (OK)",
+    modalCancelTitle: "টোকেন বাতিল করতে চান?",
+    modalCancelSub: "টোকেন বাতিল করলে লাইনে আপনার স্থান নষ্ট হবে।",
+    modalKeepBtn: "না (Keep)",
+    modalConfirmCancelBtn: "হ্যাঁ, বাতিল করুন",
+  },
+  mr: {
+    exitBtn: "सामान्य मोड (Exit)",
+    seniorBadge: "👵 ६०+ ज्येष्ठ किसान",
+    simpleService: "सोपी सेवा",
+    textSize: "अक्षरांचा आकार:",
+    selectLanguage: "भाषा निवडा:",
+    listenAloud: "आवाजात ऐका",
+    stopVoice: "आवाज थांबवा",
+    greeting: "नमस्कार, शेतकरी मित्र",
+    appTitle: "किसान रांग मदतनीस",
+    appSub: "लांब रांगांशिवाय सहज टोकन मिळवा",
+    activeTokenTitle: "तुमचा टोकन सक्रिय आहे (Active)",
+    tokenNumberLabel: "तुमचा टोकन नंबर",
+    nowServing: "सध्या सुरू असलेला नंबर",
+    gateInfo: "(गेट १ वर)",
+    aheadOfYou: "तुमच्या पुढे",
+    waitMin: "मिनिटे प्रतीक्षा",
+    listenTokenDetails: "ही माहिती आवाजात ऐका",
+    getDirections: "मार्ग पहा (Map)",
+    cancelBtn: "रद्द करा",
+    noTokenTitle: "सध्या तुमच्याकडे टोकन नाही",
+    noTokenSub: "खाली पीक, वजन आणि खरेदी केंद्र निवडून हिरवे बटण दाबा.",
+    step123: "पायरी १, २ आणि ३",
+    bookNewTokenTitle: "🌾 नवीन टोकन मिळवा",
+    helpVoiceBtn: "मदत ऐका",
+    step1Label: "१. पीक निवडा:",
+    step2Label: "२. वजन किती किलोग्रॅम?:",
+    by1kgBadge: "+१ kg प्रमाणे वाढवू शकता",
+    decrease10: "१० किलो कमी करा",
+    decrease1: "१ किलो कमी करा (-१ kg)",
+    increase1: "१ किलो वाढवा (+१ kg)",
+    increase10: "१० किलो वाढवा",
+    kgLabel: "किलोग्रॅम (किलो)",
+    addFast: "वाढवा:",
+    estimatedPayout: "अंदाजे रक्कम (MSP Bank Transfer)",
+    directDbt: "थेट बँक खात्यात (DBT)",
+    step3Label: "३. खरेदी केंद्र निवडा:",
+    centresAvailable: "खरेदी केंद्रे उपलब्ध आहेत",
+    fastQueue: "🟢 जलद गती",
+    normalQueue: "🟡 सामान्य",
+    busyQueue: "🟠 गर्दी",
+    waitingCount: "शेतकरी रांगेत",
+    confirmButton: "✅ टोकन मिळवा (CONFIRM)",
+    todayIssuedSub: "आजच्या तारखेत लगेच टोकन नंबर जारी केला जाईल",
+    needAssistance: "मदत हवी आहे? (Need Assistance?)",
+    callForToken: "फोन करून टोकन मिळवा",
+    freeHelpline: "किसान कॉल सेंटरवर मोफत कॉल करा",
+    callNow: "1800-425-1661 (कॉल करा)",
+    managerCall: "केंद्र व्यवस्थापक: 9447123456",
+    returnBtn: "सामान्य पोर्टलवर परत जा (Return)",
+    modalSuccessTitle: "टोकन मिळाले! (Success)",
+    modalOkBtn: "ठीक आहे, समजले (OK)",
+    modalCancelTitle: "टोकन रद्द करायचे आहे का?",
+    modalCancelSub: "टोकन रद्द केल्यास रांगेतील स्थान समाप्त होईल.",
+    modalKeepBtn: "नको (Keep)",
+    modalConfirmCancelBtn: "होय, रद्द करा",
+  },
+  en: {
+    exitBtn: "Standard Mode (Exit)",
+    seniorBadge: "👵 60+ Senior Farmer",
+    simpleService: "Senior Assistance Mode",
+    textSize: "Text Size:",
+    selectLanguage: "Select Language:",
+    listenAloud: "Listen Aloud",
+    stopVoice: "Stop Audio",
+    greeting: "Hello, Respected Farmer",
+    appTitle: "KisanQueue Senior Assistant",
+    appSub: "Get slot tokens easily without standing in physical queues",
+    activeTokenTitle: "Your Active Token",
+    tokenNumberLabel: "Your Token Number",
+    nowServing: "Now Serving",
+    gateInfo: "(At Gate 1)",
+    aheadOfYou: "Ahead of You",
+    waitMin: "min wait",
+    listenTokenDetails: "Read details aloud",
+    getDirections: "Get Directions (Map)",
+    cancelBtn: "Cancel Token",
+    noTokenTitle: "You currently have no active token",
+    noTokenSub: "Select your crop, quantity in kilograms, and centre below, then tap the green button.",
+    step123: "Step 1, 2 & 3",
+    bookNewTokenTitle: "🌾 Book a New Slot Token",
+    helpVoiceBtn: "Listen Help",
+    step1Label: "1. Select Harvest Crop:",
+    step2Label: "2. Quantity in Kilograms (kg):",
+    by1kgBadge: "+1 kg adjustment",
+    decrease10: "Decrease 10 kg",
+    decrease1: "Decrease 1 kg (-1 kg)",
+    increase1: "Increase 1 kg (+1 kg)",
+    increase10: "Increase 10 kg",
+    kgLabel: "Kilograms (kg)",
+    addFast: "Quick Add:",
+    estimatedPayout: "Estimated Bank Credit (MSP Direct Payment)",
+    directDbt: "Direct Benefit Transfer (DBT)",
+    step3Label: "3. Select Procurement Centre:",
+    centresAvailable: "Centres Available",
+    fastQueue: "🟢 Fast Flow",
+    normalQueue: "🟡 Normal",
+    busyQueue: "🟠 Busy",
+    waitingCount: "farmers in queue",
+    confirmButton: "✅ BOOK TOKEN NOW (CONFIRM)",
+    todayIssuedSub: "Token pass is issued immediately for today's date",
+    needAssistance: "Need Assistance?",
+    callForToken: "Call by phone to book a token",
+    freeHelpline: "Call Kisan Call Centre Toll-Free",
+    callNow: "1800-425-1661 (Call Now)",
+    managerCall: "Centre Manager: 9447123456",
+    returnBtn: "Return to Standard Portal (Exit)",
+    modalSuccessTitle: "Token Booked! (Success)",
+    modalOkBtn: "OK, Understood",
+    modalCancelTitle: "Cancel this token?",
+    modalCancelSub: "Cancelling will release your place in the live queue.",
+    modalKeepBtn: "Keep Token",
+    modalConfirmCancelBtn: "Yes, Cancel Token",
+  },
+};
+
+// Multilingual centre names
+function getCentreTranslatedName(centreName: string, lang: Language) {
+  const isKtm = centreName.includes("Kottayam");
+  const isPala = centreName.includes("Pala");
+  const isCgry = centreName.includes("Changanassery");
+  const isAlpy = centreName.includes("Alappuzha");
+
+  const titles: Record<string, Record<Language, string>> = {
+    ktm: {
+      ml: "കോട്ടയം സംഭരണ കേന്ദ്രം",
+      hi: "कोट्टायम खरीद केंद्र",
+      ta: "கோட்டயம் கொள்முதல் மையம்",
+      te: "కొట్టాయం కొనుగోలు కేంద్రం",
+      kn: "ಕೊಟ್ಟಾಯಂ ಖರೀದಿ ಕೇಂದ್ರ",
+      bn: "কোট্টায়াম সংগ্রহ কেন্দ্র",
+      mr: "कोट्टायम खरेदी केंद्र",
+      en: "Kottayam Procurement Centre",
+    },
+    pala: {
+      ml: "പാലാ സംഭരണ കേന്ദ്രം",
+      hi: "पाला खरीद केंद्र",
+      ta: "பாலா கொள்முதல் மையம்",
+      te: "పాలా కొనుగోలు కేంద్రం",
+      kn: "ಪಾಲಾ ಖರೀದಿ ಕೇಂದ್ರ",
+      bn: "পালা সংগ্রহ কেন্দ্র",
+      mr: "पाला खरेदी केंद्र",
+      en: "Pala Procurement Centre",
+    },
+    cgry: {
+      ml: "ചങ്ങനാശ്ശേരി സംഭരണ കേന്ദ്രം",
+      hi: "चंगनास्सेरी खरीद केंद्र",
+      ta: "சங்கனாச்சேரி கொள்முதல் மையம்",
+      te: "చంగనాస్సేరి కొనుగోలు కేంద్రం",
+      kn: "ಚಂಗನಾಶ್ಶೇರಿ ಖರೀದಿ ಕೇಂದ್ರ",
+      bn: "চঙ্গনাচেরি সংগ্রহ কেন্দ্র",
+      mr: "चंगनास्सेरी खरेदी केंद्र",
+      en: "Changanassery Procurement Centre",
+    },
+    alpy: {
+      ml: "ആലപ്പുഴ സംഭരണ കേന്ദ്രം",
+      hi: "अलप्पुझा खरीद केंद्र",
+      ta: "ஆலப்புழா கொள்முதல் மையம்",
+      te: "ఆలప్పుళా కొనుగోలు కేంద్రం",
+      kn: "ಆಲಪ್ಪುಳ ಖರೀದಿ ಕೇಂದ್ರ",
+      bn: "আলাপ্পুঝা সংগ্রহ কেন্দ্র",
+      mr: "अलप्पुळा खरेदी केंद्र",
+      en: "Alappuzha Procurement Centre",
+    },
+  };
+
+  const key = isKtm ? "ktm" : isPala ? "pala" : isCgry ? "cgry" : isAlpy ? "alpy" : null;
+  if (key && titles[key]?.[lang]) {
+    return titles[key][lang];
+  }
   return centreName;
 }
+
+// Spoken greetings when changing language
+const LANG_WELCOME: Record<Language, string> = {
+  ml: "മലയാളം തിരഞ്ഞെടുത്തു. ജ്യേഷ്ഠ കിസാൻ സേവനത്തിലേക്ക് സ്വാഗതം.",
+  hi: "हिन्दी चुनी गई है। ज्येष्ठ किसान सेवा में आपका स्वागत है।",
+  ta: "தமிழ் தேர்ந்தெடுக்கப்பட்டது. மூத்த விவசாயி சேவைக்கு வருக.",
+  te: "తెలుగు ఎంపిక చేయబడింది. సీనియర్ కిసాన్ సేవకు స్వాగతం.",
+  kn: "ಕನ್ನಡ ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ಹಿರಿಯ ಕಿಸಾನ್ ಸೇವೆಗೆ ಸುಸ್ವಾಗತ.",
+  bn: "বাংলা নির্বাচিত হয়েছে। প্রবীণ কৃষক সেবায় স্বাগতম।",
+  mr: "मराठी निवडली आहे. ज्येष्ठ किसान सेवेत आपले स्वागत आहे.",
+  en: "English selected. Welcome to Senior Farmer Assistance.",
+};
 
 function SeniorCitizenModePage() {
   const navigate = useNavigate();
   const {
     user,
     language,
+    setLanguage,
     activeBooking,
     nowServing,
     predictWaitingTime,
@@ -154,7 +800,7 @@ function SeniorCitizenModePage() {
     cancelBooking,
   } = useKisanQueue();
 
-  // Accessibility state - PURE LIGHT UI
+  // Accessibility state
   const [fontScale, setFontScale] = useState<"normal" | "large" | "huge">("large");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechNotice, setSpeechNotice] = useState<string>("");
@@ -162,26 +808,27 @@ function SeniorCitizenModePage() {
   // Booking selection state
   const [selectedCrop, setSelectedCrop] = useState(CROP_ITEMS[0]);
   const [quantity, setQuantity] = useState<number>(100);
-  const [selectedCentre, setSelectedCentre] = useState<ProcurementCentre>(centres[0] || {
-    id: "centre-ktm",
-    name: "Kottayam Procurement Centre",
-    district: "Kottayam",
-    location: "Near Nagampadam Bus Station, Kottayam",
-    distanceKm: 2.4,
-    workingHours: "08:30 AM – 04:30 PM",
-    dailyCapacityKg: 25000,
-    todayBookingsCount: 142,
-    currentQueueLength: 12,
-    avgProcessingMinutes: 6,
-    activeDelayMinutes: 0,
-    status: "normal",
-    slots: [],
-  });
+  const [selectedCentre, setSelectedCentre] = useState<ProcurementCentre>(
+    centres[0] || {
+      id: "centre-ktm",
+      name: "Kottayam Procurement Centre",
+      district: "Kottayam",
+      location: "Near Nagampadam Bus Station, Kottayam",
+      distanceKm: 2.4,
+      workingHours: "08:30 AM – 04:30 PM",
+      dailyCapacityKg: 25000,
+      todayBookingsCount: 142,
+      currentQueueLength: 12,
+      avgProcessingMinutes: 6,
+      activeDelayMinutes: 0,
+      status: "normal",
+      slots: [],
+    }
+  );
 
   const [bookingSuccessModal, setBookingSuccessModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  // Prediction for current or active centre
   const activeCentreForDisplay = activeBooking
     ? centres.find((c) => c.id === activeBooking.centreId) || selectedCentre
     : selectedCentre;
@@ -194,10 +841,12 @@ function SeniorCitizenModePage() {
     ? Math.max(0, activeBooking.queueNumber - nowServing)
     : 0;
 
-  // Web Speech API Voice synthesis helper
-  const speakText = (textMl: string, textEn: string) => {
+  const ui = UI_TEXTS[language] || UI_TEXTS.en;
+
+  // Web Speech API Voice synthesis helper supporting all 8 languages
+  const speakInLanguage = (text: string, langToUse?: Language) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      setSpeechNotice("ശബ്ദ സഹായം ഈ ബ്രൗസറിൽ ലഭ്യമല്ല.");
+      setSpeechNotice("Speech synthesis not supported in this browser.");
       return;
     }
 
@@ -209,31 +858,47 @@ function SeniorCitizenModePage() {
       return;
     }
 
-    const textToSpeak = language === "ml" ? textMl : textEn;
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-
+    const currentLang = langToUse || language;
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.85; // Slower, calm, clear cadence for elderly citizens
     utterance.pitch = 1.0;
 
+    const bcpMap: Record<Language, string> = {
+      ml: "ml-IN",
+      hi: "hi-IN",
+      ta: "ta-IN",
+      te: "te-IN",
+      kn: "kn-IN",
+      bn: "bn-IN",
+      mr: "mr-IN",
+      en: "en-IN",
+    };
+    const targetCode = bcpMap[currentLang] || "en-IN";
+    utterance.lang = targetCode;
+
     const voices = window.speechSynthesis.getVoices();
-    const mlVoice = voices.find(
-      (v) => v.lang.startsWith("ml") || v.lang.includes("Malayalam")
-    );
-    const inVoice = voices.find(
-      (v) => v.lang.includes("en-IN") || v.lang.includes("hi-IN")
+    const langPrefix = currentLang.toLowerCase();
+
+    // Look for matching voice
+    const matchedVoice = voices.find(
+      (v) =>
+        v.lang.toLowerCase().startsWith(langPrefix) ||
+        v.lang.toLowerCase().replace("_", "-").startsWith(targetCode.toLowerCase()) ||
+        v.name.toLowerCase().includes(langPrefix)
     );
 
-    if (language === "ml" && mlVoice) {
-      utterance.voice = mlVoice;
-      utterance.lang = "ml-IN";
-    } else if (inVoice) {
-      utterance.voice = inVoice;
-      utterance.lang = inVoice.lang;
+    if (matchedVoice) {
+      utterance.voice = matchedVoice;
+    } else {
+      const inVoice = voices.find((v) => v.lang.toLowerCase().includes("-in"));
+      if (inVoice) {
+        utterance.voice = inVoice;
+      }
     }
 
     utterance.onstart = () => {
       setIsSpeaking(true);
-      setSpeechNotice(textToSpeak);
+      setSpeechNotice(text);
     };
 
     utterance.onend = () => {
@@ -258,14 +923,21 @@ function SeniorCitizenModePage() {
     };
   }, []);
 
-  // Handle instant 1-tap booking using selected centre
+  // Handle language switch with audio confirmation in the newly selected language
+  const handleLanguageChange = (newLang: Language) => {
+    setLanguage(newLang);
+    const welcomeMsg = LANG_WELCOME[newLang] || LANG_WELCOME.en;
+    speakInLanguage(welcomeMsg, newLang);
+  };
+
+  // Handle instant 1-tap booking
   const handleInstantBook = () => {
-    const todayStr = "Today (ഇന്ന്)";
-    const slotStr = "Immediate Slot (തൽക്ഷണം)";
+    const todayStr = "Today";
+    const slotStr = "Immediate Slot";
 
     const newBooking = bookSlot(
       selectedCentre.id,
-      selectedCrop.nameEn,
+      selectedCrop.names.en,
       quantity,
       todayStr,
       slotStr
@@ -273,10 +945,38 @@ function SeniorCitizenModePage() {
 
     setBookingSuccessModal(true);
 
-    // Speak aloud confirmation in Malayalam
-    const mlSpeech = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${newBooking.queueNumber} വിജയകരമായി എടുത്തു. സംഭരണ കേന്ദ്രം: ${getCentreMalayalamTitle(selectedCentre.name)}. വിള: ${selectedCrop.nameMl}, തൂക്കം ${quantity} കിലോ. ഇപ്പോൾ വിളിക്കുന്നത് ${nowServing}. നിങ്ങളുടെ ഊഴത്തിനായി കാത്തിരിക്കുക.`;
-    const enSpeech = `Your Token Number ${newBooking.queueNumber} is booked successfully at ${selectedCentre.name} for ${selectedCrop.nameEn}, ${quantity} kilograms. Now serving is ${nowServing}.`;
-    speakText(mlSpeech, enSpeech);
+    const centreTitle = getCentreTranslatedName(selectedCentre.name, language);
+    const cropName = selectedCrop.names[language] || selectedCrop.names.en;
+
+    let confirmationSpeech = "";
+    switch (language) {
+      case "ml":
+        confirmationSpeech = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${newBooking.queueNumber} വിജയകരമായി എടുത്തു. കേന്ദ്രം: ${centreTitle}. വിള: ${cropName}, ${quantity} കിലോ. ഇപ്പോൾ വിളിക്കുന്നത് ${nowServing}. നിങ്ങളുടെ ഊഴത്തിനായി കാത്തിരിക്കുക.`;
+        break;
+      case "hi":
+        confirmationSpeech = `आपका टोकन नंबर ${newBooking.queueNumber} सफलतापूर्वक बुक हो गया है। केंद्र: ${centreTitle}। फसल: ${cropName}, ${quantity} किलो। अभी टोकन ${nowServing} बुलाया जा रहा है।`;
+        break;
+      case "ta":
+        confirmationSpeech = `உங்கள் டோக்கன் எண் ${newBooking.queueNumber} வெற்றிகரமாக பதிவு செய்யப்பட்டது. மையம்: ${centreTitle}. பயிர்: ${cropName}, ${quantity} கிலோ. இப்போது அழைக்கப்படுவது ${nowServing}.`;
+        break;
+      case "te":
+        confirmationSpeech = `మీ టోకెన్ సంఖ్య ${newBooking.queueNumber} విజయవంతంగా బుక్ చేయబడింది. కేంద్రం: ${centreTitle}. పంట: ${cropName}, ${quantity} కిలోలు. ప్రస్తుతం పిలుస్తున్న సంఖ్య ${nowServing}.`;
+        break;
+      case "kn":
+        confirmationSpeech = `ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ ${newBooking.queueNumber} ಯಶಸ್ವಿಯಾಗಿ ಬುಕ್ ಆಗಿದೆ. ಕೇಂದ್ರ: ${centreTitle}. ಬೆಳೆ: ${cropName}, ${quantity} ಕೆಜಿ. ಈಗ ಕರೆಯುತ್ತಿರುವ ಸಂಖ್ಯೆ ${nowServing}.`;
+        break;
+      case "bn":
+        confirmationSpeech = `আপনার টোকেন নম্বর ${newBooking.queueNumber} সফলভাবে বুক হয়েছে। কেন্দ্র: ${centreTitle}। ফসল: ${cropName}, ${quantity} কেজি। এখন ডাকা হচ্ছে ${nowServing}।`;
+        break;
+      case "mr":
+        confirmationSpeech = `तुमचा टोकन नंबर ${newBooking.queueNumber} यशस्वीपणे बुक झाला आहे. केंद्र: ${centreTitle}। पीक: ${cropName}, ${quantity} किलो। सध्या सुरू असलेला नंबर ${nowServing}।`;
+        break;
+      default:
+        confirmationSpeech = `Your Token Number ${newBooking.queueNumber} is booked successfully at ${centreTitle} for ${cropName}, ${quantity} kilograms. Now serving is ${nowServing}.`;
+        break;
+    }
+
+    speakInLanguage(confirmationSpeech);
   };
 
   // Font scale class
@@ -288,7 +988,7 @@ function SeniorCitizenModePage() {
       : "text-base leading-normal";
 
   return (
-    // STRICT PURE LIGHT THEME ONLY (no dark mode styling)
+    // STRICT PURE LIGHT THEME ONLY (no dark mode classes)
     <div className={`min-h-screen bg-[#F7FAF6] text-stone-900 pb-24 ${scaleClass}`}>
       {/* Top Banner: Easy Exit & Senior Mode Title */}
       <header className="sticky top-0 z-40 border-b border-amber-200 bg-white/95 px-4 py-3 shadow-md backdrop-blur-md">
@@ -297,31 +997,70 @@ function SeniorCitizenModePage() {
           <button
             onClick={() => navigate({ to: "/" })}
             className="flex items-center gap-2 rounded-2xl border-2 border-emerald-300 bg-emerald-50 px-4 py-2 font-black text-emerald-950 shadow-sm transition-all hover:bg-emerald-100 active:scale-95"
-            title="സാധാരണ വെബ്‌സൈറ്റിലേക്ക് മടങ്ങുക"
+            title={ui.exitBtn}
           >
             <ArrowLeft className="size-6 shrink-0 text-emerald-800" />
             <span className="text-base font-black sm:text-lg">
-              സാധാരണ മോഡ് (Exit)
+              {ui.exitBtn}
             </span>
           </button>
 
           {/* Senior badge */}
           <div className="text-right">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-3 py-1 text-xs font-black text-white shadow">
-              👵 60+ ജ്യേഷ്ഠ കിസാൻ
+              {ui.seniorBadge}
             </span>
             <p className="text-[11px] font-bold text-stone-600 mt-0.5">
-              ലളിതമായ സേവനം (Light UI)
+              {ui.simpleService}
             </p>
           </div>
         </div>
 
+        {/* 8 Indian Languages Selector Strip (User Requested) */}
+        <div className="mx-auto mt-2 max-w-2xl border-t border-amber-100 pt-2">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="flex items-center gap-1 text-xs font-black uppercase tracking-wider text-emerald-900">
+              <Languages className="size-3.5 text-emerald-700" />
+              {ui.selectLanguage}
+            </span>
+            <span className="text-[11px] font-bold text-stone-500">
+              {SUPPORTED_LANGUAGES.find((l) => l.id === language)?.native}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+            {SUPPORTED_LANGUAGES.map((langItem) => {
+              const isSelected = language === langItem.id;
+              return (
+                <button
+                  key={langItem.id}
+                  type="button"
+                  onClick={() => handleLanguageChange(langItem.id)}
+                  className={`rounded-xl py-2 px-1 text-center transition-all active:scale-95 ${
+                    isSelected
+                      ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-500"
+                      : "bg-white border border-stone-300 text-stone-800 font-bold hover:bg-emerald-50 shadow-sm"
+                  }`}
+                  title={langItem.label}
+                >
+                  <span className="block text-xs leading-tight font-black">
+                    {langItem.native}
+                  </span>
+                  <span className="block text-[9px] opacity-75 truncate">
+                    {langItem.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Accessibility Toolbar: Text Size + Voice Narration */}
-        <div className="mx-auto mt-2 flex max-w-2xl flex-wrap items-center justify-between gap-2 border-t border-amber-100 pt-2">
+        <div className="mx-auto mt-2 flex max-w-2xl flex-wrap items-center justify-between gap-2 border-t border-stone-200/80 pt-2">
           {/* Text Size Stepper */}
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-extrabold uppercase tracking-wider text-stone-700">
-              അക്ഷരങ്ങൾ:
+              {ui.textSize}
             </span>
             <button
               onClick={() => setFontScale("normal")}
@@ -359,13 +1098,64 @@ function SeniorCitizenModePage() {
           <button
             onClick={() => {
               if (activeBooking) {
-                const mlMsg = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber} ആണ്. സംഭരണ കേന്ദ്രം ${activeBooking.centreName}. ഇപ്പോൾ വിളിക്കുന്നത് ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്. പ്രതീക്ഷിക്കുന്ന കാത്തിരിപ്പ് സമയം ${prediction.minutesLeft} മിനിറ്റ്.`;
-                const enMsg = `Your Token Number is ${activeBooking.queueNumber} at ${activeBooking.centreName}. Now serving is ${nowServing}. There are ${farmersAhead} farmers ahead of you. Estimated wait is ${prediction.minutesLeft} minutes.`;
-                speakText(mlMsg, enMsg);
+                const centreTitle = getCentreTranslatedName(activeBooking.centreName, language);
+                let speech = "";
+                switch (language) {
+                  case "ml":
+                    speech = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber} ആണ്. കേന്ദ്രം: ${centreTitle}. ഇപ്പോൾ വിളിക്കുന്നത് ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്. പ്രതീക്ഷിക്കുന്ന കാത്തിരിപ്പ് സമയം ${prediction.minutesLeft} മിനിറ്റ്.`;
+                    break;
+                  case "hi":
+                    speech = `आपका टोकन नंबर ${activeBooking.queueNumber} है। केंद्र: ${centreTitle}। अभी नंबर ${nowServing} बुलाया जा रहा है। आपके आगे ${farmersAhead} किसान हैं। अनुमानित प्रतीक्षा समय ${prediction.minutesLeft} मिनट है।`;
+                    break;
+                  case "ta":
+                    speech = `உங்கள் டோக்கன் எண் ${activeBooking.queueNumber}. மையம்: ${centreTitle}. இப்போது அழைக்கப்படுவது ${nowServing}. உங்கள் முன் ${farmersAhead} விவசாயிகள் உள்ளனர். காத்திருப்பு நேரம் சுமார் ${prediction.minutesLeft} நிமிடங்கள்.`;
+                    break;
+                  case "te":
+                    speech = `మీ టోకెన్ సంఖ్య ${activeBooking.queueNumber}. కేంద్రం: ${centreTitle}. ప్రస్తుతం పిలుస్తున్న సంఖ్య ${nowServing}. మీ ముందు ${farmersAhead} మంది రైతులు ఉన్నారు. నిరీక్షణ సమయం సుమారు ${prediction.minutesLeft} నిమిషాలు.`;
+                    break;
+                  case "kn":
+                    speech = `ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ ${activeBooking.queueNumber}. ಕೇಂದ್ರ: ${centreTitle}. ಈಗ ಕರೆಯುತ್ತಿರುವ ಸಂಖ್ಯೆ ${nowServing}. ನಿಮ್ಮ ಮುಂದೆ ${farmersAhead} ರೈತರಿದ್ದಾರೆ. ಕಾಯುವ ಸಮಯ ಸುಮಾರು ${prediction.minutesLeft} ನಿಮಿಷಗಳು.`;
+                    break;
+                  case "bn":
+                    speech = `আপনার টোকেন নম্বর ${activeBooking.queueNumber}। কেন্দ্র: ${centreTitle}। এখন ডাকা হচ্ছে ${nowServing}। আপনার আগে ${farmersAhead} জন কৃষক আছেন। অপেক্ষার সময় প্রায় ${prediction.minutesLeft} মিনিট।`;
+                    break;
+                  case "mr":
+                    speech = `तुमचा टोकन नंबर ${activeBooking.queueNumber} आहे. केंद्र: ${centreTitle}. सध्या नंबर ${nowServing} सुरू आहे. तुमच्या पुढे ${farmersAhead} शेतकरी आहेत. प्रतीक्षेची वेळ सुमारे ${prediction.minutesLeft} मिनिटे आहे.`;
+                    break;
+                  default:
+                    speech = `Your Token Number is ${activeBooking.queueNumber} at ${centreTitle}. Now serving is ${nowServing}. There are ${farmersAhead} farmers ahead of you. Estimated wait is ${prediction.minutesLeft} minutes.`;
+                    break;
+                }
+                speakInLanguage(speech);
               } else {
-                const mlMsg = `നിങ്ങൾക്ക് നിലവിൽ ടോക്കൺ ഇല്ല. താഴെ നിന്ന് വിളയും, എത്ര കിലോ എന്നും, സംഭരണ കേന്ദ്രവും തിരഞ്ഞെടുത്ത് പച്ച ബട്ടൺ അമർത്തി ടോക്കൺ എടുക്കുക. സഹായത്തിന് 1800 425 1661 എന്ന നമ്പറിലേക്ക് വിളിക്കാം.`;
-                const enMsg = `You have no active token. Select your crop, weight in kg, and procurement centre below, then tap the green button to book a token, or call toll-free 1800-425-1661.`;
-                speakText(mlMsg, enMsg);
+                let speech = "";
+                switch (language) {
+                  case "ml":
+                    speech = "നിങ്ങൾക്ക് നിലവിൽ ടോക്കൺ ഇല്ല. താഴെ നിന്ന് വിളയും, തൂക്കവും, സംഭരണ കേന്ദ്രവും തിരഞ്ഞെടുത്ത് പച്ച ബട്ടൺ അമർത്തി ടോക്കൺ എടുക്കുക. സഹായത്തിന് 1800 425 1661 എന്ന നമ്പറിലേക്ക് വിളിക്കാം.";
+                    break;
+                  case "hi":
+                    speech = "वर्तमान में आपके पास कोई सक्रिय टोकन नहीं है। नीचे अपनी फसल, वज़न और खरीद केंद्र चुनें और हरा बटन दबाकर टोकन प्राप्त करें। सहायता के लिए 1800 425 1661 पर कॉल करें।";
+                    break;
+                  case "ta":
+                    speech = "தற்போது உங்களிடம் டோக்கன் இல்லை. கீழே பயிர், எடை மற்றும் கொள்முதல் மையத்தைத் தேர்ந்தெடுத்து பச்சை பொத்தானை அழுத்தி டோக்கன் பெறவும். உதவிக்கு 1800 425 1661 என்ற எண்ணை அழைக்கவும்.";
+                    break;
+                  case "te":
+                    speech = "ప్రస్తుతం మీ వద్ద టోకెన్ లేదు. కింద పంట, బరువు మరియు కొనుగోలు కేంద్రాన్ని ఎంచుకుని పచ్చ బటన్ నొక్కి టోకెన్ పొందండి. సహాయం కోసం 1800 425 1661 కు కాల్ చేయండి.";
+                    break;
+                  case "kn":
+                    speech = "ಪ್ರಸ್ತುತ ನಿಮ್ಮ ಬಳಿ ಯಾವುದೇ ಟೋಕನ್ ಇಲ್ಲ. ಕೆಳಗೆ ಬೆಳೆ, ತೂಕ ಮತ್ತು ಖರೀದಿ ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ ಹಸಿರು ಬಟನ್ ಒತ್ತಿ ಟೋಕನ್ ಪಡೆಯಿರಿ. ಸಹಾಯಕ್ಕಾಗಿ 1800 425 1661 ಗೆ ಕರೆ ಮಾಡಿ.";
+                    break;
+                  case "bn":
+                    speech = "বর্তমানে আপনার কাছে কোনো টোকেন নেই। নিচে ফসল, ওজন এবং সংগ্রহ কেন্দ্র নির্বাচন করে সবুজ বোতাম টিপে টোকেন নিন। সহায়তার জন্য 1800 425 1661 নম্বরে কল করুন।";
+                    break;
+                  case "mr":
+                    speech = "सध्या तुमच्याकडे कोणतेही टोकन नाही. खाली पीक, वजन आणि खरेदी केंद्र निवडून हिरवे बटण दाबा व टोकन मिळवा. मदतीसाठी 1800 425 1661 वर कॉल करा.";
+                    break;
+                  default:
+                    speech = "You do not have an active token. Select your crop, weight, and centre below, then tap the green button to book a token, or call toll-free 1800-425-1661.";
+                    break;
+                }
+                speakInLanguage(speech);
               }
             }}
             className={`flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-black shadow-md transition-transform active:scale-95 ${
@@ -377,12 +1167,12 @@ function SeniorCitizenModePage() {
             {isSpeaking ? (
               <>
                 <VolumeX className="size-5" />
-                <span>ശബ്ദം നിർത്തുക</span>
+                <span>{ui.stopVoice}</span>
               </>
             ) : (
               <>
                 <Volume2 className="size-5" />
-                <span>ശബ്ദത്തിൽ കേൾക്കുക</span>
+                <span>{ui.listenAloud}</span>
               </>
             )}
           </button>
@@ -402,13 +1192,13 @@ function SeniorCitizenModePage() {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-200">
-                നമസ്കാരം, {user.name} ചേട്ടാ
+                {ui.greeting}
               </span>
               <h1 className="text-2xl font-black sm:text-3xl text-white">
-                കിസാൻ ക്യൂ സഹായി
+                {ui.appTitle}
               </h1>
               <p className="text-sm text-emerald-100 font-medium">
-                വരിനിൽക്കാതെ എളുപ്പത്തിൽ ടോക്കൺ എടുക്കാം
+                {ui.appSub}
               </p>
             </div>
             <div className="flex size-16 shrink-0 items-center justify-center rounded-3xl bg-white/20 text-3xl shadow-inner backdrop-blur-md">
@@ -423,7 +1213,7 @@ function SeniorCitizenModePage() {
             <div className="flex items-center justify-between border-b pb-4 border-stone-200">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3.5 py-1 text-sm font-black text-emerald-800">
                 <CheckCircle2 className="size-5 text-emerald-700" />
-                നിങ്ങളുടെ ടോക്കൺ സജീവം (Active)
+                {ui.activeTokenTitle}
               </span>
               <span className="text-sm font-bold text-stone-600 font-mono">
                 {activeBooking.date}
@@ -433,7 +1223,7 @@ function SeniorCitizenModePage() {
             {/* Giant Token Metric */}
             <div className="my-6 text-center">
               <p className="text-base font-bold text-stone-600">
-                നിങ്ങളുടെ ടോക്കൺ നമ്പർ
+                {ui.tokenNumberLabel}
               </p>
               <div className="my-2 inline-block rounded-3xl bg-emerald-50 border-3 border-emerald-500 px-8 py-4 shadow-md">
                 <p className="font-display text-6xl font-black text-emerald-800 tracking-tight sm:text-7xl">
@@ -449,24 +1239,24 @@ function SeniorCitizenModePage() {
             <div className="grid grid-cols-2 gap-3 rounded-2xl bg-amber-50 p-4 border border-amber-200">
               <div className="text-center border-r border-amber-300 pr-2">
                 <span className="text-xs font-black text-stone-600 block">
-                  ഇപ്പോൾ വിളിക്കുന്നത്
+                  {ui.nowServing}
                 </span>
                 <span className="font-display text-3xl font-black text-amber-900">
                   #{nowServing}
                 </span>
                 <span className="text-[11px] font-bold text-stone-600 block">
-                  (ഗേറ്റ് 1 ൽ)
+                  {ui.gateInfo}
                 </span>
               </div>
               <div className="text-center pl-2">
                 <span className="text-xs font-black text-stone-600 block">
-                  നിങ്ങളുടെ മുന്നിൽ
+                  {ui.aheadOfYou}
                 </span>
                 <span className="font-display text-3xl font-black text-stone-900">
-                  {farmersAhead} പേർ
+                  {farmersAhead} {ui.waitingCount}
                 </span>
                 <span className="text-[11px] font-bold text-stone-600 block">
-                  ~{prediction.minutesLeft} മിനിറ്റ് കാത്തിരിപ്പ്
+                  ~{prediction.minutesLeft} {ui.waitMin}
                 </span>
               </div>
             </div>
@@ -476,7 +1266,7 @@ function SeniorCitizenModePage() {
               <Building2 className="size-6 text-emerald-700 shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-base font-black">
-                  {getCentreMalayalamTitle(activeBooking.centreName)}
+                  {getCentreTranslatedName(activeBooking.centreName, language)}
                 </strong>
                 <p className="text-xs text-stone-600">
                   {activeCentreForDisplay.location || activeCentreForDisplay.address}
@@ -488,14 +1278,40 @@ function SeniorCitizenModePage() {
             <div className="mt-5 space-y-3">
               <button
                 onClick={() => {
-                  const mlMsg = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber} ആണ്. കേന്ദ്രം: ${getCentreMalayalamTitle(activeBooking.centreName)}. ഇപ്പോൾ വിളിക്കുന്നത് നമ്പർ ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്. ഏകദേശം ${prediction.minutesLeft} മിനിറ്റിനകം നിങ്ങളുടെ ഊഴം എത്തും.`;
-                  const enMsg = `Your Token Number is ${activeBooking.queueNumber} at ${activeBooking.centreName}. Currently serving token is ${nowServing}. There are ${farmersAhead} farmers ahead of you. Estimated wait is ${prediction.minutesLeft} minutes.`;
-                  speakText(mlMsg, enMsg);
+                  const centreTitle = getCentreTranslatedName(activeBooking.centreName, language);
+                  let speech = "";
+                  switch (language) {
+                    case "ml":
+                      speech = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber} ആണ്. കേന്ദ്രം: ${centreTitle}. ഇപ്പോൾ വിളിക്കുന്നത് നമ്പർ ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്. ഏകദേശം ${prediction.minutesLeft} മിനിറ്റിനകം ഊഴം എത്തും.`;
+                      break;
+                    case "hi":
+                      speech = `आपका टोकन नंबर ${activeBooking.queueNumber} है। केंद्र: ${centreTitle}। अभी नंबर ${nowServing} बुलाया जा रहा है। आपके आगे ${farmersAhead} किसान हैं। लगभग ${prediction.minutesLeft} मिनट में आपकी बारी आएगी।`;
+                      break;
+                    case "ta":
+                      speech = `உங்கள் டோக்கன் எண் ${activeBooking.queueNumber}. மையம்: ${centreTitle}. இப்போது அழைக்கப்படுவது ${nowServing}. உங்கள் முன் ${farmersAhead} விவசாயிகள் உள்ளனர். சுமார் ${prediction.minutesLeft} நிமிடங்களில் உங்கள் முறை வரும்.`;
+                      break;
+                    case "te":
+                      speech = `మీ టోకెన్ సంఖ్య ${activeBooking.queueNumber}. కేంద్రం: ${centreTitle}. ప్రస్తుతం పిలుస్తున్న సంఖ్య ${nowServing}. మీ ముందు ${farmersAhead} మంది రైతులు ఉన్నారు. సుమారు ${prediction.minutesLeft} నిమిషాల్లో మీ వంతు వస్తుంది.`;
+                      break;
+                    case "kn":
+                      speech = `ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ ${activeBooking.queueNumber}. ಕೇಂದ್ರ: ${centreTitle}. ಈಗ ಕರೆಯುತ್ತಿರುವ ಸಂಖ್ಯೆ ${nowServing}. ನಿಮ್ಮ ಮುಂದೆ ${farmersAhead} ರೈತರಿದ್ದಾರೆ. ಸುಮಾರು ${prediction.minutesLeft} ನಿಮಿಷಗಳಲ್ಲಿ ನಿಮ್ಮ ಸರದಿ ಬರಲಿದೆ.`;
+                      break;
+                    case "bn":
+                      speech = `আপনার টোকেন নম্বর ${activeBooking.queueNumber}। কেন্দ্র: ${centreTitle}। এখন ডাকা হচ্ছে ${nowServing}। আপনার আগে ${farmersAhead} জন কৃষক আছেন। প্রায় ${prediction.minutesLeft} মিনিটের মধ্যে আপনার পালা আসবে।`;
+                      break;
+                    case "mr":
+                      speech = `तुमचा टोकन नंबर ${activeBooking.queueNumber} आहे. केंद्र: ${centreTitle}. सध्या नंबर ${nowServing} सुरू आहे. तुमच्या पुढे ${farmersAhead} शेतकरी आहेत. सुमारे ${prediction.minutesLeft} मिनिटांत तुमची पाळी येईल.`;
+                      break;
+                    default:
+                      speech = `Your Token Number is ${activeBooking.queueNumber} at ${centreTitle}. Currently serving token is ${nowServing}. There are ${farmersAhead} farmers ahead of you. Estimated wait is ${prediction.minutesLeft} minutes.`;
+                      break;
+                  }
+                  speakInLanguage(speech);
                 }}
                 className="flex w-full items-center justify-center gap-3 rounded-2xl bg-emerald-700 py-4 font-black text-white shadow-lg hover:bg-emerald-800 active:scale-95 transition-all text-lg"
               >
                 <Volume2 className="size-6" />
-                <span>ഈ വിവരങ്ങൾ ശബ്ദത്തിൽ കേൾക്കുക</span>
+                <span>{ui.listenTokenDetails}</span>
               </button>
 
               <div className="flex gap-2">
@@ -508,7 +1324,7 @@ function SeniorCitizenModePage() {
                   className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-3.5 font-bold text-stone-800 hover:bg-stone-50 shadow-sm"
                 >
                   <MapPin className="size-5 text-emerald-700" />
-                  <span>വഴി അറിയുക (Map)</span>
+                  <span>{ui.getDirections}</span>
                 </a>
 
                 <button
@@ -516,7 +1332,7 @@ function SeniorCitizenModePage() {
                   className="flex items-center justify-center gap-1.5 rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3.5 font-bold text-red-700 hover:bg-red-100 transition-colors"
                 >
                   <X className="size-5" />
-                  <span>റദ്ദാക്കുക</span>
+                  <span>{ui.cancelBtn}</span>
                 </button>
               </div>
             </div>
@@ -526,10 +1342,10 @@ function SeniorCitizenModePage() {
           <div className="rounded-3xl border-2 border-dashed border-stone-300 bg-white p-5 text-center shadow-sm">
             <Ticket className="mx-auto size-12 text-stone-400" />
             <h2 className="mt-2 text-xl font-black text-stone-800">
-              ഇപ്പോൾ നിങ്ങളുടെ പക്കൽ ടോക്കൺ ഇല്ല
+              {ui.noTokenTitle}
             </h2>
             <p className="mt-1 text-sm font-medium text-stone-600">
-              താഴെ നിങ്ങളുടെ വിളയും, തൂക്കവും, സംഭരണ കേന്ദ്രവും തിരഞ്ഞെടുത്ത് പച്ച ബട്ടൺ അമർത്തുക.
+              {ui.noTokenSub}
             </p>
           </div>
         )}
@@ -539,42 +1355,93 @@ function SeniorCitizenModePage() {
           <div className="flex items-center justify-between border-b pb-4 border-stone-200">
             <div>
               <span className="text-xs font-black uppercase tracking-wider text-emerald-700">
-                സ്റ്റെപ്പ് 1, 2 & 3
+                {ui.step123}
               </span>
               <h2 className="text-2xl font-black text-stone-900">
-                🌾 പുതിയ ടോക്കൺ എടുക്കുക
+                {ui.bookNewTokenTitle}
               </h2>
             </div>
             <button
               onClick={() => {
-                const mlMsg = `പുതിയ ടോക്കൺ എടുക്കുന്നതിനായി ആദ്യം നിങ്ങളുടെ വിള തിരഞ്ഞെടുക്കുക. തുടർന്ന് എത്ര കിലോ ഉണ്ടെന്ന് 1 കിലോ വീതം കൂട്ടുകയോ കുറയ്ക്കുകയോ ചെയ്യാം. ശേഷം നിങ്ങളുടെ അടുത്തുള്ള സംഭരണ കേന്ദ്രം തിരഞ്ഞെടുത്ത് താഴെയുള്ള വലിയ പച്ച ബട്ടൺ അമർത്തുക.`;
-                const enMsg = `To book a new token, first select your crop, adjust weight by 1 kg increments, pick your procurement centre, and tap the big green button at the bottom.`;
-                speakText(mlMsg, enMsg);
+                let speech = "";
+                switch (language) {
+                  case "ml":
+                    speech = "പുതിയ ടോക്കൺ എടുക്കുന്നതിനായി ആദ്യം വിള തിരഞ്ഞെടുക്കുക. തുടർന്ന് എത്ര കിലോ ഉണ്ടെന്ന് 1 കിലോ വീതം കൂട്ടുകയോ കുറയ്ക്കുകയോ ചെയ്യാം. ശേഷം സംഭരണ കേന്ദ്രം തിരഞ്ഞെടുത്ത് താഴെയുള്ള വലിയ പച്ച ബട്ടൺ അമർത്തുക.";
+                    break;
+                  case "hi":
+                    speech = "नया टोकन प्राप्त करने के लिए पहले फसल चुनें। फिर 1 किलो के हिसाब से वज़न तय करें। उसके बाद खरीद केंद्र चुनकर नीचे दिया गया बड़ा हरा बटन दबाएं।";
+                    break;
+                  case "ta":
+                    speech = "புதிய டோக்கன் எடுக்க முதலில் பயிரைத் தேர்ந்தெடுக்கவும். பின்னர் 1 கிலோ வீதம் எடையை மாற்றலாம். பிறகு கொள்முதல் மையத்தைத் தேர்ந்தெடுத்து கீழே உள்ள பெரிய பச்சை பொத்தானை அழுத்தவும்.";
+                    break;
+                  case "te":
+                    speech = "కొత్త టోకెన్ పొందడానికి ముందుగా పంటను ఎంచుకోండి. తర్వాత 1 కిలో చొప్పున బరువు నిర్ణయించండి. ఆపై కొనుగోలు కేంద్రాన్ని ఎంచుకుని కింద ఉన్న పెద్ద పచ్చ బటన్ నొక్కండి.";
+                    break;
+                  case "kn":
+                    speech = "ಹೊಸ ಟೋಕನ್ ಪಡೆಯಲು ಮೊದಲು ಬೆಳೆ ಆಯ್ಕೆಮಾಡಿ. ನಂತರ 1 ಕೆಜಿಯಂತೆ ತೂಕ ಹೊಂದಿಸಿ. ಬಳಿಕ ಖರೀದಿ ಕೇಂದ್ರ ಆರಿಸಿ ಕೆಳಗಿನ ದೊಡ್ಡ ಹಸಿರು ಬಟನ್ ಒತ್ತಿ.";
+                    break;
+                  case "bn":
+                    speech = "নতুন টোকেন নিতে প্রথমে ফসল বেছে নিন। তারপর ১ কেজি করে ওজন ঠিক করুন। এরপর সংগ্রহ কেন্দ্র নির্বাচন করে নিচের বড় সবুজ বোতাম টিপুন।";
+                    break;
+                  case "mr":
+                    speech = "नवीन टोकन मिळवण्यासाठी प्रथम पीक निवडा. नंतर १ किलोच्या हिशोबाने वजन ठरवा. त्यानंतर खरेदी केंद्र निवडून खालील मोठे हिरवे बटण दाबा.";
+                    break;
+                  default:
+                    speech = "To book a new token, first select your crop, adjust weight by 1 kg increments, pick your procurement centre, and tap the big green button at the bottom.";
+                    break;
+                }
+                speakInLanguage(speech);
               }}
               className="flex items-center gap-1.5 rounded-2xl bg-amber-100 border border-amber-300 px-3 py-2 text-xs font-black text-amber-900 hover:bg-amber-200"
             >
               <Volume2 className="size-4" />
-              <span>സഹായം കേൾക്കുക</span>
+              <span>{ui.helpVoiceBtn}</span>
             </button>
           </div>
 
           {/* STEP 1: CROP SELECTOR */}
           <div className="space-y-2.5">
             <label className="block text-base font-black text-stone-800">
-              1. വിള തിരഞ്ഞെടുക്കുക (Select Crop):
+              {ui.step1Label}
             </label>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {CROP_ITEMS.map((crop) => {
                 const isSelected = selectedCrop.id === crop.id;
+                const localizedCropName = crop.names[language] || crop.names.en;
                 return (
                   <button
                     key={crop.id}
                     type="button"
                     onClick={() => {
                       setSelectedCrop(crop);
-                      const mlMsg = `${crop.nameMl} തിരഞ്ഞെടുത്തു. താങ്ങുവില കിലോയ്ക്ക് ${crop.msp} രൂപ.`;
-                      const enMsg = `Selected ${crop.nameEn}. MSP is rupees ${crop.msp} per kilogram.`;
-                      speakText(mlMsg, enMsg);
+                      let cropSpeech = "";
+                      switch (language) {
+                        case "ml":
+                          cropSpeech = `${localizedCropName} തിരഞ്ഞെടുത്തു. താങ്ങുവില കിലോയ്ക്ക് ${crop.msp} രൂപ.`;
+                          break;
+                        case "hi":
+                          cropSpeech = `${localizedCropName} चुना गया। समर्थन मूल्य ₹${crop.msp} प्रति किलो है।`;
+                          break;
+                        case "ta":
+                          cropSpeech = `${localizedCropName} தேர்ந்தெடுக்கப்பட்டது. ஆதரவு விலை கிலோவிற்கு ₹${crop.msp}.`;
+                          break;
+                        case "te":
+                          cropSpeech = `${localizedCropName} ఎంపిక చేయబడింది. మద్దతు ధర కిలోకు ₹${crop.msp}.`;
+                          break;
+                        case "kn":
+                          cropSpeech = `${localizedCropName} ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ಬೆಂಬಲ ಬೆಲೆ ಪ್ರತಿ ಕೆಜಿಗೆ ₹${crop.msp}.`;
+                          break;
+                        case "bn":
+                          cropSpeech = `${localizedCropName} নির্বাচিত হয়েছে। সমর্থন মূল্য প্রতি কেজি ₹${crop.msp}।`;
+                          break;
+                        case "mr":
+                          cropSpeech = `${localizedCropName} निवडले आहे. हमीभाव ₹${crop.msp} प्रति किलो आहे.`;
+                          break;
+                        default:
+                          cropSpeech = `Selected ${localizedCropName}. Support price is ₹${crop.msp} per kg.`;
+                          break;
+                      }
+                      speakInLanguage(cropSpeech);
                     }}
                     className={`relative flex flex-col items-center rounded-2xl p-3 text-left transition-all border-2 active:scale-95 ${
                       isSelected
@@ -589,11 +1456,11 @@ function SeniorCitizenModePage() {
                     )}
                     <img
                       src={crop.image}
-                      alt={crop.nameEn}
+                      alt={crop.names.en}
                       className="size-16 rounded-xl object-cover shadow-sm"
                     />
                     <span className="mt-2 text-center text-sm font-black text-stone-900 leading-tight">
-                      {crop.nameMl}
+                      {localizedCropName}
                     </span>
                     <span className="mt-0.5 text-xs font-extrabold text-emerald-700">
                       ₹{crop.msp} / {crop.unit}
@@ -608,10 +1475,10 @@ function SeniorCitizenModePage() {
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
               <label className="block text-base font-black text-stone-800">
-                2. തൂക്കം എത്ര കിലോഗ്രാം? (Quantity in kg):
+                {ui.step2Label}
               </label>
               <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
-                +1 kg വീതം കൂട്ടാം
+                {ui.by1kgBadge}
               </span>
             </div>
 
@@ -622,7 +1489,7 @@ function SeniorCitizenModePage() {
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 10))}
                 className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-white text-stone-700 shadow-sm border border-stone-300 font-black text-xs sm:text-sm hover:bg-stone-100 active:scale-90"
-                title="10 കിലോ കുറയ്ക്കുക"
+                title={ui.decrease10}
               >
                 -10
               </button>
@@ -632,7 +1499,7 @@ function SeniorCitizenModePage() {
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 className="flex size-14 sm:size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
-                title="1 കിലോ കുറയ്ക്കുക (-1 kg)"
+                title={ui.decrease1}
               >
                 <Minus className="size-8 stroke-[3]" />
               </button>
@@ -655,7 +1522,7 @@ function SeniorCitizenModePage() {
                   <span className="text-xl font-black text-stone-600">kg</span>
                 </div>
                 <span className="text-[11px] font-bold text-emerald-700 block mt-0.5">
-                  കിലോഗ്രാം (കിലോ)
+                  {ui.kgLabel}
                 </span>
               </div>
 
@@ -664,7 +1531,7 @@ function SeniorCitizenModePage() {
                 type="button"
                 onClick={() => setQuantity((q) => q + 1)}
                 className="flex size-14 sm:size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
-                title="1 കിലോ കൂട്ടുക (+1 kg)"
+                title={ui.increase1}
               >
                 <Plus className="size-8 stroke-[3]" />
               </button>
@@ -674,7 +1541,7 @@ function SeniorCitizenModePage() {
                 type="button"
                 onClick={() => setQuantity((q) => q + 10)}
                 className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-white text-stone-700 shadow-sm border border-stone-300 font-black text-xs sm:text-sm hover:bg-stone-100 active:scale-90"
-                title="10 കിലോ കൂട്ടുക"
+                title={ui.increase10}
               >
                 +10
               </button>
@@ -682,7 +1549,7 @@ function SeniorCitizenModePage() {
 
             {/* Micro-stepper pills: +1 kg, +5 kg, +25 kg, +50 kg */}
             <div className="flex items-center justify-center gap-2 pt-1 flex-wrap">
-              <span className="text-xs font-bold text-stone-500 mr-1">കൂട്ടുക:</span>
+              <span className="text-xs font-bold text-stone-500 mr-1">{ui.addFast}</span>
               <button
                 type="button"
                 onClick={() => setQuantity((q) => q + 1)}
@@ -735,7 +1602,7 @@ function SeniorCitizenModePage() {
             <div className="flex items-center justify-between rounded-2xl bg-emerald-50 border border-emerald-200 p-4">
               <div>
                 <span className="text-xs font-bold text-emerald-800 block">
-                  കണക്കാക്കിയ തുക (Estimated MSP Bank Credit)
+                  {ui.estimatedPayout}
                 </span>
                 <p className="text-xs text-stone-600">
                   {quantity} kg × ₹{selectedCrop.msp} / kg
@@ -746,35 +1613,60 @@ function SeniorCitizenModePage() {
                   ₹{(quantity * selectedCrop.msp).toLocaleString("en-IN")}
                 </span>
                 <span className="block text-[10px] font-bold text-stone-500">
-                  നേരിട്ട് ബാങ്കിലേക്ക് (DBT)
+                  {ui.directDbt}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* STEP 3: CENTRE SELECTOR (USER REQUESTED OPTION) */}
+          {/* STEP 3: CENTRE SELECTOR */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
               <label className="block text-base font-black text-stone-800">
-                3. സംഭരണ കേന്ദ്രം തിരഞ്ഞെടുക്കുക (Select Centre):
+                {ui.step3Label}
               </label>
               <span className="text-xs font-bold text-emerald-800">
-                {centres.length} കേന്ദ്രങ്ങൾ ലഭ്യമാണ്
+                {centres.length} {ui.centresAvailable}
               </span>
             </div>
 
             <div className="space-y-2.5">
               {centres.map((centre) => {
                 const isSelected = selectedCentre.id === centre.id;
-                const centreTitle = getCentreMalayalamTitle(centre.name);
+                const centreTitle = getCentreTranslatedName(centre.name, language);
                 return (
                   <div
                     key={centre.id}
                     onClick={() => {
                       setSelectedCentre(centre);
-                      const mlMsg = `${centreTitle} തിരഞ്ഞെടുത്തു. ദൂരം ${centre.distanceKm} കിലോമീറ്റർ.`;
-                      const enMsg = `Selected ${centre.name}. Distance is ${centre.distanceKm} kilometers.`;
-                      speakText(mlMsg, enMsg);
+                      let centreSpeech = "";
+                      switch (language) {
+                        case "ml":
+                          centreSpeech = `${centreTitle} സംഭരണ കേന്ദ്രം തിരഞ്ഞെടുത്തു. ദൂരം ${centre.distanceKm} കിലോമീറ്റർ.`;
+                          break;
+                        case "hi":
+                          centreSpeech = `${centreTitle} खरीद केंद्र चुना गया। दूरी ${centre.distanceKm} किलोमीटर है।`;
+                          break;
+                        case "ta":
+                          centreSpeech = `${centreTitle} கொள்முதல் மையம் தேர்ந்தெடுக்கப்பட்டது. தூரம் ${centre.distanceKm} கி.மீ.`;
+                          break;
+                        case "te":
+                          centreSpeech = `${centreTitle} కొనుగోలు కేంద్రం ఎంపిక చేయబడింది. దూరం ${centre.distanceKm} కి.మీ.`;
+                          break;
+                        case "kn":
+                          centreSpeech = `${centreTitle} ಖರೀದಿ ಕೇಂದ್ರ ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ದೂರ ${centre.distanceKm} ಕಿ.ಮೀ.`;
+                          break;
+                        case "bn":
+                          centreSpeech = `${centreTitle} সংগ্রহ কেন্দ্র নির্বাচিত হয়েছে। দূরত্ব ${centre.distanceKm} কিমি।`;
+                          break;
+                        case "mr":
+                          centreSpeech = `${centreTitle} खरेदी केंद्र निवडले आहे. अंतर ${centre.distanceKm} किमी आहे.`;
+                          break;
+                        default:
+                          centreSpeech = `Selected ${centreTitle}. Distance is ${centre.distanceKm} kilometers.`;
+                          break;
+                      }
+                      speakInLanguage(centreSpeech);
                     }}
                     className={`flex items-start justify-between gap-3 rounded-2xl p-4 border-2 cursor-pointer transition-all active:scale-98 ${
                       isSelected
@@ -801,7 +1693,7 @@ function SeniorCitizenModePage() {
                           {centre.location || centre.address}
                         </p>
                         <p className="text-xs font-bold text-emerald-700 mt-1 flex items-center gap-2">
-                          <span>📍 {centre.distanceKm} km അകലെ</span>
+                          <span>📍 {centre.distanceKm} km</span>
                           <span>·</span>
                           <span>⏰ {centre.workingHours}</span>
                         </p>
@@ -819,13 +1711,13 @@ function SeniorCitizenModePage() {
                         }`}
                       >
                         {centre.status === "normal"
-                          ? "🟢 വേഗത്തിൽ"
+                          ? ui.fastQueue
                           : centre.status === "busy"
-                          ? "🟡 സാധാരണ"
-                          : "🟠 തിരക്ക്"}
+                          ? ui.normalQueue
+                          : ui.busyQueue}
                       </span>
                       <p className="text-[11px] font-bold text-stone-600 mt-1">
-                        {centre.currentQueueLength} പേർ ക്യൂവിൽ
+                        {centre.currentQueueLength} {ui.waitingCount}
                       </p>
                     </div>
                   </div>
@@ -842,10 +1734,10 @@ function SeniorCitizenModePage() {
               className="flex w-full items-center justify-center gap-3 rounded-3xl bg-emerald-700 py-5 px-6 font-black text-white shadow-2xl hover:bg-emerald-800 active:scale-95 transition-all text-xl sm:text-2xl border-4 border-emerald-500/60"
             >
               <Ticket className="size-8" />
-              <span>✅ ടോക്കൺ എടുക്കുക (CONFIRM)</span>
+              <span>{ui.confirmButton}</span>
             </button>
             <p className="mt-2 text-center text-xs font-bold text-stone-600">
-              {getCentreMalayalamTitle(selectedCentre.name)} - ഇന്നത്തെ തീയതിയിൽ ടോക്കൺ നൽകും
+              {getCentreTranslatedName(selectedCentre.name, language)} - {ui.todayIssuedSub}
             </p>
           </div>
         </section>
@@ -858,13 +1750,13 @@ function SeniorCitizenModePage() {
             </div>
             <div>
               <span className="text-xs font-black uppercase tracking-wider text-emerald-800">
-                സഹായം വേണോ? (Need Assistance?)
+                {ui.needAssistance}
               </span>
               <h3 className="text-xl font-black text-stone-900">
-                ഫോണിൽ വിളിച്ച് ടോക്കൺ എടുക്കാം
+                {ui.callForToken}
               </h3>
               <p className="text-xs text-stone-600 font-medium">
-                കിസാൻ കോൾ സെന്ററിലേക്ക് സൗജന്യമായി വിളിക്കാം
+                {ui.freeHelpline}
               </p>
             </div>
           </div>
@@ -876,16 +1768,16 @@ function SeniorCitizenModePage() {
               className="flex items-center justify-center gap-3 rounded-2xl bg-emerald-700 py-4 px-4 font-black text-white shadow hover:bg-emerald-800 active:scale-95 transition-all text-base"
             >
               <Phone className="size-6" />
-              <span>1800-425-1661 (വിളിക്കുക)</span>
+              <span>{ui.callNow}</span>
             </a>
 
             {/* Centre Manager Direct Call */}
             <a
-              href={`tel:+919447123456`}
+              href="tel:+919447123456"
               className="flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-4 px-4 font-black text-stone-800 shadow-sm hover:bg-stone-50 active:scale-95 transition-all text-base"
             >
               <Phone className="size-5 text-emerald-700" />
-              <span>കേന്ദ്ര മാനേജർ: 9447123456</span>
+              <span>{ui.managerCall}</span>
             </a>
           </div>
         </section>
@@ -897,7 +1789,7 @@ function SeniorCitizenModePage() {
             className="inline-flex items-center gap-2 rounded-2xl border-2 border-stone-300 bg-white px-6 py-3 font-extrabold text-stone-800 shadow-sm hover:bg-stone-100 active:scale-95 transition-all text-base"
           >
             <ArrowLeft className="size-5" />
-            <span>സാധാരണ വെബ്‌സൈറ്റിലേക്ക് മടങ്ങുക (Return)</span>
+            <span>{ui.returnBtn}</span>
           </button>
         </div>
       </main>
@@ -911,27 +1803,27 @@ function SeniorCitizenModePage() {
             </div>
 
             <span className="inline-block rounded-full bg-emerald-100 px-4 py-1 text-sm font-black text-emerald-800">
-              ടോക്കൺ ലഭിച്ചു! (Success)
+              {ui.modalSuccessTitle}
             </span>
 
             <h3 className="text-2xl font-black text-stone-900">
-              ടോക്കൺ നമ്പർ #{activeBooking.queueNumber}
+              #{activeBooking.queueNumber}
             </h3>
 
             <div className="rounded-2xl bg-emerald-50 p-3 border border-emerald-200 text-xs font-bold text-emerald-950 space-y-1">
-              <p>കേന്ദ്രം: <strong>{getCentreMalayalamTitle(activeBooking.centreName)}</strong></p>
-              <p>വിള: <strong>{activeBooking.crop} · {activeBooking.quantityKg} kg</strong></p>
+              <p>{getCentreTranslatedName(activeBooking.centreName, language)}</p>
+              <p>{activeBooking.crop} · {activeBooking.quantityKg} kg</p>
             </div>
 
             <div className="rounded-2xl bg-amber-50 p-3 border border-amber-200 text-xs font-bold text-amber-900">
-              ഇപ്പോൾ വിളിക്കുന്നത് #{nowServing} · നിങ്ങളുടെ ഊഴം വരുമ്പോൾ അറിയിക്കും.
+              {ui.nowServing} #{nowServing}
             </div>
 
             <button
               onClick={() => setBookingSuccessModal(false)}
               className="w-full rounded-2xl bg-emerald-700 py-4 text-lg font-black text-white shadow-lg hover:bg-emerald-800 active:scale-95 transition-all"
             >
-              ശരി, മനസ്സിലായി (OK)
+              {ui.modalOkBtn}
             </button>
           </div>
         </div>
@@ -946,11 +1838,11 @@ function SeniorCitizenModePage() {
             </div>
 
             <h3 className="text-xl font-black text-stone-900">
-              ടോക്കൺ റദ്ദാക്കണമോ?
+              {ui.modalCancelTitle}
             </h3>
 
             <p className="text-sm font-bold text-stone-600">
-              ടോക്കൺ #{activeBooking.queueNumber} ഒഴിവാക്കിയാൽ ക്യൂവിൽ നിങ്ങളുടെ സ്ഥാനം നഷ്ടപ്പെടും.
+              #{activeBooking.queueNumber} - {ui.modalCancelSub}
             </p>
 
             <div className="flex gap-2 pt-2">
@@ -958,20 +1850,28 @@ function SeniorCitizenModePage() {
                 onClick={() => setShowCancelModal(false)}
                 className="flex-1 rounded-2xl border-2 border-stone-300 bg-white py-3 font-bold text-stone-800 hover:bg-stone-100"
               >
-                വേണ്ട (Keep)
+                {ui.modalKeepBtn}
               </button>
               <button
                 onClick={() => {
                   cancelBooking(activeBooking.id);
                   setShowCancelModal(false);
-                  speakText(
-                    "നിങ്ങളുടെ ടോക്കൺ വിജയകരമായി റദ്ദാക്കി.",
-                    "Your token has been successfully cancelled."
-                  );
+                  let cancelSpeech = "";
+                  switch (language) {
+                    case "ml": cancelSpeech = "നിങ്ങളുടെ ടോക്കൺ വിജയകരമായി റദ്ദാക്കി."; break;
+                    case "hi": cancelSpeech = "आपका टोकन सफलतापूर्वक रद्द कर दिया गया है।"; break;
+                    case "ta": cancelSpeech = "உங்கள் டோக்கன் வெற்றிகரமாக ரத்து செய்யப்பட்டது."; break;
+                    case "te": cancelSpeech = "మీ టోకెన్ విజయవంతంగా రద్దు చేయబడింది."; break;
+                    case "kn": cancelSpeech = "ನಿಮ್ಮ ಟೋಕನ್ ಯಶಸ್ವಿಯಾಗಿ ರದ್ದುಗೊಂಡಿದೆ."; break;
+                    case "bn": cancelSpeech = "আপনার টোকেন সফলভাবে বাতিল করা হয়েছে।"; break;
+                    case "mr": cancelSpeech = "तुमचे टोकन यशस्वीपणे रद्द केले आहे."; break;
+                    default: cancelSpeech = "Your token has been successfully cancelled."; break;
+                  }
+                  speakInLanguage(cancelSpeech);
                 }}
                 className="flex-1 rounded-2xl bg-red-600 py-3 font-black text-white shadow hover:bg-red-700 active:scale-95"
               >
-                അതെ, റദ്ദാക്കുക
+                {ui.modalConfirmCancelBtn}
               </button>
             </div>
           </div>
