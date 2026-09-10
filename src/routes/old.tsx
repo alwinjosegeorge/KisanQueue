@@ -1187,47 +1187,8 @@ function SeniorCitizenModePage() {
           </button>
         </div>
 
-        {/* 8 Indian Languages Selector Strip */}
-        <div className="mx-auto mt-2 max-w-2xl border-t border-emerald-50 pt-2">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="flex items-center gap-1 text-xs font-black uppercase tracking-wider text-emerald-900">
-              <Languages className="size-3.5 text-emerald-700" />
-              {ui.selectLanguage}
-            </span>
-            <span className="text-[11px] font-bold text-stone-500">
-              {SUPPORTED_LANGUAGES.find((l) => l.id === language)?.native}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
-            {SUPPORTED_LANGUAGES.map((langItem) => {
-              const isSelected = language === langItem.id;
-              return (
-                <button
-                  key={langItem.id}
-                  type="button"
-                  onClick={() => handleLanguageChange(langItem.id)}
-                  className={`rounded-xl py-2 px-1 text-center transition-all active:scale-95 ${
-                    isSelected
-                      ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-500"
-                      : "bg-white border border-stone-200 text-stone-800 font-bold hover:bg-emerald-50 shadow-sm"
-                  }`}
-                  title={langItem.label}
-                >
-                  <span className="block text-xs leading-tight font-black">
-                    {langItem.native}
-                  </span>
-                  <span className="block text-[9px] opacity-75 truncate">
-                    {langItem.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Accessibility Toolbar: Text Size + Voice Narration */}
-        <div className="mx-auto mt-2 flex max-w-2xl flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-2">
+        <div className="mx-auto mt-2.5 flex max-w-2xl flex-wrap items-center justify-between gap-2 border-t border-emerald-100 pt-2.5">
           {/* Text Size Stepper */}
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-extrabold uppercase tracking-wider text-stone-700">
@@ -1997,6 +1958,58 @@ function SeniorCitizenModePage() {
                     {user.mobile}
                   </p>
                 </div>
+              </div>
+            </div>
+
+            {/* 8 Indian Languages Selection Card (Moved from header into Profile) */}
+            <div className="rounded-3xl bg-white p-5 border-2 border-emerald-200 shadow-md space-y-3">
+              <div className="flex items-center justify-between border-b pb-2.5 border-stone-200">
+                <div className="flex items-center gap-2">
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 font-black">
+                    <Languages className="size-5 text-emerald-700" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-stone-900">
+                      {ui.selectLanguage}
+                    </h3>
+                    <p className="text-xs text-stone-500 font-bold">
+                      ഭാഷയും ശബ്ദവും മാറ്റുക (Language & Voice)
+                    </p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800 border border-emerald-300">
+                  {SUPPORTED_LANGUAGES.find((l) => l.id === language)?.native}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                {SUPPORTED_LANGUAGES.map((langItem) => {
+                  const isSelected = language === langItem.id;
+                  return (
+                    <button
+                      key={langItem.id}
+                      type="button"
+                      onClick={() => handleLanguageChange(langItem.id)}
+                      className={`flex flex-col items-center justify-center rounded-2xl py-3 px-2 text-center transition-all active:scale-95 ${
+                        isSelected
+                          ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-500"
+                          : "bg-stone-50 border-2 border-stone-200 text-stone-800 font-bold hover:bg-emerald-50 hover:border-emerald-300 shadow-sm"
+                      }`}
+                      title={langItem.label}
+                    >
+                      <span className="block text-base leading-tight font-black">
+                        {langItem.native}
+                      </span>
+                      <span
+                        className={`block text-xs mt-0.5 ${
+                          isSelected ? "text-emerald-100" : "text-stone-500"
+                        }`}
+                      >
+                        {langItem.label}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
