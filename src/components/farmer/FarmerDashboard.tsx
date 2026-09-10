@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useKisanQueue } from "@/lib/store";
 import { t } from "@/lib/translations";
 import {
@@ -153,6 +154,7 @@ export function FarmerDashboard({
     bookSlot,
   } = useKisanQueue();
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const navigate = useNavigate();
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const recommendedCentre = getRecommendedCentre();
@@ -345,6 +347,29 @@ export function FarmerDashboard({
           </div>
         </div>
       )}
+
+      {/* 60+ Senior Citizen Quick Mode Switch Banner */}
+      <div
+        onClick={() => navigate({ to: "/old" })}
+        className="flex items-center justify-between rounded-2xl bg-emerald-50 border border-emerald-200 p-3 text-emerald-950 cursor-pointer shadow-sm hover:bg-emerald-100 hover:border-emerald-300 transition-all dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-850"
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white text-base shadow">
+            👵
+          </span>
+          <div className="min-w-0">
+            <p className="text-xs font-bold leading-tight truncate">
+              മുതിർന്ന കർഷകർക്കുള്ള മോഡ് (60+ Senior Mode)
+            </p>
+            <p className="text-[10px] text-emerald-700 dark:text-emerald-400 truncate">
+              വലിയ അക്ഷരങ്ങളും ശബ്ദ സഹായവും അടങ്ങിയ ലളിതമായ രൂപം
+            </p>
+          </div>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700">
+          തുറക്കുക →
+        </span>
+      </div>
 
       {/* My Crops & Harvest Section (Horizontal Scrollable Cards matching reference image) */}
       <section>

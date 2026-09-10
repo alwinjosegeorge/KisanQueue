@@ -366,8 +366,17 @@ function KisanQueueApp() {
           {/* Clean Portal Navigation Links in Rail */}
           <div className="mt-6 space-y-1.5 border-t border-border/50 pt-4 text-xs font-medium text-muted-foreground">
             <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 px-2 mb-1">
-              Official Portals
+              Official Portals & Accessibility
             </p>
+            <button
+              onClick={() => navigate({ to: "/old" })}
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-colors text-left dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-base">👵</span> 60+ Senior Mode (/old)
+              </span>
+              <ChevronRight className="size-3.5 text-muted-foreground" />
+            </button>
             <button
               onClick={() => navigate({ to: "/staff" })}
               className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors text-left"
@@ -646,9 +655,19 @@ function FarmerProfileView({
       {/* Official Government Portals */}
       <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          {t(language, "govPortals")}
+          {t(language, "govPortals")} & Special Modes
         </h3>
         <div className="grid grid-cols-1 gap-2">
+          <button
+            onClick={() => navigate({ to: "/old" })}
+            className="flex items-center justify-between rounded-xl border border-emerald-300 bg-emerald-50/80 p-3 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition-all dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-base">👵</span>
+              <span>മുതിർന്ന കർഷകർക്കുള്ള മോഡ് (60+ Senior Mode)</span>
+            </div>
+            <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-400">/old</span>
+          </button>
           <button
             onClick={() => {
               setRole("staff");
