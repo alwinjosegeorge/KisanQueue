@@ -288,6 +288,21 @@ const UI_TEXTS: Record<
     totalReceived: string;
     dbtVerified: string;
     txnHistory: string;
+    // Extended UI & Voice keys
+    farmRegistryTitle: string;
+    farmLandDetail: string;
+    farmCropsList: string;
+    bankSectionTitle: string;
+    bankBranchInfo: string;
+    languageVoiceSub: string;
+    listenBtn: string;
+    successBadge: string;
+    paddyProcurement: string;
+    coconutProcurement: string;
+    tokenCancelledSpeech: string;
+    activeBadge: string;
+    doneBadge: string;
+    cancelledBadge: string;
   }
 > = {
   ml: {
@@ -362,6 +377,20 @@ const UI_TEXTS: Record<
     totalReceived: "നേരിട്ട് അക്കൗണ്ടിലെത്തിയ ആകെ തുക",
     dbtVerified: "പി.എഫ്.എം.എസ് വഴി ബാങ്കിലേക്ക് കൈമാറി",
     txnHistory: "കഴിഞ്ഞ പേയ്മെന്റുകൾ",
+    farmRegistryTitle: "കാർഷിക വിവരങ്ങൾ (Farm Registry)",
+    farmLandDetail: "2.4 ഏക്കർ (കുമരകം)",
+    farmCropsList: "നെല്ല്, തേങ്ങ, റബ്ബർ",
+    bankSectionTitle: "ബാങ്ക് അക്കൗണ്ട് വിവരങ്ങൾ (PFMS DBT)",
+    bankBranchInfo: "ശാഖ: തിരുനക്കര, കോട്ടയം",
+    languageVoiceSub: "പോർട്ടൽ ഭാഷയും ശബ്ദവും മാറ്റുക (Language & Voice)",
+    listenBtn: "കേൾക്കുക",
+    successBadge: "വിജയകരം",
+    paddyProcurement: "നെല്ല് സംഭരണം",
+    coconutProcurement: "പച്ചത്തേങ്ങ സംഭരണം",
+    tokenCancelledSpeech: "ടോക്കൺ വിജയകരമായി റദ്ദാക്കി.",
+    activeBadge: "സജീവം",
+    doneBadge: "പൂർത്തിയായി",
+    cancelledBadge: "റദ്ദാക്കി",
   },
   hi: {
     tabToken: "टोकन",
@@ -435,6 +464,20 @@ const UI_TEXTS: Record<
     totalReceived: "सीधे खाते में प्राप्त कुल राशि",
     dbtVerified: "PFMS द्वारा सीधे बैंक में जमा",
     txnHistory: "हालिया लेन-देन विवरण",
+    farmRegistryTitle: "कृषि विवरण (Farm Registry)",
+    farmLandDetail: "2.4 एकड़ (कुमरकम)",
+    farmCropsList: "धान, नारियल, रबर",
+    bankSectionTitle: "बैंक खाता विवरण (PFMS DBT)",
+    bankBranchInfo: "शाखा: तिरुनक्करा, कोट्टायम",
+    languageVoiceSub: "पोर्टल भाषा और आवाज़ बदलें (Language & Voice)",
+    listenBtn: "सुनें",
+    successBadge: "सफल",
+    paddyProcurement: "धान खरीद",
+    coconutProcurement: "नारियल खरीद",
+    tokenCancelledSpeech: "टोकन सफलतापूर्वक रद्द कर दिया गया है।",
+    activeBadge: "सक्रिय",
+    doneBadge: "पूर्ण",
+    cancelledBadge: "रद्द",
   },
   ta: {
     tabToken: "டோக்கன்",
@@ -508,6 +551,20 @@ const UI_TEXTS: Record<
     totalReceived: "நேரடியாக வங்கியில் பெறப்பட்ட தொகை",
     dbtVerified: "PFMS வழியாக வங்கிக்கு மாற்றப்பட்டது",
     txnHistory: "பரிவர்த்தனை வரலாறு",
+    farmRegistryTitle: "விவசாய பதிவேடு (Farm Registry)",
+    farmLandDetail: "2.4 ஏக்கர் (குமரகம்)",
+    farmCropsList: "நெல், தேங்காய், ரப்பர்",
+    bankSectionTitle: "வங்கி கணக்கு விவரங்கள் (PFMS DBT)",
+    bankBranchInfo: "கிளை: திருநக்கரா, கோட்டயம்",
+    languageVoiceSub: "போர்டல் மொழி மற்றும் குரலை மாற்றவும் (Language & Voice)",
+    listenBtn: "கேட்கவும்",
+    successBadge: "வெற்றி",
+    paddyProcurement: "நெல் கொள்முதல்",
+    coconutProcurement: "தேங்காய் கொள்முதல்",
+    tokenCancelledSpeech: "டோக்கன் வெற்றிகரமாக ரத்து செய்யப்பட்டது.",
+    activeBadge: "செயலில்",
+    doneBadge: "முடிந்தது",
+    cancelledBadge: "ரத்து செய்யப்பட்டது",
   },
   te: {
     tabToken: "టోకెన్",
@@ -654,6 +711,20 @@ const UI_TEXTS: Record<
     totalReceived: "ಖಾತೆಗೆ ನೇರವಾಗಿ ಜಮೆಯಾದ ಮೊತ್ತ",
     dbtVerified: "PFMS ಮೂಲಕ ವರ್ಗಾಯಿಸಲಾಗಿದೆ",
     txnHistory: "ಹಿಂದಿನ ಪಾವತಿಗಳ ವಿವರ",
+    farmRegistryTitle: "ಕೃಷಿ ವಿವರಗಳು (Farm Registry)",
+    farmLandDetail: "2.4 ಎಕರೆ (ಕುಮರಕಂ)",
+    farmCropsList: "ಭತ್ತ, ತೆಂಗಿನಕಾಯಿ, ರಬ್ಬರ್",
+    bankSectionTitle: "ಬ್ಯಾಂಕ್ ಖಾತೆ ವಿವರಗಳು (PFMS DBT)",
+    bankBranchInfo: "ಶಾಖೆ: ತಿರುನಕ್ಕರ, ಕೊಟ್ಟಾಯಂ",
+    languageVoiceSub: "ಪೋರ್ಟಲ್ ಭಾಷೆ ಮತ್ತು ಧ್ವನಿ ಬದಲಾಯಿಸಿ (Language & Voice)",
+    listenBtn: "ಕೇಳಿ",
+    successBadge: "ಯಶಸ್ವಿ",
+    paddyProcurement: "ಭತ್ತ ಖರೀದಿ",
+    coconutProcurement: "ತೆಂಗಿನಕಾಯಿ ಖರೀದಿ",
+    tokenCancelledSpeech: "ಟೋಕನ್ ಯಶಸ್ವಿಯಾಗಿ ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ.",
+    activeBadge: "ಸಕ್ರಿಯ",
+    doneBadge: "ಪೂರ್ಣಗೊಂಡಿದೆ",
+    cancelledBadge: "ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ",
   },
   bn: {
     tabToken: "টোকেন",
@@ -727,6 +798,20 @@ const UI_TEXTS: Record<
     totalReceived: "ব্যাংক অ্যাকাউন্টে প্রাপ্ত মোট অর্থ",
     dbtVerified: "PFMS মারফত সরাসরি স্থানান্তর",
     txnHistory: "লেনদেন ইতিহাস",
+    farmRegistryTitle: "কৃষি বিবরণ (Farm Registry)",
+    farmLandDetail: "2.4 একর (কুমরকম)",
+    farmCropsList: "ধান, নারকেল, রবার",
+    bankSectionTitle: "ব্যাংক অ্যাকাউন্ট বিবরণ (PFMS DBT)",
+    bankBranchInfo: "শাখা: তিরুনাক্কারা, কোট্টায়াম",
+    languageVoiceSub: "পোর্টাল ভাষা ও ভয়েস পরিবর্তন করুন (Language & Voice)",
+    listenBtn: "শুনুন",
+    successBadge: "সফল",
+    paddyProcurement: "ধান সংগ্রহ",
+    coconutProcurement: "নারকেল সংগ্রহ",
+    tokenCancelledSpeech: "টোকেন সফলভাবে বাতিল করা হয়েছে।",
+    activeBadge: "সক্রিয়",
+    doneBadge: "সম্পন্ন",
+    cancelledBadge: "বাতিল",
   },
   mr: {
     tabToken: "टोकन",
@@ -800,6 +885,20 @@ const UI_TEXTS: Record<
     totalReceived: "थेट खात्यात प्राप्त झालेली रक्कम",
     dbtVerified: "PFMS द्वारे थेट हस्तांतरित",
     txnHistory: "मागील व्यवहार",
+    farmRegistryTitle: "शेती तपशील (Farm Registry)",
+    farmLandDetail: "2.4 एकर (कुमरकम)",
+    farmCropsList: "भात, नारळ, रबर",
+    bankSectionTitle: "बँक खाते तपशील (PFMS DBT)",
+    bankBranchInfo: "शाखा: तिरुनक्करा, कोट्टायम",
+    languageVoiceSub: "पोर्टल भाषा आणि आवाज बदला (Language & Voice)",
+    listenBtn: "ऐका",
+    successBadge: "यशस्वी",
+    paddyProcurement: "भात खरेदी",
+    coconutProcurement: "नारळ खरेदी",
+    tokenCancelledSpeech: "टोकन यशस्वीपणे रद्द केले आहे.",
+    activeBadge: "सक्रिय",
+    doneBadge: "पूर्ण",
+    cancelledBadge: "रद्द",
   },
   en: {
     tabToken: "Token",
@@ -873,6 +972,20 @@ const UI_TEXTS: Record<
     totalReceived: "Total MSP Settled Directly to Bank",
     dbtVerified: "PFMS Direct Benefit Transfer Verified",
     txnHistory: "Settlement History",
+    farmRegistryTitle: "Farm Registry Details",
+    farmLandDetail: "2.4 Acres (Kumarakom)",
+    farmCropsList: "Paddy, Coconut, Rubber",
+    bankSectionTitle: "Bank Account Details (PFMS DBT)",
+    bankBranchInfo: "Branch: Thirunakkara, Kottayam",
+    languageVoiceSub: "Select portal language and audio voice",
+    listenBtn: "Listen",
+    successBadge: "Success",
+    paddyProcurement: "Paddy Procurement",
+    coconutProcurement: "Raw Coconut Procurement",
+    tokenCancelledSpeech: "Token has been cancelled successfully.",
+    activeBadge: "Active",
+    doneBadge: "Completed",
+    cancelledBadge: "Cancelled",
   },
 };
 
@@ -944,6 +1057,107 @@ const LANG_WELCOME: Record<Language, string> = {
   mr: "मराठी निवडली आहे. ज्येष्ठ किसान सेवेत आपले स्वागत आहे.",
   en: "English selected. Welcome to Senior Farmer Assistance.",
 };
+
+// Voice speech announcement generator for crop selection
+function getCropAnnouncement(crop: (typeof CROP_ITEMS)[0], lang: Language) {
+  const cropName = crop.names[lang] || crop.names.en;
+  switch (lang) {
+    case "ml":
+      return `${cropName}, കിലോയ്ക്ക് ${crop.msp} രൂപ താങ്ങുവില.`;
+    case "hi":
+      return `${cropName}, ${crop.msp} रुपये प्रति किलो समर्थन मूल्य।`;
+    case "ta":
+      return `${cropName}, கிலோவுக்கு ${crop.msp} ரூபாய் ஆதரவு விலை.`;
+    case "te":
+      return `${cropName}, కిలోకు ${crop.msp} రూపాయల మద్దతు ధర.`;
+    case "kn":
+      return `${cropName}, ಪ್ರತಿ ಕೆಜಿಗೆ ${crop.msp} ರೂಪಾಯಿ ಬೆಂಬಲ ಬೆಲೆ.`;
+    case "bn":
+      return `${cropName}, প্রতি কেজি ${crop.msp} টাকা সহায়ক মূল্য।`;
+    case "mr":
+      return `${cropName}, प्रति किलो ${crop.msp} रुपये हमीभाव.`;
+    default:
+      return `${cropName}, Minimum Support Price ${crop.msp} rupees per kilogram.`;
+  }
+}
+
+// Voice speech announcement generator for procurement centre selection
+function getCentreAnnouncement(centreTitle: string, distanceKm: number, queueCount: number, lang: Language) {
+  switch (lang) {
+    case "ml":
+      return `${centreTitle} തിരഞ്ഞെടുത്തു. ദൂരം ${distanceKm} കിലോമീറ്റർ. ക്യൂവിൽ ${queueCount} കർഷകർ.`;
+    case "hi":
+      return `${centreTitle} चुना गया। दूरी ${distanceKm} किलोमीटर। कतार में ${queueCount} किसान हैं।`;
+    case "ta":
+      return `${centreTitle} தேர்ந்தெடுக்கப்பட்டது. தொலைவு ${distanceKm} கிலோமீட்டர். வரிசையில் ${queueCount} விவசாயிகள்.`;
+    case "te":
+      return `${centreTitle} ఎంపిక చేయబడింది. దూరం ${distanceKm} కిలోమీటర్లు. క్యూలో ${queueCount} మంది రైతులు.`;
+    case "kn":
+      return `${centreTitle} ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ದೂರ ${distanceKm} ಕಿಲೋಮೀಟರ್. ಸಾಲಿನಲ್ಲಿ ${queueCount} ರೈತರು.`;
+    case "bn":
+      return `${centreTitle} নির্বাচিত হয়েছে। দূরত্ব ${distanceKm} কিলোমিটার। সারিতে ${queueCount} জন কৃষক আছেন।`;
+    case "mr":
+      return `${centreTitle} निवडले. अंतर ${distanceKm} किलोमीटर. रांगेत ${queueCount} शेतकरी आहेत.`;
+    default:
+      return `${centreTitle} selected. Distance ${distanceKm} kilometers. ${queueCount} farmers currently in queue.`;
+  }
+}
+
+// Voice speech announcement generator for active token
+function getActiveTokenSpeech(
+  tokenNumber: number,
+  centreTitle: string,
+  nowServing: number,
+  farmersAhead: number,
+  waitMinutes: number,
+  lang: Language
+) {
+  switch (lang) {
+    case "ml":
+      return `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${tokenNumber} ആണ്. കേന്ദ്രം: ${centreTitle}. ഇപ്പോൾ വിളിക്കുന്നത് ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്. പ്രതീക്ഷിക്കുന്ന കാത്തിരിപ്പ് സമയം ${waitMinutes} മിനിറ്റ്.`;
+    case "hi":
+      return `आपका टोकन नंबर ${tokenNumber} है। खरीद केंद्र: ${centreTitle}। अभी टोकन नंबर ${nowServing} बुलाया जा रहा है। आपके आगे ${farmersAhead} किसान हैं। अनुमानित प्रतीक्षा समय ${waitMinutes} मिनट है।`;
+    case "ta":
+      return `உங்கள் டோக்கன் எண் ${tokenNumber}. கொள்முதல் மையம்: ${centreTitle}. இப்போது அழைக்கப்படும் எண் ${nowServing}. உங்கள் முன் ${farmersAhead} விவசாயிகள் உள்ளனர். காத்திருப்பு நேரம் சுமார் ${waitMinutes} நிமிடங்கள்.`;
+    case "te":
+      return `మీ టోకెన్ సంఖ్య ${tokenNumber}. కొనుగోలు కేంద్రం: ${centreTitle}. ప్రస్తుతం పిలుస్తున్న సంఖ్య ${nowServing}. మీ ముందు ${farmersAhead} మంది రైతులు ఉన్నారు. నిరీక్షణ సమయం ${waitMinutes} నిమిషాలు.`;
+    case "kn":
+      return `ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ ${tokenNumber}. ಖರೀದಿ ಕೇಂದ್ರ: ${centreTitle}. ಈಗ ಕರೆಯುತ್ತಿರುವ ಸಂಖ್ಯೆ ${nowServing}. ನಿಮ್ಮ ಮುಂದೆ ${farmersAhead} ರೈತರಿದ್ದಾರೆ. ಕಾಯುವ ಸಮಯ ${waitMinutes} ನಿಮಿಷಗಳು.`;
+    case "bn":
+      return `আপনার টোকেন নম্বর ${tokenNumber}। সংগ্রহ কেন্দ্র: ${centreTitle}। এখন ডাকা হচ্ছে নম্বর ${nowServing}। আপনার সামনে ${farmersAhead} জন কৃষক আছেন। অপেক্ষার সময় ${waitMinutes} মিনিট।`;
+    case "mr":
+      return `तुमचा टोकन नंबर ${tokenNumber} आहे. खरेदी केंद्र: ${centreTitle}. सध्या सुरू असलेला नंबर ${nowServing}. तुमच्या पुढे ${farmersAhead} शेतकरी आहेत. अंदाजे प्रतीक्षा वेळ ${waitMinutes} मिनिटे.`;
+    default:
+      return `Your Token Number is ${tokenNumber} at ${centreTitle}. Currently serving number is ${nowServing}. There are ${farmersAhead} farmers ahead of you. Estimated wait is ${waitMinutes} minutes.`;
+  }
+}
+
+// Voice speech announcement generator for single booking pass
+function getSingleBookingSpeech(
+  b: Booking,
+  centreTitle: string,
+  cropName: string,
+  lang: Language
+) {
+  switch (lang) {
+    case "ml":
+      return `ടോക്കൺ #${b.queueNumber}. ${centreTitle}. വിള: ${cropName}, ${b.quantityKg} കിലോ. തീയതി: ${b.date}.`;
+    case "hi":
+      return `टोकन #${b.queueNumber}। ${centreTitle}। फसल: ${cropName}, ${b.quantityKg} किलो। तारीख: ${b.date}।`;
+    case "ta":
+      return `டோக்கன் #${b.queueNumber}. ${centreTitle}. பயிர்: ${cropName}, ${b.quantityKg} கிலோ. தேதி: ${b.date}.`;
+    case "te":
+      return `టోకెన్ #${b.queueNumber}. ${centreTitle}. పంట: ${cropName}, ${b.quantityKg} కిలోలు. తేదీ: ${b.date}.`;
+    case "kn":
+      return `ಟೋಕನ್ #${b.queueNumber}. ${centreTitle}. ಬೆಳೆ: ${cropName}, ${b.quantityKg} ಕೆಜಿ. ದಿನಾಂಕ: ${b.date}.`;
+    case "bn":
+      return `টোকেন #${b.queueNumber}। ${centreTitle}। ফসল: ${cropName}, ${b.quantityKg} কেজি। তারিখ: ${b.date}।`;
+    case "mr":
+      return `टोकन #${b.queueNumber}. ${centreTitle}. पीक: ${cropName}, ${b.quantityKg} किलो. दिनांक: ${b.date}.`;
+    default:
+      return `Token #${b.queueNumber} at ${centreTitle} for ${cropName}, ${b.quantityKg} kilograms on ${b.date}.`;
+  }
+}
 
 function SeniorCitizenModePage() {
   const navigate = useNavigate();
@@ -1041,12 +1255,24 @@ function SeniorCitizenModePage() {
 
     const voices = window.speechSynthesis.getVoices();
     const langPrefix = currentLang.toLowerCase();
+    const langNames: Record<Language, string> = {
+      ml: "malayalam",
+      hi: "hindi",
+      ta: "tamil",
+      te: "telugu",
+      kn: "kannada",
+      bn: "bengali",
+      mr: "marathi",
+      en: "english",
+    };
+    const targetName = langNames[currentLang] || "english";
 
-    // Look for matching voice
+    // Look for best matching regional voice
     const matchedVoice = voices.find(
       (v) =>
-        v.lang.toLowerCase().startsWith(langPrefix) ||
         v.lang.toLowerCase().replace("_", "-").startsWith(targetCode.toLowerCase()) ||
+        v.lang.toLowerCase().startsWith(langPrefix) ||
+        v.name.toLowerCase().includes(targetName) ||
         v.name.toLowerCase().includes(langPrefix)
     );
 
@@ -1077,8 +1303,14 @@ function SeniorCitizenModePage() {
     window.speechSynthesis.speak(utterance);
   };
 
-  // Stop speech on unmount
+  // Preload voices and clean up on unmount
   useEffect(() => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
     return () => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
@@ -1182,7 +1414,7 @@ function SeniorCitizenModePage() {
             className="flex items-center gap-1.5 rounded-xl border border-stone-300 bg-stone-50 px-3 py-1.5 text-xs font-bold text-stone-700 hover:bg-stone-100 transition-colors shadow-sm"
             title={ui.switchStandard}
           >
-            <span>സാധാരണ മോഡ്</span>
+            <span>{ui.switchStandard}</span>
             <ExternalLink className="size-3.5 text-stone-500" />
           </button>
         </div>
@@ -1230,20 +1462,46 @@ function SeniorCitizenModePage() {
           <button
             onClick={() => {
               if (currentTab === "profile") {
-                const profileSpeech = `${user.name}, ${ui.farmerIdLabel}: ${user.farmerId}. ${ui.panchayatLabel}: ${user.village}, ${user.district}. ${ui.cropsLabel}: ${user.primaryCrop}. ${ui.bankLabel}: ${user.bankAccount}. ${ui.aadhaarLinked}.`;
+                const profileSpeech = `${user.name}. ${ui.farmerIdLabel}: ${user.farmerId || "KL-KTM-26047"}. ${ui.panchayatLabel}: ${user.village}, ${user.district}. ${ui.landholdingLabel}: ${ui.farmLandDetail}. ${ui.cropsLabel}: ${ui.farmCropsList}. ${ui.bankLabel}: ${user.bankAccount || "State Bank of India 4891"}. ${ui.aadhaarLinked}.`;
                 speakInLanguage(profileSpeech);
                 return;
               }
 
               if (currentTab === "payments") {
-                const paySpeech = `${ui.paymentsTitle}. ${ui.totalReceived}: ₹13,440. ${ui.dbtVerified}. ${ui.bankLabel}: ${user.bankAccount}.`;
+                const paySpeech = `${ui.paymentsTitle}. ${ui.totalReceived}: ₹13,440. ${ui.dbtVerified}. ${ui.bankLabel}: ${user.bankAccount || "State Bank of India 4891"}.`;
                 speakInLanguage(paySpeech);
                 return;
               }
 
               if (currentTab === "bookings") {
                 const count = bookings.length;
-                const bookSpeech = `${ui.bookingsTitle}. ${count} ${ui.waitingCount}. ${activeBooking ? `സജീവ ടോക്കൺ #${activeBooking.queueNumber}` : ""}`;
+                let bookSpeech = "";
+                switch (language) {
+                  case "ml":
+                    bookSpeech = `${ui.bookingsTitle}. ആകെ ${count} ബുക്കിംഗുകൾ. ${activeBooking ? `സജീവ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber}.` : ""}`;
+                    break;
+                  case "hi":
+                    bookSpeech = `${ui.bookingsTitle}। कुल ${count} बुकिंग। ${activeBooking ? `सक्रिय टोकन नंबर ${activeBooking.queueNumber}।` : ""}`;
+                    break;
+                  case "ta":
+                    bookSpeech = `${ui.bookingsTitle}. மொத்தம் ${count} பதிவுகள். ${activeBooking ? `செயலில் உள்ள டோக்கன் எண் ${activeBooking.queueNumber}.` : ""}`;
+                    break;
+                  case "te":
+                    bookSpeech = `${ui.bookingsTitle}. మొత్తం ${count} బుకింగ్‌లు. ${activeBooking ? `యాక్టివ్ టోకెన్ సంఖ్య ${activeBooking.queueNumber}.` : ""}`;
+                    break;
+                  case "kn":
+                    bookSpeech = `${ui.bookingsTitle}. ಒಟ್ಟು ${count} ಬುಕಿಂಗ್‌ಗಳು. ${activeBooking ? `ಸಕ್ರಿಯ ಟೋಕನ್ ಸಂಖ್ಯೆ ${activeBooking.queueNumber}.` : ""}`;
+                    break;
+                  case "bn":
+                    bookSpeech = `${ui.bookingsTitle}। মোট ${count}টি বুকিং। ${activeBooking ? `সক্রিয় টোকেন নম্বর ${activeBooking.queueNumber}।` : ""}`;
+                    break;
+                  case "mr":
+                    bookSpeech = `${ui.bookingsTitle}. एकूण ${count} बुकिंग. ${activeBooking ? `सक्रिय टोकन नंबर ${activeBooking.queueNumber}.` : ""}`;
+                    break;
+                  default:
+                    bookSpeech = `${ui.bookingsTitle}. Total ${count} bookings. ${activeBooking ? `Active Token Number ${activeBooking.queueNumber}.` : ""}`;
+                    break;
+                }
                 speakInLanguage(bookSpeech);
                 return;
               }
@@ -1251,21 +1509,14 @@ function SeniorCitizenModePage() {
               // Token tab
               if (activeBooking) {
                 const centreTitle = getCentreTranslatedName(activeBooking.centreName, language);
-                let speech = "";
-                switch (language) {
-                  case "ml":
-                    speech = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber} ആണ്. കേന്ദ്രം: ${centreTitle}. ഇപ്പോൾ വിളിക്കുന്നത് ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്. പ്രതീക്ഷിക്കുന്ന കാത്തിരിപ്പ് സമയം ${prediction.minutesLeft} മിനിറ്റ്.`;
-                    break;
-                  case "hi":
-                    speech = `आपका टोकन नंबर ${activeBooking.queueNumber} है। केंद्र: ${centreTitle}। अभी नंबर ${nowServing} बुलाया जा रहा है। आपके आगे ${farmersAhead} किसान हैं। अनुमानित प्रतीक्षा समय ${prediction.minutesLeft} मिनट है।`;
-                    break;
-                  case "ta":
-                    speech = `உங்கள் டோக்கன் எண் ${activeBooking.queueNumber}. மையம்: ${centreTitle}. இப்போது அழைக்கப்படுவது ${nowServing}. உங்கள் முன் ${farmersAhead} விவசாயிகள் உள்ளனர். காத்திருப்பு நேரம் சுமார் ${prediction.minutesLeft} நிமிடங்கள்.`;
-                    break;
-                  default:
-                    speech = `Your Token Number is ${activeBooking.queueNumber} at ${centreTitle}. Now serving is ${nowServing}. There are ${farmersAhead} farmers ahead of you. Estimated wait is ${prediction.minutesLeft} minutes.`;
-                    break;
-                }
+                const speech = getActiveTokenSpeech(
+                  activeBooking.queueNumber,
+                  centreTitle,
+                  nowServing,
+                  farmersAhead,
+                  prediction.minutesLeft,
+                  language
+                );
                 speakInLanguage(speech);
               } else {
                 speakInLanguage(ui.noTokenSub);
@@ -1397,7 +1648,14 @@ function SeniorCitizenModePage() {
                   <button
                     onClick={() => {
                       const centreTitle = getCentreTranslatedName(activeBooking.centreName, language);
-                      const speech = `നിങ്ങളുടെ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber} ആണ്. കേന്ദ്രം: ${centreTitle}. ഇപ്പോൾ വിളിക്കുന്നത് നമ്പർ ${nowServing}. നിങ്ങളുടെ മുന്നിൽ ${farmersAhead} കർഷകരുണ്ട്.`;
+                      const speech = getActiveTokenSpeech(
+                        activeBooking.queueNumber,
+                        centreTitle,
+                        nowServing,
+                        farmersAhead,
+                        prediction.minutesLeft,
+                        language
+                      );
                       speakInLanguage(speech);
                     }}
                     className="flex w-full items-center justify-center gap-3 rounded-2xl bg-emerald-700 py-4 font-black text-white shadow-lg hover:bg-emerald-800 active:scale-95 transition-all text-lg"
@@ -1477,7 +1735,8 @@ function SeniorCitizenModePage() {
                         type="button"
                         onClick={() => {
                           setSelectedCrop(crop);
-                          speakInLanguage(`${localizedCropName}, ₹${crop.msp} / ${crop.unit}`);
+                          const cropNotice = getCropAnnouncement(crop, language);
+                          speakInLanguage(cropNotice);
                         }}
                         className={`relative flex flex-col items-center rounded-2xl p-3 text-left transition-all border-2 active:scale-95 ${
                           isSelected
@@ -1772,13 +2031,13 @@ function SeniorCitizenModePage() {
                           #{b.queueNumber}
                         </span>
                         <span
-                          className={`rounded-full px-3 py-0.5 text-xs font-black uppercase ${
+                          className={`rounded-full px-3 py-0.5 text-xs font-black ${
                             b.status === "confirmed"
                               ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
                               : "bg-stone-200 text-stone-700"
                           }`}
                         >
-                          {b.status}
+                          {b.status === "confirmed" ? ui.activeBadge : b.status === "completed" ? ui.doneBadge : ui.cancelledBadge}
                         </span>
                       </div>
 
@@ -1804,23 +2063,28 @@ function SeniorCitizenModePage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const bSpeech = `ടോക്കൺ #${b.queueNumber}. ${b.centreName}. ${b.crop}, ${b.quantityKg} കിലോ. തീയതി ${b.date}.`;
+                              const centreTitle = getCentreTranslatedName(b.centreName, language);
+                              const cropObj = CROP_ITEMS.find(
+                                (c) => c.names.en.toLowerCase() === b.crop.toLowerCase() || c.id === b.crop.toLowerCase()
+                              );
+                              const cropName = cropObj?.names[language] || b.crop;
+                              const bSpeech = getSingleBookingSpeech(b, centreTitle, cropName, language);
                               speakInLanguage(bSpeech);
                             }}
                             className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 py-2 text-xs font-black text-white shadow-sm"
                           >
                             <Volume2 className="size-4" />
-                            <span>കേൾക്കുക</span>
+                            <span>{ui.listenBtn}</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => {
                               cancelBooking(b.id);
-                              speakInLanguage("ടോക്കൺ വിജയകരമായി റദ്ദാക്കി.");
+                              speakInLanguage(ui.tokenCancelledSpeech);
                             }}
                             className="px-3 rounded-xl border border-red-300 bg-red-50 text-xs font-bold text-red-700 hover:bg-red-100"
                           >
-                            റദ്ദാക്കുക
+                            {ui.cancelBtn}
                           </button>
                         </div>
                       )}
@@ -1856,7 +2120,7 @@ function SeniorCitizenModePage() {
                   ₹13,440
                 </p>
                 <p className="text-xs text-emerald-200 mt-1 font-medium">
-                  നെല്ല് സംഭരണം · 420 kg @ ₹32/kg MSP നിരക്ക്
+                  {ui.paddyProcurement} · 420 kg @ ₹32/kg MSP
                 </p>
               </div>
 
@@ -1882,10 +2146,10 @@ function SeniorCitizenModePage() {
                 <div className="rounded-2xl bg-stone-50 p-3.5 border border-stone-200 flex items-center justify-between">
                   <div>
                     <strong className="block text-sm font-black text-stone-900">
-                      നെല്ല് സംഭരണം (Paddy)
+                      {ui.paddyProcurement} (Paddy)
                     </strong>
                     <span className="text-xs text-stone-600 block">
-                      കോട്ടയം സംഭരണ കേന്ദ്രം · 420 kg
+                      {getCentreTranslatedName("Kottayam Procurement Centre", language)} · 420 kg
                     </span>
                     <span className="text-[10px] font-mono text-stone-500">
                       TXN80472291 · 08 Sep 2026
@@ -1896,7 +2160,7 @@ function SeniorCitizenModePage() {
                       +₹13,440
                     </span>
                     <span className="inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
-                      വിജയകരം
+                      {ui.successBadge}
                     </span>
                   </div>
                 </div>
@@ -1904,10 +2168,10 @@ function SeniorCitizenModePage() {
                 <div className="rounded-2xl bg-stone-50 p-3.5 border border-stone-200 flex items-center justify-between">
                   <div>
                     <strong className="block text-sm font-black text-stone-900">
-                      പച്ചത്തേങ്ങ (Raw Coconut)
+                      {ui.coconutProcurement} (Raw Coconut)
                     </strong>
                     <span className="text-xs text-stone-600 block">
-                      ചങ്ങനാശ്ശേരി സംഭരണ കേന്ദ്രം · 250 kg
+                      {getCentreTranslatedName("Changanassery Procurement Centre", language)} · 250 kg
                     </span>
                     <span className="text-[10px] font-mono text-stone-500">
                       TXN74198205 · 14 Aug 2026
@@ -1918,7 +2182,7 @@ function SeniorCitizenModePage() {
                       +₹9,500
                     </span>
                     <span className="inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
-                      വിജയകരം
+                      {ui.successBadge}
                     </span>
                   </div>
                 </div>
@@ -1973,7 +2237,7 @@ function SeniorCitizenModePage() {
                       {ui.selectLanguage}
                     </h3>
                     <p className="text-xs text-stone-500 font-bold">
-                      ഭാഷയും ശബ്ദവും മാറ്റുക (Language & Voice)
+                      {ui.languageVoiceSub}
                     </p>
                   </div>
                 </div>
@@ -2016,7 +2280,7 @@ function SeniorCitizenModePage() {
             {/* Agricultural Registry Details */}
             <div className="rounded-3xl bg-white p-5 border-2 border-emerald-200 shadow-md space-y-3">
               <h3 className="text-base font-black text-stone-900 border-b pb-2 border-stone-200">
-                കാർഷിക വിവരങ്ങൾ (Farm Registry)
+                {ui.farmRegistryTitle}
               </h3>
 
               <div className="grid grid-cols-2 gap-3 text-xs">
@@ -2034,7 +2298,7 @@ function SeniorCitizenModePage() {
                     {ui.landholdingLabel}
                   </span>
                   <strong className="text-sm font-black text-stone-900">
-                    2.4 Acres (കുമരകം)
+                    {ui.farmLandDetail}
                   </strong>
                 </div>
 
@@ -2043,7 +2307,7 @@ function SeniorCitizenModePage() {
                     {ui.cropsLabel}
                   </span>
                   <strong className="text-sm font-black text-stone-900">
-                    {user.primaryCrop || "നെല്ല് (Paddy), തേങ്ങ (Coconut), റബ്ബർ (Rubber)"}
+                    {user.primaryCrop || ui.farmCropsList}
                   </strong>
                 </div>
               </div>
@@ -2054,7 +2318,7 @@ function SeniorCitizenModePage() {
               <div className="flex items-center gap-2">
                 <Landmark className="size-5 text-emerald-700" />
                 <h3 className="text-base font-black text-stone-900">
-                  ബാങ്ക് അക്കൗണ്ട് വിവരങ്ങൾ (PFMS DBT)
+                  {ui.bankSectionTitle}
                 </h3>
               </div>
 
@@ -2066,7 +2330,7 @@ function SeniorCitizenModePage() {
                   {user.bankAccount || "State Bank of India **** 4891"}
                 </p>
                 <p className="text-xs font-mono text-stone-600">
-                  IFSC: {user.ifsc || "SBIN0070123"} · ശാഖ: തിരുനക്കര, കോട്ടയം
+                  IFSC: {user.ifsc || "SBIN0070123"} · {ui.bankBranchInfo}
                 </p>
               </div>
             </div>
@@ -2211,7 +2475,7 @@ function SeniorCitizenModePage() {
                 onClick={() => {
                   cancelBooking(activeBooking.id);
                   setShowCancelModal(false);
-                  speakInLanguage("ടോക്കൺ വിജയകരമായി റദ്ദാക്കി.");
+                  speakInLanguage(ui.tokenCancelledSpeech);
                 }}
                 className="flex-1 rounded-2xl bg-red-600 py-3 font-black text-white shadow hover:bg-red-700 active:scale-95"
               >
