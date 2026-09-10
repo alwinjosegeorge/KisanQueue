@@ -638,6 +638,20 @@ const UI_TEXTS: Record<
     totalReceived: "బ్యాంక్ ఖాతాలో జమ అయిన మొత్తం",
     dbtVerified: "PFMS ద్వారా నేరుగా బదిలీ",
     txnHistory: "లావాదేవీల చరిత్ర",
+    farmRegistryTitle: "వ్యవసాయ వివరాలు (Farm Registry)",
+    farmLandDetail: "2.4 ఎకరాలు (కుమరకం)",
+    farmCropsList: "వరి, కొబ్బరి, రబ్బరు",
+    bankSectionTitle: "బ్యాంక్ ఖాతా వివరాలు (PFMS DBT)",
+    bankBranchInfo: "శాఖ: తిరునక్కర, కొట్టాయం",
+    languageVoiceSub: "పోర్టల్ భాష మరియు వాయిస్ మార్చండి (Language & Voice)",
+    listenBtn: "వినండి",
+    successBadge: "విజయవంతం",
+    paddyProcurement: "వరి కొనుగోలు",
+    coconutProcurement: "కొబ్బరి కొనుగోలు",
+    tokenCancelledSpeech: "టోకెన్ విజయవంతంగా రద్దు చేయబడింది.",
+    activeBadge: "యాక్టివ్",
+    doneBadge: "పూర్తయింది",
+    cancelledBadge: "రద్దు చేయబడింది",
   },
   kn: {
     tabToken: "ಟೋಕನ್",
@@ -1161,18 +1175,47 @@ function getSingleBookingSpeech(
 
 function SeniorCitizenModePage() {
   const navigate = useNavigate();
-  const {
-    user,
-    language,
-    setLanguage,
-    activeBooking,
-    bookings,
-    nowServing,
-    predictWaitingTime,
-    centres,
-    bookSlot,
-    cancelBooking,
-  } = useKisanQueue();
+  const queueContext = useKisanQueue();
+  const user = queueContext?.user;
+  const language = queueContext?.language || "ml";
+  const setLanguage = queueContext?.setLanguage;
+  const activeBooking = queueContext?.activeBooking;
+  const bookings = Array.isArray(queueContext?.bookings) ? queueContext.bookings : [];
+  const nowServing = queueContext?.nowServing ?? 40;
+  const predictWaitingTime = queueContext?.predictWaitingTime;
+  const centres = Array.isArray(queueContext?.centres) && queueContext.centres.length > 0 ? queueContext.centres : [];
+  const bookSlot = queueContext?.bookSlot;
+  const cancelBooking = queueContext?.cancelBooking;
+
+  const fallbackCentre: ProcurementCentre = {
+    id: "centre-ktm",
+    name: "Kottayam Procurement Centre",
+    district: "Kottayam",
+    location: "Near Nagampadam Bus Station, Kottayam",
+    distanceKm: 2.4,
+    workingHours: "08:30 AM – 04:30 PM",
+    dailyCapacityKg: 25000,
+    todayBookingsCount: 142,
+    currentQueueLength: 12,
+    avgProcessingMinutes: 6,
+    activeDelayMinutes: 0,
+    status: "normal",
+    slots: [],
+  };
+
+  const safeCentres = centres.length > 0 ? centres : [fallbackCentre];
+  const safeUser = user || {
+    id: "usr-01",
+    name: "Arun Kumar",
+    role: "farmer" as const,
+    mobile: "+91 94471 28930",
+    farmerId: "KL-KTM-26047",
+    village: "Kumarakom",
+    district: "Kottayam",
+    primaryCrop: "Paddy (നെല്ല്)",
+    bankAccount: "State Bank of India **** 4891",
+    ifsc: "SBIN0070123",
+  };
 
   // Active tab state
   const [currentTab, setCurrentTab] = useState<SeniorTab>("token");
@@ -1183,42 +1226,40 @@ function SeniorCitizenModePage() {
   const [speechNotice, setSpeechNotice] = useState<string>("");
 
   // Booking selection state
-  const [selectedCrop, setSelectedCrop] = useState(CROP_ITEMS[0]);
-  const [quantity, setQuantity] = useState<number>(100);
-  const [selectedCentre, setSelectedCentre] = useState<ProcurementCentre>(
-    centres[0] || {
-      id: "centre-ktm",
-      name: "Kottayam Procurement Centre",
-      district: "Kottayam",
-      location: "Near Nagampadam Bus Station, Kottayam",
-      distanceKm: 2.4,
-      workingHours: "08:30 AM – 04:30 PM",
-      dailyCapacityKg: 25000,
-      todayBookingsCount: 142,
-      currentQueueLength: 12,
-      avgProcessingMinutes: 6,
-      activeDelayMinutes: 0,
-      status: "normal",
-      slots: [],
-    }
+  const [selectedCrop, setSelectedCrop] = useState(
+    CROP_ITEMS[0] || { id: "paddy", names: { en: "Paddy", ml: "നെല്ല്" }, msp: 32, unit: "kg" }
   );
+  const [quantity, setQuantity] = useState<number>(100);
+  const [selectedCentre, setSelectedCentre] = useState<ProcurementCentre>(safeCentres[0] || fallbackCentre);
 
   const [bookingSuccessModal, setBookingSuccessModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const activeCentreForDisplay = activeBooking
-    ? centres.find((c) => c.id === activeBooking.centreId) || selectedCentre
-    : selectedCentre;
+  const activeCentreForDisplay =
+    (activeBooking ? safeCentres.find((c) => c.id === activeBooking.centreId) : null) ||
+    selectedCentre ||
+    safeCentres[0] ||
+    fallbackCentre;
 
-  const prediction = activeBooking
-    ? predictWaitingTime(activeBooking.centreId || selectedCentre.id, activeBooking.queueNumber)
-    : { timeStr: "Immediate", minutesLeft: 0, delayMinutes: 0 };
+  let prediction = { timeStr: "Immediate", minutesLeft: 0, delayMinutes: 0 };
+  if (activeBooking && typeof predictWaitingTime === "function") {
+    try {
+      const p = predictWaitingTime(
+        activeBooking.centreId || selectedCentre?.id || "centre-ktm",
+        activeBooking.queueNumber || 40
+      );
+      if (p) prediction = p;
+    } catch {
+      // Graceful fallback
+    }
+  }
 
   const farmersAhead = activeBooking
-    ? Math.max(0, activeBooking.queueNumber - nowServing)
+    ? Math.max(0, (activeBooking.queueNumber || 0) - (nowServing || 0))
     : 0;
 
-  const ui = UI_TEXTS[language] || UI_TEXTS.en;
+  const currentLang: Language = (language && UI_TEXTS[language]) ? language : "ml";
+  const ui = UI_TEXTS[currentLang] || UI_TEXTS.ml || UI_TEXTS.en;
 
   // Web Speech API Voice synthesis helper supporting all 8 languages
   const speakInLanguage = (text: string, langToUse?: Language) => {
@@ -1320,24 +1361,28 @@ function SeniorCitizenModePage() {
 
   // Handle language switch with audio confirmation in the newly selected language
   const handleLanguageChange = (newLang: Language) => {
-    setLanguage(newLang);
+    if (typeof setLanguage === "function") {
+      setLanguage(newLang);
+    }
     const welcomeMsg = LANG_WELCOME[newLang] || LANG_WELCOME.en;
     speakInLanguage(welcomeMsg, newLang);
   };
 
   // Handle instant 1-tap booking
   const handleInstantBook = () => {
+    if (typeof bookSlot !== "function") return;
     const todayStr = "Today";
     const slotStr = "Immediate Slot";
 
     const newBooking = bookSlot(
-      selectedCentre.id,
-      selectedCrop.names.en,
+      selectedCentre?.id || "centre-ktm",
+      selectedCrop?.names?.en || "Paddy",
       quantity,
       todayStr,
       slotStr
     );
 
+    if (!newBooking) return;
     setBookingSuccessModal(true);
 
     const centreTitle = getCentreTranslatedName(selectedCentre.name, language);
@@ -1505,7 +1550,7 @@ function SeniorCitizenModePage() {
                       {getCentreTranslatedName(activeBooking.centreName, language)}
                     </strong>
                     <p className="text-xs text-stone-600">
-                      {activeCentreForDisplay.location || activeCentreForDisplay.address}
+                      {activeCentreForDisplay?.location || (activeCentreForDisplay as any)?.address || "Kottayam"}
                     </p>
                   </div>
                 </div>
@@ -1921,7 +1966,7 @@ function SeniorCitizenModePage() {
                           <span>{b.date} · {b.slotTime}</span>
                         </p>
                         <p className="font-mono text-[11px] text-stone-500 pt-1">
-                          ID: {b.id} · MSP: ₹{b.mspPerKg}/kg · Total: ₹{b.totalAmount.toLocaleString("en-IN")}
+                          ID: {b.id} · MSP: ₹{b.mspPerKg}/kg · Total: ₹{(b.totalAmount != null ? b.totalAmount : 0).toLocaleString("en-IN")}
                         </p>
                       </div>
 
@@ -1932,7 +1977,7 @@ function SeniorCitizenModePage() {
                             onClick={() => {
                               const centreTitle = getCentreTranslatedName(b.centreName, language);
                               const cropObj = CROP_ITEMS.find(
-                                (c) => c.names.en.toLowerCase() === b.crop.toLowerCase() || c.id === b.crop.toLowerCase()
+                                (c) => c.names.en.toLowerCase() === (b.crop || "").toLowerCase() || c.id === (b.crop || "").toLowerCase()
                               );
                               const cropName = cropObj?.names[language] || b.crop;
                               const bSpeech = getSingleBookingSpeech(b, centreTitle, cropName, language);
@@ -1994,11 +2039,11 @@ function SeniorCitizenModePage() {
               <div className="border-t border-white/20 pt-3 grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span className="text-emerald-200 text-[10px] block">{ui.bankLabel}</span>
-                  <strong className="font-mono">{user.bankAccount || "SBI **** 4891"}</strong>
+                  <strong className="font-mono">{safeUser.bankAccount || "SBI **** 4891"}</strong>
                 </div>
                 <div>
                   <span className="text-emerald-200 text-[10px] block">{ui.ifscLabel}</span>
-                  <strong className="font-mono">{user.ifsc || "SBIN0070123"}</strong>
+                  <strong className="font-mono">{safeUser.ifsc || "SBIN0070123"}</strong>
                 </div>
               </div>
             </div>
@@ -2076,17 +2121,17 @@ function SeniorCitizenModePage() {
 
               <div className="flex items-center gap-4">
                 <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-950 font-display text-2xl font-black text-emerald-200 shadow-inner">
-                  {user.name.slice(0, 2).toUpperCase()}
+                  {(safeUser.name || "Farmer").slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <h2 className="text-2xl font-black text-white leading-tight">
-                    {user.name}
+                    {safeUser.name || "Farmer"}
                   </h2>
                   <p className="text-xs text-emerald-200 font-mono mt-0.5">
-                    {ui.farmerIdLabel}: {user.farmerId || "KL-KTM-26047"}
+                    {ui.farmerIdLabel}: {safeUser.farmerId || "KL-KTM-26047"}
                   </p>
                   <p className="text-xs text-emerald-100 mt-0.5">
-                    {user.mobile}
+                    {safeUser.mobile || "+91 94471 28930"}
                   </p>
                 </div>
               </div>
@@ -2217,7 +2262,7 @@ function SeniorCitizenModePage() {
                 <button
                   type="button"
                   onClick={() => {
-                    const profileSpeech = `${user.name}. ${ui.farmerIdLabel}: ${user.farmerId || "KL-KTM-26047"}. ${ui.panchayatLabel}: ${user.village}, ${user.district}. ${ui.landholdingLabel}: ${ui.farmLandDetail}. ${ui.cropsLabel}: ${ui.farmCropsList}. ${ui.bankLabel}: ${user.bankAccount || "State Bank of India 4891"}. ${ui.aadhaarLinked}.`;
+                    const profileSpeech = `${safeUser.name || "Farmer"}. ${ui.farmerIdLabel}: ${safeUser.farmerId || "KL-KTM-26047"}. ${ui.panchayatLabel}: ${safeUser.village || "Kumarakom"}, ${safeUser.district || "Kottayam"}. ${ui.landholdingLabel}: ${ui.farmLandDetail}. ${ui.cropsLabel}: ${ui.farmCropsList}. ${ui.bankLabel}: ${safeUser.bankAccount || "State Bank of India 4891"}. ${ui.aadhaarLinked}.`;
                     speakInLanguage(profileSpeech);
                   }}
                   className={`w-full flex items-center justify-center gap-2 rounded-2xl py-3 font-black text-white shadow-md transition-all active:scale-95 text-sm ${
@@ -2242,7 +2287,7 @@ function SeniorCitizenModePage() {
                     {ui.panchayatLabel}
                   </span>
                   <strong className="text-sm font-black text-stone-900">
-                    {user.village}, {user.district}
+                    {safeUser.village || "Kumarakom"}, {safeUser.district || "Kottayam"}
                   </strong>
                 </div>
 
@@ -2260,7 +2305,7 @@ function SeniorCitizenModePage() {
                     {ui.cropsLabel}
                   </span>
                   <strong className="text-sm font-black text-stone-900">
-                    {user.primaryCrop || ui.farmCropsList}
+                    {safeUser.primaryCrop || ui.farmCropsList}
                   </strong>
                 </div>
               </div>
@@ -2280,10 +2325,10 @@ function SeniorCitizenModePage() {
                   {ui.bankLabel}
                 </span>
                 <p className="text-base font-black font-mono text-emerald-950">
-                  {user.bankAccount || "State Bank of India **** 4891"}
+                  {safeUser.bankAccount || "State Bank of India **** 4891"}
                 </p>
                 <p className="text-xs font-mono text-stone-600">
-                  IFSC: {user.ifsc || "SBIN0070123"} · {ui.bankBranchInfo}
+                  IFSC: {safeUser.ifsc || "SBIN0070123"} · {ui.bankBranchInfo}
                 </p>
               </div>
             </div>
