@@ -1409,129 +1409,6 @@ function SeniorCitizenModePage() {
           </div>
         </div>
 
-        {/* Accessibility Toolbar: Text Size + Voice Narration */}
-        <div className="mx-auto mt-2.5 flex max-w-2xl flex-wrap items-center justify-between gap-2 border-t border-emerald-100 pt-2.5">
-          {/* Text Size Stepper */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-stone-700">
-              {ui.textSize}
-            </span>
-            <button
-              onClick={() => setFontScale("normal")}
-              className={`rounded-xl px-3 py-1 text-sm font-bold transition-all shadow-sm ${
-                fontScale === "normal"
-                  ? "bg-emerald-800 text-white font-black ring-2 ring-emerald-600"
-                  : "bg-white border border-stone-300 text-stone-800 hover:bg-stone-50"
-              }`}
-            >
-              A
-            </button>
-            <button
-              onClick={() => setFontScale("large")}
-              className={`rounded-xl px-3.5 py-1 text-base font-extrabold transition-all shadow-sm ${
-                fontScale === "large"
-                  ? "bg-emerald-800 text-white font-black ring-2 ring-emerald-600"
-                  : "bg-white border border-stone-300 text-stone-800 hover:bg-stone-50"
-              }`}
-            >
-              A+
-            </button>
-            <button
-              onClick={() => setFontScale("huge")}
-              className={`rounded-xl px-4 py-1 text-lg font-black transition-all shadow-sm ${
-                fontScale === "huge"
-                  ? "bg-emerald-800 text-white font-black ring-2 ring-emerald-600"
-                  : "bg-white border border-stone-300 text-stone-800 hover:bg-stone-50"
-              }`}
-            >
-              A++
-            </button>
-          </div>
-
-          {/* Voice Reading Trigger */}
-          <button
-            onClick={() => {
-              if (currentTab === "profile") {
-                const profileSpeech = `${user.name}. ${ui.farmerIdLabel}: ${user.farmerId || "KL-KTM-26047"}. ${ui.panchayatLabel}: ${user.village}, ${user.district}. ${ui.landholdingLabel}: ${ui.farmLandDetail}. ${ui.cropsLabel}: ${ui.farmCropsList}. ${ui.bankLabel}: ${user.bankAccount || "State Bank of India 4891"}. ${ui.aadhaarLinked}.`;
-                speakInLanguage(profileSpeech);
-                return;
-              }
-
-              if (currentTab === "payments") {
-                const paySpeech = `${ui.paymentsTitle}. ${ui.totalReceived}: ₹13,440. ${ui.dbtVerified}. ${ui.bankLabel}: ${user.bankAccount || "State Bank of India 4891"}.`;
-                speakInLanguage(paySpeech);
-                return;
-              }
-
-              if (currentTab === "bookings") {
-                const count = bookings.length;
-                let bookSpeech = "";
-                switch (language) {
-                  case "ml":
-                    bookSpeech = `${ui.bookingsTitle}. ആകെ ${count} ബുക്കിംഗുകൾ. ${activeBooking ? `സജീവ ടോക്കൺ നമ്പർ ${activeBooking.queueNumber}.` : ""}`;
-                    break;
-                  case "hi":
-                    bookSpeech = `${ui.bookingsTitle}। कुल ${count} बुकिंग। ${activeBooking ? `सक्रिय टोकन नंबर ${activeBooking.queueNumber}।` : ""}`;
-                    break;
-                  case "ta":
-                    bookSpeech = `${ui.bookingsTitle}. மொத்தம் ${count} பதிவுகள். ${activeBooking ? `செயலில் உள்ள டோக்கன் எண் ${activeBooking.queueNumber}.` : ""}`;
-                    break;
-                  case "te":
-                    bookSpeech = `${ui.bookingsTitle}. మొత్తం ${count} బుకింగ్‌లు. ${activeBooking ? `యాక్టివ్ టోకెన్ సంఖ్య ${activeBooking.queueNumber}.` : ""}`;
-                    break;
-                  case "kn":
-                    bookSpeech = `${ui.bookingsTitle}. ಒಟ್ಟು ${count} ಬುಕಿಂಗ್‌ಗಳು. ${activeBooking ? `ಸಕ್ರಿಯ ಟೋಕನ್ ಸಂಖ್ಯೆ ${activeBooking.queueNumber}.` : ""}`;
-                    break;
-                  case "bn":
-                    bookSpeech = `${ui.bookingsTitle}। মোট ${count}টি বুকিং। ${activeBooking ? `সক্রিয় টোকেন নম্বর ${activeBooking.queueNumber}।` : ""}`;
-                    break;
-                  case "mr":
-                    bookSpeech = `${ui.bookingsTitle}. एकूण ${count} बुकिंग. ${activeBooking ? `सक्रिय टोकन नंबर ${activeBooking.queueNumber}.` : ""}`;
-                    break;
-                  default:
-                    bookSpeech = `${ui.bookingsTitle}. Total ${count} bookings. ${activeBooking ? `Active Token Number ${activeBooking.queueNumber}.` : ""}`;
-                    break;
-                }
-                speakInLanguage(bookSpeech);
-                return;
-              }
-
-              // Token tab
-              if (activeBooking) {
-                const centreTitle = getCentreTranslatedName(activeBooking.centreName, language);
-                const speech = getActiveTokenSpeech(
-                  activeBooking.queueNumber,
-                  centreTitle,
-                  nowServing,
-                  farmersAhead,
-                  prediction.minutesLeft,
-                  language
-                );
-                speakInLanguage(speech);
-              } else {
-                speakInLanguage(ui.noTokenSub);
-              }
-            }}
-            className={`flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-black shadow-md transition-transform active:scale-95 ${
-              isSpeaking
-                ? "bg-red-600 text-white animate-pulse"
-                : "bg-emerald-700 text-white hover:bg-emerald-800"
-            }`}
-          >
-            {isSpeaking ? (
-              <>
-                <VolumeX className="size-5" />
-                <span>{ui.stopVoice}</span>
-              </>
-            ) : (
-              <>
-                <Volume2 className="size-5" />
-                <span>{ui.listenAloud}</span>
-              </>
-            )}
-          </button>
-        </div>
-
         {/* Real-time speaking banner */}
         {speechNotice && (
           <div className="mx-auto mt-2 max-w-2xl rounded-2xl bg-emerald-100 border-2 border-emerald-300 p-2.5 text-center text-xs font-black text-emerald-950 shadow-inner">
@@ -2264,6 +2141,92 @@ function SeniorCitizenModePage() {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* Text Size / Accessibility Settings (Moved from header to Profile) */}
+            <div className="rounded-3xl bg-white p-5 border-2 border-emerald-200 shadow-md space-y-3">
+              <div className="flex items-center justify-between border-b pb-2.5 border-stone-200">
+                <div className="flex items-center gap-2">
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 font-black">
+                    <Sparkles className="size-5 text-emerald-700" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-stone-900">
+                      {ui.textSize}
+                    </h3>
+                    <p className="text-xs text-stone-500 font-bold">
+                      വലിയ അക്ഷരങ്ങൾ തിരഞ്ഞെടുക്കുക (Font Scale)
+                    </p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800 border border-emerald-300">
+                  {fontScale === "huge" ? "A++" : fontScale === "large" ? "A+" : "A"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setFontScale("normal")}
+                  className={`flex flex-col items-center justify-center rounded-2xl py-3 px-2 text-center transition-all active:scale-95 ${
+                    fontScale === "normal"
+                      ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-500"
+                      : "bg-stone-50 border-2 border-stone-200 text-stone-800 font-bold hover:bg-emerald-50 shadow-sm"
+                  }`}
+                >
+                  <span className="text-base font-black">A</span>
+                  <span className={`text-xs mt-0.5 ${fontScale === "normal" ? "text-emerald-100" : "text-stone-500"}`}>
+                    Normal
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFontScale("large")}
+                  className={`flex flex-col items-center justify-center rounded-2xl py-3 px-2 text-center transition-all active:scale-95 ${
+                    fontScale === "large"
+                      ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-500"
+                      : "bg-stone-50 border-2 border-stone-200 text-stone-800 font-bold hover:bg-emerald-50 shadow-sm"
+                  }`}
+                >
+                  <span className="text-xl font-black">A+</span>
+                  <span className={`text-xs mt-0.5 ${fontScale === "large" ? "text-emerald-100" : "text-stone-500"}`}>
+                    Large
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFontScale("huge")}
+                  className={`flex flex-col items-center justify-center rounded-2xl py-3 px-2 text-center transition-all active:scale-95 ${
+                    fontScale === "huge"
+                      ? "bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-500"
+                      : "bg-stone-50 border-2 border-stone-200 text-stone-800 font-bold hover:bg-emerald-50 shadow-sm"
+                  }`}
+                >
+                  <span className="text-2xl font-black">A++</span>
+                  <span className={`text-xs mt-0.5 ${fontScale === "huge" ? "text-emerald-100" : "text-stone-500"}`}>
+                    Huge
+                  </span>
+                </button>
+              </div>
+
+              {/* Profile Voice Reading Trigger */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const profileSpeech = `${user.name}. ${ui.farmerIdLabel}: ${user.farmerId || "KL-KTM-26047"}. ${ui.panchayatLabel}: ${user.village}, ${user.district}. ${ui.landholdingLabel}: ${ui.farmLandDetail}. ${ui.cropsLabel}: ${ui.farmCropsList}. ${ui.bankLabel}: ${user.bankAccount || "State Bank of India 4891"}. ${ui.aadhaarLinked}.`;
+                    speakInLanguage(profileSpeech);
+                  }}
+                  className={`w-full flex items-center justify-center gap-2 rounded-2xl py-3 font-black text-white shadow-md transition-all active:scale-95 text-sm ${
+                    isSpeaking ? "bg-red-600 animate-pulse" : "bg-emerald-700 hover:bg-emerald-800"
+                  }`}
+                >
+                  {isSpeaking ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
+                  <span>{isSpeaking ? ui.stopVoice : ui.listenAloud}</span>
+                </button>
               </div>
             </div>
 
