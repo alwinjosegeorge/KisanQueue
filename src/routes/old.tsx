@@ -1482,30 +1482,20 @@ function SeniorCitizenModePage() {
               </span>
             </div>
 
-            {/* Giant +1 / -1 Stepper Controls */}
-            <div className="flex items-center justify-between gap-2 rounded-3xl bg-emerald-50/70 border-2 border-emerald-300 p-3 shadow-inner">
-              {/* -10 kg Fast Step */}
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => Math.max(1, q - 10))}
-                className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-white text-stone-700 shadow-sm border border-stone-300 font-black text-xs sm:text-sm hover:bg-stone-100 active:scale-90"
-                title={ui.decrease10}
-              >
-                -10
-              </button>
-
+            {/* Clean, Giant +1 / -1 Stepper Controls */}
+            <div className="flex items-center justify-between gap-4 rounded-3xl bg-emerald-50/70 border-2 border-emerald-300 p-3 shadow-inner">
               {/* -1 kg Main Button */}
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex size-14 sm:size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
+                className="flex size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
                 title={ui.decrease1}
               >
                 <Minus className="size-8 stroke-[3]" />
               </button>
 
               {/* Number Value Display & Edit */}
-              <div className="text-center px-1">
+              <div className="text-center px-2">
                 <div className="flex items-baseline justify-center gap-1">
                   <input
                     type="number"
@@ -1517,11 +1507,11 @@ function SeniorCitizenModePage() {
                       if (!isNaN(val) && val > 0) setQuantity(val);
                       else if (e.target.value === "") setQuantity(1);
                     }}
-                    className="w-24 sm:w-28 text-center font-display text-4xl sm:text-5xl font-black text-emerald-950 bg-transparent border-b-2 border-emerald-500 focus:outline-none focus:border-emerald-700"
+                    className="w-28 text-center font-display text-5xl font-black text-emerald-950 bg-transparent border-b-2 border-emerald-500 focus:outline-none focus:border-emerald-700"
                   />
-                  <span className="text-xl font-black text-stone-600">kg</span>
+                  <span className="text-2xl font-black text-stone-600">kg</span>
                 </div>
-                <span className="text-[11px] font-bold text-emerald-700 block mt-0.5">
+                <span className="text-xs font-bold text-emerald-700 block mt-0.5">
                   {ui.kgLabel}
                 </span>
               </div>
@@ -1530,53 +1520,10 @@ function SeniorCitizenModePage() {
               <button
                 type="button"
                 onClick={() => setQuantity((q) => q + 1)}
-                className="flex size-14 sm:size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
+                className="flex size-16 items-center justify-center rounded-2xl bg-white text-emerald-800 shadow-md border-3 border-emerald-400 hover:bg-emerald-50 active:scale-90 font-black text-3xl"
                 title={ui.increase1}
               >
                 <Plus className="size-8 stroke-[3]" />
-              </button>
-
-              {/* +10 kg Fast Step */}
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => q + 10)}
-                className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-white text-stone-700 shadow-sm border border-stone-300 font-black text-xs sm:text-sm hover:bg-stone-100 active:scale-90"
-                title={ui.increase10}
-              >
-                +10
-              </button>
-            </div>
-
-            {/* Micro-stepper pills: +1 kg, +5 kg, +25 kg, +50 kg */}
-            <div className="flex items-center justify-center gap-2 pt-1 flex-wrap">
-              <span className="text-xs font-bold text-stone-500 mr-1">{ui.addFast}</span>
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => q + 1)}
-                className="rounded-xl bg-white border border-emerald-300 px-3 py-1.5 text-xs font-black text-emerald-900 shadow-sm hover:bg-emerald-50 active:scale-95"
-              >
-                +1 kg
-              </button>
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => q + 5)}
-                className="rounded-xl bg-white border border-emerald-300 px-3 py-1.5 text-xs font-black text-emerald-900 shadow-sm hover:bg-emerald-50 active:scale-95"
-              >
-                +5 kg
-              </button>
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => q + 25)}
-                className="rounded-xl bg-white border border-emerald-300 px-3 py-1.5 text-xs font-black text-emerald-900 shadow-sm hover:bg-emerald-50 active:scale-95"
-              >
-                +25 kg
-              </button>
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => q + 50)}
-                className="rounded-xl bg-white border border-emerald-300 px-3 py-1.5 text-xs font-black text-emerald-900 shadow-sm hover:bg-emerald-50 active:scale-95"
-              >
-                +50 kg
               </button>
             </div>
 
