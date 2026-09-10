@@ -394,7 +394,6 @@ export function FarmerDashboard({
               <div className="p-2.5">
                 <h4 className="text-xs font-bold truncate text-foreground">{crop.name}</h4>
                 <p className="text-[10px] text-muted-foreground mt-0.5">{t(language, crop.timeframeKey)}</p>
-                <p className="text-[10px] font-bold text-primary mt-1">{crop.msp}</p>
               </div>
             </div>
           ))}
