@@ -218,19 +218,6 @@ export function FarmerDashboard({
             </div>
           </div>
 
-          {/* Temperature & Weather / District */}
-          <div className="pt-1">
-            <div className="flex items-baseline gap-2">
-              <span className="font-display text-4xl font-extrabold tracking-tight drop-shadow-md">24°C</span>
-              <span className="text-xs font-semibold text-white/90">☀️ {t(language, "weatherSunny")}</span>
-            </div>
-            <p className="text-[11px] text-white/75 flex items-center gap-2 mt-0.5">
-              <span>📍 Kottayam {t(language, "cluster")}</span>
-              <span>·</span>
-              <span>L: 21°C  H: 31°C</span>
-            </p>
-          </div>
-
           {/* 3 Frosted White Metric Pills (Exact Match to Reference Image!) */}
           <div className="grid grid-cols-3 gap-2">
             {/* Metric 1 */}
