@@ -3,6 +3,7 @@ import { useKisanQueue } from "@/lib/store";
 import { Language } from "@/lib/types";
 import { generateKisanChatResponse } from "@/lib/gemini";
 import {
+  Bot,
   Sparkles,
   X,
   Send,
@@ -426,28 +427,13 @@ export function KisanQueueAIChatbot({ isSeniorMode = false }: KisanQueueAIChatbo
               setIsOpen(true);
               stopAudio();
             }}
-            className={`group relative flex items-center gap-2.5 rounded-full shadow-2xl transition-all duration-300 active:scale-95 border-2 ${
-              isSeniorMode
-                ? "bg-emerald-800 text-white px-5 py-4 text-base font-black border-emerald-400 ring-4 ring-emerald-500/40"
-                : "bg-emerald-900 text-white px-4 py-3 text-sm font-bold border-emerald-500/70 ring-4 ring-emerald-400/30 hover:bg-emerald-800"
+            className={`flex items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 bg-emerald-700 hover:bg-emerald-800 text-white ${
+              isSeniorMode ? "size-14" : "size-12"
             }`}
-            title="Kisan Queue AI Voice Assistant"
+            title="Kisan Queue AI"
+            aria-label="Kisan Queue AI"
           >
-            <span className="relative flex size-3.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full size-3.5 bg-emerald-500"></span>
-            </span>
-
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="size-5 text-amber-300 transition-transform group-hover:rotate-12" />
-              <span className="tracking-tight font-black">
-                {isSeniorMode ? "🌾 കിസാൻ AI (വോയിസ്)" : "Kisan Queue AI"}
-              </span>
-            </div>
-
-            <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-black text-amber-300 border border-amber-400/30">
-              🎙️ Voice
-            </span>
+            <Bot className={isSeniorMode ? "size-7 text-white" : "size-6 text-white"} />
           </button>
         </aside>
       )}
