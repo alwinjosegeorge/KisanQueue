@@ -3,14 +3,14 @@ import React, { useState } from "react";
 import { useKisanQueue } from "@/lib/store";
 import { User } from "@/lib/types";
 import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
+  Phone,
   ArrowLeft,
   CheckCircle2,
   UserCheck,
-  User as UserIcon,
+  KeyRound,
+  ShieldCheck,
+  RotateCcw,
+  Sparkles,
 } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
@@ -19,26 +19,25 @@ export const Route = createFileRoute("/login")({
       { title: "Login — KisanQueue" },
       {
         name: "description",
-        content: "Sign in to KisanQueue farmer procurement portal.",
+        content: "Sign in to KisanQueue farmer portal using Phone Number and OTP.",
       },
     ],
   }),
-  component: MinimalLoginPage,
+  component: PhoneOtpLoginPage,
 });
 
-export function MinimalLoginPage() {
+export function PhoneOtpLoginPage() {
   const navigate = useNavigate();
   const { setUser, addNotification } = useKisanQueue();
 
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  // "phone" step or "otp" step
+  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [phoneNumber, setPhoneNumber] = useState("9447128930");
+  const [otpCode, setOtpCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  // Quick helper to sign in a demo or custom user
+  // Quick helper to sign in
   const handleCompleteAuth = (userData: Partial<User>, successMsg: string) => {
     setIsLoading(true);
     setTimeout(() => {
@@ -56,34 +55,45 @@ export function MinimalLoginPage() {
     }, 500);
   };
 
-  // Submit standard Email/Password login
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle Request OTP
+  const handleRequestOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
-      setFeedback("Please enter your email or phone number");
-      return;
-    }
-    if (!password.trim()) {
-      setFeedback("Please enter your password");
+    const cleanNumber = phoneNumber.replace(/\D/g, "");
+    if (cleanNumber.length < 10) {
+      setFeedback("Please enter a valid 10-digit mobile number");
       return;
     }
 
     setFeedback(null);
-    const identifier = email.trim();
-    const displayName =
-      mode === "signup" && name.trim()
-        ? name.trim()
-        : identifier.includes("@")
-        ? identifier.split("@")[0]
-        : "Arun Kumar";
+    setIsLoading(true);
 
+    setTimeout(() => {
+      setIsLoading(false);
+      setStep("otp");
+      setOtpCode("2604"); // Pre-fill test code for convenience
+      setFeedback("OTP sent successfully to +91 " + cleanNumber + " (Demo Code: 2604)");
+    }, 400);
+  };
+
+  // Handle Verify OTP
+  const handleVerifyOtp = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpCode.length < 4) {
+      setFeedback("Please enter the 4-digit verification code");
+      return;
+    }
+
+    setFeedback(null);
+    const cleanNumber = phoneNumber.replace(/\D/g, "");
     handleCompleteAuth(
       {
-        name: displayName,
-        mobile: identifier.includes("@") ? "+91 94471 28930" : identifier,
+        name: "Arun Kumar",
+        mobile: "+91 " + cleanNumber,
         farmerId: "KL-KTM-26047",
+        village: "Kumarakom",
+        district: "Kottayam",
       },
-      mode === "signup" ? `Welcome to KisanQueue, ${displayName}!` : `Welcome back, ${displayName}!`
+      "Verified successfully! Welcome to KisanQueue"
     );
   };
 
@@ -122,16 +132,6 @@ export function MinimalLoginPage() {
     );
   };
 
-  // Forgot password handler
-  const handleForgotPassword = () => {
-    setFeedback("Password reset instructions sent to your email/phone.");
-    addNotification({
-      title: "Password Reset Sent",
-      message: "Check your email or SMS for reset instructions.",
-      type: "info",
-    });
-  };
-
   return (
     <div className="min-h-screen bg-[#FBFBFA] flex flex-col justify-between p-4 sm:p-6 font-sans antialiased text-stone-900 selection:bg-emerald-200">
       
@@ -139,10 +139,17 @@ export function MinimalLoginPage() {
       <header className="w-full max-w-sm mx-auto flex items-center justify-between py-2">
         <button
           type="button"
-          onClick={() => navigate({ to: "/" })}
+          onClick={() => {
+            if (step === "otp") {
+              setStep("phone");
+              setFeedback(null);
+            } else {
+              navigate({ to: "/" });
+            }
+          }}
           className="flex size-10 items-center justify-center rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors cursor-pointer"
-          title="Back to home"
-          aria-label="Back to home"
+          title="Go back"
+          aria-label="Go back"
         >
           <ArrowLeft className="size-5" />
         </button>
@@ -152,14 +159,19 @@ export function MinimalLoginPage() {
         <div className="size-10" />
       </header>
 
-      {/* Main Login Form Container */}
+      {/* Main Container */}
       <main className="w-full max-w-sm mx-auto my-auto py-6 space-y-6">
         
-        {/* Title: "Login" in deep forest green */}
+        {/* Title: "Login" */}
         <div className="text-center">
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#1C3E1B]">
-            {mode === "login" ? "Login" : "Sign Up"}
+            Login
           </h1>
+          <p className="mt-1 text-xs text-stone-500 font-medium">
+            {step === "phone"
+              ? "Enter your mobile number to receive OTP"
+              : `Enter the 4-digit OTP sent to +91 ${phoneNumber}`}
+          </p>
         </div>
 
         {/* Feedback Alert */}
@@ -170,85 +182,100 @@ export function MinimalLoginPage() {
           </div>
         )}
 
-        {/* Credentials Form */}
-        <form onSubmit={handleSubmit} className="space-y-3.5">
-          {mode === "signup" && (
+        {/* STEP 1: Phone Number Input */}
+        {step === "phone" ? (
+          <form onSubmit={handleRequestOtp} className="space-y-4">
+            <div className="relative flex items-center">
+              <div className="absolute left-4 pointer-events-none text-stone-400 flex items-center gap-1.5">
+                <Phone className="size-4" />
+                <span className="text-xs font-bold text-stone-500 pl-1 border-r border-stone-200 pr-2">
+                  +91
+                </span>
+              </div>
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={phoneNumber}
+                maxLength={10}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
+                className="w-full h-12 rounded-2xl border border-stone-200 bg-white pl-20 pr-4 text-sm font-medium text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700/30 focus:border-emerald-700 transition-all shadow-sm"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading || phoneNumber.length < 10}
+              className="w-full h-12 rounded-full bg-[#183917] hover:bg-[#132d12] active:scale-[0.98] text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isLoading ? (
+                <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <span>Login</span>
+              )}
+            </button>
+          </form>
+        ) : (
+          /* STEP 2: OTP Verification Input */
+          <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div className="relative flex items-center">
               <div className="absolute left-4 pointer-events-none text-stone-400">
-                <UserIcon className="size-4" />
+                <KeyRound className="size-4" />
               </div>
               <input
                 type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full h-12 rounded-2xl border border-stone-200 bg-white pl-11 pr-4 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700/30 focus:border-emerald-700 transition-all shadow-sm"
+                placeholder="Enter 4-digit OTP"
+                maxLength={4}
+                value={otpCode}
+                autoFocus
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                className="w-full h-12 rounded-2xl border border-stone-200 bg-white pl-11 pr-24 text-sm font-bold tracking-widest text-stone-800 placeholder:text-stone-400 placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-emerald-700/30 focus:border-emerald-700 transition-all shadow-sm"
               />
-            </div>
-          )}
-
-          {/* Email Input */}
-          <div className="relative flex items-center">
-            <div className="absolute left-4 pointer-events-none text-stone-400">
-              <Mail className="size-4" />
-            </div>
-            <input
-              type="text"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 rounded-2xl border border-stone-200 bg-white pl-11 pr-4 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700/30 focus:border-emerald-700 transition-all shadow-sm"
-            />
-          </div>
-
-          {/* Password Input */}
-          <div className="relative flex items-center">
-            <div className="absolute left-4 pointer-events-none text-stone-400">
-              <Lock className="size-4" />
-            </div>
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 rounded-2xl border border-stone-200 bg-white pl-11 pr-11 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700/30 focus:border-emerald-700 transition-all shadow-sm"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer"
-              title={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </button>
-          </div>
-
-          {/* Forgot Password Link */}
-          {mode === "login" && (
-            <div className="text-center pt-0.5">
               <button
                 type="button"
-                onClick={handleForgotPassword}
-                className="text-xs text-stone-500 hover:text-stone-800 underline underline-offset-4 transition-colors font-medium cursor-pointer"
+                onClick={() => setOtpCode("2604")}
+                className="absolute right-2 px-2.5 py-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors cursor-pointer"
               >
-                Forgot Password?
+                Auto-fill
               </button>
             </div>
-          )}
 
-          {/* Primary Login Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full h-12 mt-2 rounded-full bg-[#183917] hover:bg-[#132d12] active:scale-[0.98] text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
-          >
-            {isLoading ? (
-              <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <span>{mode === "login" ? "Login" : "Sign Up"}</span>
-            )}
-          </button>
-        </form>
+            <div className="flex items-center justify-between text-xs px-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("phone");
+                  setFeedback(null);
+                }}
+                className="text-stone-500 hover:text-stone-800 underline underline-offset-4 cursor-pointer font-medium"
+              >
+                Change Number
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFeedback("New OTP sent to +91 " + phoneNumber + " (Demo Code: 2604)");
+                  setOtpCode("2604");
+                }}
+                className="flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer"
+              >
+                <RotateCcw className="size-3" /> Resend OTP
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading || otpCode.length < 4}
+              className="w-full h-12 rounded-full bg-[#183917] hover:bg-[#132d12] active:scale-[0.98] text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isLoading ? (
+                <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <span>Verify & Login</span>
+              )}
+            </button>
+          </form>
+        )}
 
         {/* Divider with "or" */}
         <div className="relative flex items-center justify-center my-6">
@@ -258,7 +285,7 @@ export function MinimalLoginPage() {
           </span>
         </div>
 
-        {/* Alternate Social Action Buttons */}
+        {/* The 3 Buttons Requested by User */}
         <div className="space-y-3">
           {/* 1. Continue with Google */}
           <button
@@ -315,41 +342,6 @@ export function MinimalLoginPage() {
             </div>
             <span>Continue As Guest</span>
           </button>
-        </div>
-
-        {/* Footer: Need an account? Sign up */}
-        <div className="text-center pt-2">
-          <p className="text-xs text-stone-500 font-medium">
-            {mode === "login" ? (
-              <>
-                Need an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("signup");
-                    setFeedback(null);
-                  }}
-                  className="font-bold text-stone-900 hover:underline cursor-pointer"
-                >
-                  Sign up
-                </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("login");
-                    setFeedback(null);
-                  }}
-                  className="font-bold text-stone-900 hover:underline cursor-pointer"
-                >
-                  Login
-                </button>
-              </>
-            )}
-          </p>
         </div>
 
       </main>
