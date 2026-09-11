@@ -197,9 +197,9 @@ export function FarmerDashboard({
   };
 
   const recommendedCentre = getRecommendedCentre();
-  const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || recommendedCentre;
+  const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || recommendedCentre || centres[0];
   const userQueueNumber = activeBooking ? activeBooking.queueNumber : null;
-  const prediction = activeBooking
+  const prediction = (activeBooking && currentCentre?.id)
     ? predictWaitingTime(currentCentre.id, activeBooking.queueNumber)
     : { timeStr: "Immediate", minutesLeft: 0, delayMinutes: 0 };
   const farmersAhead = activeBooking ? Math.max(0, activeBooking.queueNumber - nowServing) : 0;
@@ -379,7 +379,7 @@ export function FarmerDashboard({
       )}
 
       {/* Delay Alert Broadcast Banner (if operational delay exists) */}
-      {currentCentre.activeDelayMinutes > 0 && (
+      {currentCentre && currentCentre.activeDelayMinutes > 0 && (
         <div className="relative overflow-hidden rounded-2xl border border-amber-500/40 bg-amber-500/15 p-4 text-foreground shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-500/25 text-amber-700">

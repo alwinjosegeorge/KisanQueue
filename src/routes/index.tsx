@@ -286,14 +286,8 @@ function KisanQueueApp() {
   const { t: translate } = useTranslation();
   const navigate = useNavigate();
 
-  // Initialize as splash for SSR matching; dynamically restore login or URL param on mount
-  const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>(() => {
-    if (typeof window !== "undefined") {
-      const storedLogin = localStorage.getItem("kisanqueue_logged_in") === "true";
-      return storedLogin ? "home" : "splash";
-    }
-    return "splash";
-  });
+  // Initialize cleanly as splash to match SSR 100%; restore login or URL param on mount
+  const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>("splash");
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [authOpen, setAuthOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -302,16 +296,20 @@ function KisanQueueApp() {
   const [selectedCropForBooking, setSelectedCropForBooking] = useState<string | null>(null);
   const [assistedModalOpen, setAssistedModalOpen] = useState(false);
 
-  // Read URL search params safely on mount without triggering router search schema errors
+  // Read URL search params and login state safely on mount AFTER hydration
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const storedLogin = localStorage.getItem("kisanqueue_logged_in") === "true";
       const params = new URLSearchParams(window.location.search);
       const screenParam = params.get("screen") as FarmerScreen | null;
+
       if (
         screenParam &&
         ["home", "bookings", "queue", "timeline", "payment", "map", "profile"].includes(screenParam)
       ) {
         setFarmerScreen(screenParam);
+      } else if (storedLogin) {
+        setFarmerScreen("home");
       }
     }
   }, []);

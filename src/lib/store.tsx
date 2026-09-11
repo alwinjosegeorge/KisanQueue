@@ -364,12 +364,16 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
   const [highContrast, setHighContrast] = useState(false);
 
   // Authentication & Session Persistence
-  const [isLoggedIn, setIsLoggedInState] = useState<boolean>(() => {
+  const [isLoggedIn, setIsLoggedInState] = useState<boolean>(false);
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("kisanqueue_logged_in") === "true";
+      const stored = localStorage.getItem("kisanqueue_logged_in") === "true";
+      if (stored) {
+        setIsLoggedInState(true);
+      }
     }
-    return false;
-  });
+  }, []);
 
   const setIsLoggedIn = (val: boolean) => {
     setIsLoggedInState(val);
