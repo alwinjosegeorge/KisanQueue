@@ -11,6 +11,7 @@ import {
   Languages,
   CircleHelp,
   Phone,
+  PhoneCall,
   ShieldCheck,
   ChevronRight,
   ChevronLeft,
@@ -428,6 +429,15 @@ function KisanQueueApp() {
               <ChevronRight className="size-3.5 text-muted-foreground" />
             </button>
             <button
+              onClick={() => navigate({ to: "/call" })}
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 transition-colors text-left dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60"
+            >
+              <span className="flex items-center gap-2">
+                <PhoneCall className="size-4 text-amber-700 dark:text-amber-400" /> IVR Call Booking (/call)
+              </span>
+              <ChevronRight className="size-3.5 text-muted-foreground" />
+            </button>
+            <button
               onClick={() => navigate({ to: "/staff" })}
               className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors text-left"
             >
@@ -793,6 +803,20 @@ function FarmerProfileView({
               </span>
             </div>
             <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-400">/old</span>
+          </button>
+          <button
+            onClick={() => navigate({ to: "/call" })}
+            className="flex items-center justify-between rounded-xl border border-amber-300 bg-amber-50/80 p-3 text-xs font-bold text-amber-950 hover:bg-amber-100 transition-all dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-base">📞</span>
+              <span>
+                {language === "ml"
+                  ? "ടോൾ-ഫ്രീ IVR ഫോൺ കോൾ ബുക്കിംഗ് (1800-425-1661)"
+                  : "Toll-Free IVR Call Booking (1800-425-1661)"}
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-amber-700 dark:text-amber-400">/call</span>
           </button>
           <button
             onClick={() => {

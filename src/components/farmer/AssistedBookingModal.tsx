@@ -1,131 +1,49 @@
-import React, { useState } from "react";
-import { useKisanQueue } from "@/lib/store";
-import { X, PhoneCall, Headphones, MessageSquare, Check, Sparkles, Volume2 } from "lucide-react";
+import React from "react";
+import { IVRCallSimulator } from "@/components/ivr/IVRCallSimulator";
+import { X, Headphones } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 export function AssistedBookingModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { bookSlot, centres, crops, addNotification } = useKisanQueue();
-  const [callerName, setCallerName] = useState("Arun Kumar");
-  const [assistedCrop, setAssistedCrop] = useState("Paddy (നെല്ല്)");
-  const [isCalling, setIsCalling] = useState(false);
-  const [booked, setBooked] = useState(false);
-
+  const navigate = useNavigate();
   if (!isOpen) return null;
 
-  const handleAssistedBook = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsCalling(true);
-    setTimeout(() => {
-      bookSlot(centres[0].id, assistedCrop, 500, "11 Sep 2026", "11:00 AM – 12:00 PM");
-      setIsCalling(false);
-      setBooked(true);
-      addNotification("Assisted Booking Confirmed", "Krishi Bhavan desk officer booked your slot on your behalf.", "booking");
-    }, 1200);
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-border bg-card text-foreground shadow-2xl p-5">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
-        >
-          <X className="size-4" />
-        </button>
-
-        <div className="flex items-center gap-2.5">
-          <div className="flex size-10 items-center justify-center rounded-2xl bg-secondary/30 text-primary">
-            <Headphones className="size-5" />
-          </div>
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-              Digital Literacy Support
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 sm:p-4 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg my-auto rounded-[36px] bg-stone-900 border border-stone-800 shadow-2xl p-4 sm:p-5 text-stone-100">
+        <div className="flex items-center justify-between pb-3 mb-2 border-b border-stone-800/80">
+          <div className="flex items-center gap-2">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <Headphones className="size-4" />
             </span>
-            <h2 className="font-display text-lg font-bold">Assisted Booking Hotline</h2>
+            <div>
+              <h2 className="text-sm font-bold text-white">Toll-Free IVR Call Booking (1800-425-1661)</h2>
+              <p className="text-[11px] text-stone-400">Interactive voice simulation for non-smartphone farmers</p>
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="size-8 rounded-full flex items-center justify-center text-stone-400 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
+          >
+            <X className="size-4" />
+          </button>
         </div>
 
-        <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-          For elderly farmers or those with basic keypad phones, centre staff and Krishi Bhavan field officers can book slots on their behalf.
-        </p>
-
-        {!booked ? (
-          <form onSubmit={handleAssistedBook} className="mt-4 space-y-3.5">
-            <div className="rounded-2xl border border-border bg-muted/40 p-3 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold flex items-center gap-1.5">
-                  <PhoneCall className="size-3.5 text-primary" /> Toll-Free Voice Assistance:
-                </span>
-                <span className="font-mono text-xs font-bold text-primary">1800-425-1661</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                Supported Languages: Malayalam (മലയാളം), English, Tamil (தமிழ்), Hindi (हिंदी).
-              </p>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold uppercase text-muted-foreground">Farmer Name</label>
-              <input
-                type="text"
-                value={callerName}
-                onChange={(e) => setCallerName(e.target.value)}
-                required
-                className="mt-1 w-full rounded-xl border border-input bg-background p-2.5 text-xs font-semibold outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold uppercase text-muted-foreground">Crop to Harvest</label>
-              <select
-                value={assistedCrop}
-                onChange={(e) => setAssistedCrop(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-input bg-background p-2.5 text-xs font-semibold outline-none"
-              >
-                {crops.map((c) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-primary flex items-center gap-2">
-              <Volume2 className="size-4 shrink-0" />
-              <span>Audio confirmation and SMS token will be sent directly to your registered number.</span>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isCalling}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md transition-all hover:scale-[1.01]"
-            >
-              {isCalling ? (
-                <span>Connecting to Krishi Bhavan Desk...</span>
-              ) : (
-                <>
-                  <span>Confirm Assisted Booking</span>
-                  <Check className="size-4" />
-                </>
-              )}
-            </button>
-          </form>
-        ) : (
-          <div className="py-6 text-center space-y-3">
-            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
-              <Check className="size-6 stroke-[3]" />
-            </div>
-            <h3 className="font-display text-lg font-bold">Assisted Reservation Confirmed!</h3>
-            <p className="text-xs text-muted-foreground">
-              A voice confirmation and SMS token have been dispatched to +91 94471 28930.
-            </p>
-            <button
-              type="button"
-              onClick={onClose}
-              className="mt-2 w-full rounded-xl bg-primary py-2.5 text-xs font-bold text-primary-foreground"
-            >
-              Back to Dashboard
-            </button>
-          </div>
-        )}
+        {/* Embedded Call Simulator */}
+        <div className="flex justify-center">
+          <IVRCallSimulator
+            isModal={true}
+            onClose={onClose}
+            onNavigateToDashboard={() => {
+              onClose();
+              navigate({ to: "/" });
+            }}
+            onNavigateToQueue={() => {
+              onClose();
+              navigate({ to: "/" });
+            }}
+          />
+        </div>
       </div>
     </div>
   );

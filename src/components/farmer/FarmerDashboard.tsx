@@ -25,6 +25,7 @@ import {
   Ticket,
   Plus,
   Check,
+  PhoneCall,
 } from "lucide-react";
 import heroImage from "@/assets/smartprocure-home.jpg";
 import cropPaddy from "@/assets/crop-paddy.jpg";
@@ -251,8 +252,8 @@ export function FarmerDashboard({
                 type="button"
                 onClick={onOpenAssisted}
                 className="flex size-11 items-center justify-center rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-colors shadow-md"
-                title="Assisted Helpline"
-                aria-label="Assisted Helpline"
+                title="Toll-Free IVR Call Booking (1800-425-1661)"
+                aria-label="Toll-Free IVR Call Booking"
               >
                 <Headphones className="size-4" />
               </button>
@@ -498,6 +499,42 @@ export function FarmerDashboard({
               <IndianRupee className="size-4 sm:size-5" />
             </span>
             <span className="text-[10px] sm:text-[11px] font-bold text-center leading-tight line-clamp-2 w-full break-words">{t(language, "paymentStatus")}</span>
+          </button>
+        </div>
+      </section>
+
+      {/* Toll-Free IVR Phone Call Simulation Banner (Digital Inclusion for Keypad Phones) */}
+      <section className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-emerald-500/10 to-primary/5 p-3.5 shadow-xs">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm shrink-0">
+              <PhoneCall className="size-5" />
+            </span>
+            <div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-bold text-foreground">
+                  {language === "ml"
+                    ? "സ്മാർട്ട്ഫോൺ ഇല്ലേ? ടോൾ-ഫ്രീ വിളിക്കുക"
+                    : "No Smartphone? Book via Toll-Free Call"}
+                </span>
+                <span className="rounded-full bg-primary/20 text-primary px-1.5 py-0.5 text-[9.5px] font-mono font-bold">
+                  1800-425-1661
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">
+                {language === "ml"
+                  ? "സാധാരണ കീപാഡ് ഫോണിലൂടെ IVR / ശബ്ദ ബുക്കിംഗ് നടത്താം."
+                  : "Interactive Voice Response (IVR) & keypad booking for feature phones."}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenAssisted}
+            className="shrink-0 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer shadow-sm active:scale-95 flex items-center gap-1"
+          >
+            <span>{language === "ml" ? "വിളിക്കുക" : "Simulate Call"}</span>
+            <ArrowRight className="size-3.5" />
           </button>
         </div>
       </section>

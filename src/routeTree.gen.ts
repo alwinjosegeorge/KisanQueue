@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CallRouteImport } from './routes/call'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OldRouteImport } from './routes/old'
 import { Route as StaffRouteImport } from './routes/staff'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CallRoute = CallRouteImport.update({
+  id: '/call',
+  path: '/call',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -56,6 +62,7 @@ const ApiTtsRoute = ApiTtsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/call': typeof CallRoute
   '/login': typeof LoginRoute
   '/old': typeof OldRoute
   '/staff': typeof StaffRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/call': typeof CallRoute
   '/login': typeof LoginRoute
   '/old': typeof OldRoute
   '/staff': typeof StaffRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/call': typeof CallRoute
   '/login': typeof LoginRoute
   '/old': typeof OldRoute
   '/staff': typeof StaffRoute
@@ -84,13 +93,29 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/login' | '/old' | '/staff' | '/api/chat' | '/api/tts'
+    | '/'
+    | '/admin'
+    | '/call'
+    | '/login'
+    | '/old'
+    | '/staff'
+    | '/api/chat'
+    | '/api/tts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/login' | '/old' | '/staff' | '/api/chat' | '/api/tts'
+  to:
+    | '/'
+    | '/admin'
+    | '/call'
+    | '/login'
+    | '/old'
+    | '/staff'
+    | '/api/chat'
+    | '/api/tts'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/call'
     | '/login'
     | '/old'
     | '/staff'
@@ -101,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  CallRoute: typeof CallRoute
   LoginRoute: typeof LoginRoute
   OldRoute: typeof OldRoute
   StaffRoute: typeof StaffRoute
@@ -122,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/call': {
+      id: '/call'
+      path: '/call'
+      fullPath: '/call'
+      preLoaderRoute: typeof CallRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -165,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  CallRoute: CallRoute,
   LoginRoute: LoginRoute,
   OldRoute: OldRoute,
   StaffRoute: StaffRoute,
