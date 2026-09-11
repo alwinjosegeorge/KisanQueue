@@ -27,6 +27,7 @@ import {
   Check,
   Phone,
   PhoneCall,
+  ArrowRight,
 } from "lucide-react";
 import heroImage from "@/assets/smartprocure-home.jpg";
 import cropPaddy from "@/assets/crop-paddy.jpg";
