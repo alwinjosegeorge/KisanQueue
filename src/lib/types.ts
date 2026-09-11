@@ -50,11 +50,11 @@ export interface ProcurementCentre {
   currentQueueLength: number;
   avgProcessingMinutes: number;
   activeDelayMinutes: number;
-  delayReason?: string;
+  delayReason?: string | undefined;
   status: "normal" | "busy" | "delayed";
   slots: TimeSlot[];
-  recommendationScore?: number;
-  isRecommended?: boolean;
+  recommendationScore?: number | undefined;
+  isRecommended?: boolean | undefined;
 }
 
 export type BookingStatus = "confirmed" | "arrived" | "verified" | "procured" | "completed" | "cancelled";
@@ -76,12 +76,12 @@ export interface Booking {
   status: BookingStatus;
   currentStepIndex: number;
   bookedAt: string;
-  transactionId?: string;
-  paymentStatus?: "pending" | "processing" | "completed";
-  bookingSource?: "ivr" | "web" | "counter";
-  alternatePhone?: string;
-  qualityGrade?: string;
-  languageUsed?: "ml" | "en";
+  transactionId?: string | undefined;
+  paymentStatus?: "pending" | "processing" | "completed" | undefined;
+  bookingSource?: "ivr" | "web" | "counter" | undefined;
+  alternatePhone?: string | undefined;
+  qualityGrade?: string | undefined;
+  languageUsed?: "ml" | "en" | undefined;
 }
 
 export interface QueueItem {
@@ -91,8 +91,8 @@ export interface QueueItem {
   crop: string;
   quantityKg: number;
   status: "waiting" | "serving" | "verified" | "completed" | "skipped";
-  isCurrentFarmer?: boolean;
-  bookingSource?: "ivr" | "web" | "counter";
+  isCurrentFarmer?: boolean | undefined;
+  bookingSource?: "ivr" | "web" | "counter" | undefined;
 }
 
 export interface NotificationItem {
@@ -100,7 +100,7 @@ export interface NotificationItem {
   title: string;
   message: string;
   timestamp: string;
-  type: "booking" | "queue" | "delay" | "procurement" | "payment" | "sms";
+  type: "booking" | "queue" | "delay" | "procurement" | "payment" | "sms" | "info";
   read: boolean;
 }
 

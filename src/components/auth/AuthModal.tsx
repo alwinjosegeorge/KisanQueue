@@ -2,7 +2,16 @@ import React, { useState } from "react";
 import { useKisanQueue } from "@/lib/store";
 import { X, CheckCircle2, Phone, ShieldCheck, KeyRound, UserCheck, ArrowRight } from "lucide-react";
 
-export function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function AuthModal({
+  isOpen,
+  open,
+  onClose,
+}: {
+  isOpen?: boolean;
+  open?: boolean;
+  onClose: () => void;
+}) {
+  const isModalOpen = isOpen ?? open ?? false;
   const { setRole, addNotification, setIsLoggedIn } = useKisanQueue();
   const [authMode, setAuthMode] = useState<"otp" | "farmerId" | "staff" | "register">("otp");
   const [mobile, setMobile] = useState("8281251299");
@@ -17,7 +26,7 @@ export function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   const [regDistrict, setRegDistrict] = useState("Kottayam");
   const [regCrop, setRegCrop] = useState("Paddy (നെല്ല്)");
 
-  if (!isOpen) return null;
+  if (!isModalOpen) return null;
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();

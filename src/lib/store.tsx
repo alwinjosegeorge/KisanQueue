@@ -505,7 +505,7 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
 
   // Smart Engine: Waiting-time prediction
   const predictWaitingTime = (centreId: string, userQueueNumber: number) => {
-    const centre = centres.find((c) => c.id === centreId) ?? centres[0];
+    const centre = centres.find((c) => c.id === centreId) ?? centres[0] ?? INITIAL_CENTRES[0];
     const farmersAhead = Math.max(0, userQueueNumber - nowServing);
     const rawMinutes = farmersAhead * centre.avgProcessingMinutes;
     const totalMinutes = rawMinutes + centre.activeDelayMinutes;
@@ -521,9 +521,9 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
   };
 
   // Smart Engine: Centre Recommendation algorithm (Multi-factor ranking)
-  const getRecommendedCentre = (cropId?: string) => {
+  const getRecommendedCentre = (cropId?: string): ProcurementCentre => {
     // Scoring: Distance (30%) + Waiting Time (40%) + Remaining Capacity (30%)
-    let bestCentre = centres[0];
+    let bestCentre: ProcurementCentre = centres[0] || INITIAL_CENTRES[0];
     let bestScore = Infinity;
 
     centres.forEach((centre) => {
@@ -555,9 +555,9 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
       languageUsed?: "ml" | "en";
     }
   ): Booking => {
-    const centre = centres.find((c) => c.id === centreId) || centres[0];
+    const centre = centres.find((c) => c.id === centreId) || centres[0] || INITIAL_CENTRES[0];
     const newQueueNum = nowServing + queue.length + 1;
-    const cropObj = crops.find((c) => c.name.toLowerCase().includes(cropName.toLowerCase())) || crops[0];
+    const cropObj = crops.find((c) => c.name.toLowerCase().includes(cropName.toLowerCase())) || crops[0] || INITIAL_CROPS[0];
 
     const farmerMobile = options?.farmerMobile || user.mobile;
     const farmerName = options?.farmerName || user.name;
