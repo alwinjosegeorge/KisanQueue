@@ -134,8 +134,20 @@ function IVRCallRoutePage() {
         {/* Right 7 Cols: Interactive Phone Keypad Simulator */}
         <div className="lg:col-span-7 flex justify-center">
           <IVRCallSimulator
-            onNavigateToDashboard={() => navigate({ to: "/", search: { screen: "home" } })}
-            onNavigateToQueue={() => navigate({ to: "/", search: { screen: "queue" } })}
+            onNavigateToDashboard={() => {
+              if (typeof window !== "undefined") {
+                window.location.href = "/?screen=home";
+              } else {
+                navigate({ to: "/" });
+              }
+            }}
+            onNavigateToQueue={() => {
+              if (typeof window !== "undefined") {
+                window.location.href = "/?screen=queue";
+              } else {
+                navigate({ to: "/" });
+              }
+            }}
           />
         </div>
       </main>

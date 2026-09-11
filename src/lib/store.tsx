@@ -404,18 +404,33 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
   const [centres, setCentres] = useState<ProcurementCentre[]>(INITIAL_CENTRES);
   const [crops] = useState<Crop[]>(INITIAL_CROPS);
 
-  const [bookings, setBookingsState] = useState<Booking[]>(() => {
+  const [bookings, setBookingsState] = useState<Booking[]>(INITIAL_BOOKINGS);
+  const [queue, setQueueState] = useState<QueueItem[]>(INITIAL_QUEUE);
+
+  // Safely hydrate stored bookings and queue on client mount to avoid SSR hydration mismatch
+  useEffect(() => {
     if (typeof window !== "undefined") {
       try {
-        const stored = localStorage.getItem("kisanqueue_bookings");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        const storedBookings = localStorage.getItem("kisanqueue_bookings");
+        if (storedBookings) {
+          const parsed = JSON.parse(storedBookings);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setBookingsState(parsed);
+          }
+        }
+      } catch (e) {}
+
+      try {
+        const storedQueue = localStorage.getItem("kisanqueue_queue");
+        if (storedQueue) {
+          const parsed = JSON.parse(storedQueue);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setQueueState(parsed);
+          }
         }
       } catch (e) {}
     }
-    return INITIAL_BOOKINGS;
-  });
+  }, []);
 
   const setBookings = (val: Booking[] | ((prev: Booking[]) => Booking[])) => {
     setBookingsState((prev) => {
@@ -428,19 +443,6 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
       return next;
     });
   };
-
-  const [queue, setQueueState] = useState<QueueItem[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("kisanqueue_queue");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-      } catch (e) {}
-    }
-    return INITIAL_QUEUE;
-  });
 
   const setQueue = (val: QueueItem[] | ((prev: QueueItem[]) => QueueItem[])) => {
     setQueueState((prev) => {

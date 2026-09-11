@@ -46,11 +46,6 @@ import { CentreMapView } from "@/components/farmer/CentreMapView";
 import { KisanQueueAIChatbot } from "@/components/KisanQueueAIChatbot";
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): { screen?: string } => {
-    return {
-      screen: typeof search.screen === "string" ? search.screen : undefined,
-    };
-  },
   head: () => ({
     meta: [
       { title: "KisanQueue — Fair & Fast Farmer Queue Management System" },
@@ -290,14 +285,10 @@ function KisanQueueApp() {
   } = useKisanQueue();
   const { t: translate } = useTranslation();
   const navigate = useNavigate();
-  const search = Route.useSearch();
 
-  // If already logged in or search param provided, default to home dashboard; otherwise show splash
+  // Initialize as splash for SSR matching; dynamically restore login or URL param on mount
   const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>(() => {
     if (typeof window !== "undefined") {
-      if (search?.screen && ["home", "bookings", "queue", "timeline", "payment", "map", "profile"].includes(search.screen)) {
-        return search.screen as FarmerScreen;
-      }
       const storedLogin = localStorage.getItem("kisanqueue_logged_in") === "true";
       return storedLogin ? "home" : "splash";
     }
@@ -311,12 +302,19 @@ function KisanQueueApp() {
   const [selectedCropForBooking, setSelectedCropForBooking] = useState<string | null>(null);
   const [assistedModalOpen, setAssistedModalOpen] = useState(false);
 
-  // Sync with search.screen whenever URL changes
+  // Read URL search params safely on mount without triggering router search schema errors
   useEffect(() => {
-    if (search?.screen && ["home", "bookings", "queue", "timeline", "payment", "map", "profile"].includes(search.screen)) {
-      setFarmerScreen(search.screen as FarmerScreen);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const screenParam = params.get("screen") as FarmerScreen | null;
+      if (
+        screenParam &&
+        ["home", "bookings", "queue", "timeline", "payment", "map", "profile"].includes(screenParam)
+      ) {
+        setFarmerScreen(screenParam);
+      }
     }
-  }, [search?.screen]);
+  }, []);
 
   useEffect(() => {
     setRole("farmer");
