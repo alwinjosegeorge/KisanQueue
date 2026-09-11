@@ -2468,7 +2468,14 @@ function SeniorCitizenModePage() {
             </div>
 
             {/* Switch to Standard View button inside profile */}
-            <div className="pt-2">
+            <div className="pt-2 space-y-2">
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/login" })}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-emerald-300 bg-emerald-50 py-3.5 font-black text-emerald-950 shadow-sm hover:bg-emerald-100 active:scale-95 transition-all text-sm"
+              >
+                <span>🌾 {language === "ml" ? "കർഷക ലോഗിൻ / അക്കൗണ്ട് മാറുക" : "Farmer Login / Switch Account"}</span>
+              </button>
               <button
                 type="button"
                 onClick={() => navigate({ to: "/" })}

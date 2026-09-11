@@ -17,6 +17,7 @@ interface KisanQueueContextType {
   role: Role;
   setRole: (role: Role) => void;
   user: User;
+  setUser: (u: User | ((prev: User) => User)) => void;
   language: Language;
   setLanguage: (lang: Language) => void;
   largeText: boolean;
@@ -345,7 +346,7 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
   const [largeText, setLargeText] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
 
-  const [user] = useState<User>({
+  const [user, setUser] = useState<User>({
     id: "usr-01",
     name: "Arun Kumar",
     role: "farmer",
@@ -668,6 +669,7 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
         role,
         setRole,
         user,
+        setUser,
         language,
         setLanguage,
         largeText,

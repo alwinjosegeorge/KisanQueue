@@ -20,6 +20,8 @@ import {
   LogOut,
   Sparkles,
   Building2,
+  LogIn,
+  KeyRound,
 } from "lucide-react";
 
 import { useKisanQueue } from "@/lib/store";
@@ -126,6 +128,7 @@ function AppButton({
 
 function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
   const { language, setLanguage } = useKisanQueue();
+  const navigate = useNavigate();
   return (
     <main className="splash-screen">
       <img
@@ -161,6 +164,14 @@ function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) 
           >
             {language === "ml" ? "ആരംഭിക്കുക" : language === "hi" ? "शुरू करें" : language === "ta" ? "தொடங்குங்கள்" : language === "te" ? "ప్రారంభించండి" : language === "kn" ? "ಪ್ರಾರಂಭಿಸಿ" : language === "bn" ? "শুরু করুন" : language === "mr" ? "सुरू करा" : "Begin"} <ChevronRight className="size-4" />
           </AppButton>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/login" })}
+            className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-full border border-white/30 bg-white/10 text-white font-semibold text-xs hover:bg-white/20 backdrop-blur-md transition-all active:scale-[0.99]"
+          >
+            <KeyRound className="size-3.5 text-secondary" />
+            <span>{language === "ml" ? "കർഷക ലോഗിൻ / സൈൻ ഇൻ" : "Farmer Sign In / Login"}</span>
+          </button>
         </div>
       </div>
     </main>
@@ -370,6 +381,15 @@ function KisanQueueApp() {
               Official Portals & Accessibility
             </p>
             <button
+              onClick={() => navigate({ to: "/login" })}
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors text-left"
+            >
+              <span className="flex items-center gap-2">
+                <LogIn className="size-4 text-primary" /> Farmer Login (/login)
+              </span>
+              <ChevronRight className="size-3.5 text-muted-foreground" />
+            </button>
+            <button
               onClick={() => navigate({ to: "/old" })}
               className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-colors text-left dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
             >
@@ -574,7 +594,14 @@ function FarmerProfileView({
 
         <div className="relative z-10 mt-6 flex items-center gap-4">
           <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-secondary font-display text-2xl font-black text-primary shadow">
-            AK
+            {user.name
+              ? user.name
+                  .split(" ")
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()
+              : "KQ"}
           </div>
           <div>
             <h1 className="font-display text-2xl font-bold">{user.name}</h1>
@@ -583,6 +610,27 @@ function FarmerProfileView({
           </div>
         </div>
       </div>
+
+      {/* Switch Account / Login Button */}
+      <button
+        onClick={() => navigate({ to: "/login" })}
+        className="w-full flex items-center justify-between rounded-2xl border border-primary/20 bg-primary/5 p-3.5 text-xs font-bold text-primary hover:bg-primary/10 transition-all shadow-sm"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+            <LogIn className="size-4" />
+          </div>
+          <div className="text-left">
+            <p className="font-bold text-foreground">
+              {language === "ml" ? "കർഷക ലോഗിൻ / അക്കൗണ്ട് മാറുക" : "Farmer Login / Switch Account"}
+            </p>
+            <span className="text-[10px] text-muted-foreground font-normal">
+              {language === "ml" ? "OTP അല്ലെങ്കിൽ കർഷക ഐഡി ഉപയോഗിച്ച് പ്രവേശിക്കുക" : "Login via Mobile OTP, Kerala Farmer ID, or 1-Tap Demo Profiles"}
+            </span>
+          </div>
+        </div>
+        <ChevronRight className="size-4 text-primary" />
+      </button>
 
       {/* Land & Crop Registry */}
       <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
@@ -660,6 +708,16 @@ function FarmerProfileView({
           {t(language, "govPortals")} & Special Modes
         </h3>
         <div className="grid grid-cols-1 gap-2">
+          <button
+            onClick={() => navigate({ to: "/login" })}
+            className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs font-bold text-primary hover:bg-primary/10 transition-all"
+          >
+            <div className="flex items-center gap-2.5">
+              <LogIn className="size-4 text-primary" />
+              <span>🌾 {language === "ml" ? "കർഷക ലോഗിൻ പോർട്ടൽ" : "Farmer Login Portal"}</span>
+            </div>
+            <span className="text-[11px] text-primary/80 font-mono">/login</span>
+          </button>
           <button
             onClick={() => navigate({ to: "/old" })}
             className="flex items-center justify-between rounded-xl border border-emerald-300 bg-emerald-50/80 p-3 text-xs font-bold text-emerald-950 hover:bg-emerald-100 transition-all dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
