@@ -3,7 +3,7 @@ import { useKisanQueue } from "@/lib/store";
 import { X, CheckCircle2, Phone, ShieldCheck, KeyRound, UserCheck, ArrowRight } from "lucide-react";
 
 export function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { setRole, addNotification } = useKisanQueue();
+  const { setRole, addNotification, setIsLoggedIn } = useKisanQueue();
   const [authMode, setAuthMode] = useState<"otp" | "farmerId" | "staff" | "register">("otp");
   const [mobile, setMobile] = useState("9447128930");
   const [otpSent, setOtpSent] = useState(false);
@@ -29,6 +29,7 @@ export function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setRole("farmer");
+    setIsLoggedIn(true);
     addNotification("Login Successful 👨‍🌾", "Welcome back Arun Kumar (Farmer ID: KL-KTM-26047).", "booking");
     onClose();
   };
@@ -36,6 +37,7 @@ export function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   const handleFarmerIdLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setRole("farmer");
+    setIsLoggedIn(true);
     addNotification("Farmer Authenticated 🌾", `Logged in with verified Kerala Farmer ID: ${farmerIdInput}.`, "booking");
     onClose();
   };

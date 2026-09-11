@@ -159,18 +159,19 @@ function Splash({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) 
           </p>
           <AppButton
             tone="soft"
-            className="mt-7 w-full flex items-center justify-center gap-1.5 py-3 font-bold text-base shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all"
-            onClick={onNext}
+            className="mt-7 w-full flex items-center justify-center gap-2 py-3.5 font-bold text-base shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
+            onClick={() => navigate({ to: "/login" })}
           >
-            {language === "ml" ? "ആരംഭിക്കുക" : language === "hi" ? "शुरू करें" : language === "ta" ? "தொடங்குங்கள்" : language === "te" ? "ప్రారంభించండి" : language === "kn" ? "ಪ್ರಾರಂಭಿಸಿ" : language === "bn" ? "শুরু করুন" : language === "mr" ? "सुरू करा" : "Begin"} <ChevronRight className="size-4" />
+            <LogIn className="size-4" />
+            <span>{language === "ml" ? "ലോഗിൻ ചെയ്യുക" : "Login"}</span>
+            <ChevronRight className="size-4" />
           </AppButton>
           <button
             type="button"
-            onClick={() => navigate({ to: "/login" })}
-            className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-full border border-white/30 bg-white/10 text-white font-semibold text-xs hover:bg-white/20 backdrop-blur-md transition-all active:scale-[0.99]"
+            onClick={onSkip}
+            className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-full border border-white/30 bg-white/10 text-white font-semibold text-xs hover:bg-white/20 backdrop-blur-md transition-all active:scale-[0.99] cursor-pointer"
           >
-            <KeyRound className="size-3.5 text-secondary" />
-            <span>{language === "ml" ? "കർഷക ലോഗിൻ / സൈൻ ഇൻ" : "Farmer Sign In / Login"}</span>
+            <span>{language === "ml" ? "ലോഗിൻ ചെയ്യാതെ തുടരുക (Guest)" : "Continue as Guest"}</span>
           </button>
         </div>
       </div>
@@ -266,12 +267,31 @@ function Onboarding({
 }
 
 function KisanQueueApp() {
-  const { role, setRole, language, setLanguage, user, activeBooking, nowServing, largeText, highContrast } =
-    useKisanQueue();
+  const {
+    role,
+    setRole,
+    language,
+    setLanguage,
+    user,
+    activeBooking,
+    nowServing,
+    largeText,
+    highContrast,
+    isLoggedIn,
+    logout,
+    addNotification,
+  } = useKisanQueue();
   const { t: translate } = useTranslation();
   const navigate = useNavigate();
 
-  const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>("splash");
+  // If already logged in, default to home dashboard; otherwise show splash
+  const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>(() => {
+    if (typeof window !== "undefined") {
+      const storedLogin = localStorage.getItem("kisanqueue_logged_in") === "true";
+      return storedLogin ? "home" : "splash";
+    }
+    return "splash";
+  });
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [authOpen, setAuthOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -284,6 +304,15 @@ function KisanQueueApp() {
     setRole("farmer");
   }, [setRole]);
 
+  // Keep user on home dashboard if logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      if (farmerScreen === "splash" || farmerScreen === "onboarding") {
+        setFarmerScreen("home");
+      }
+    }
+  }, [isLoggedIn]);
+
   // If user is on pure Splash screen
   if (farmerScreen === "splash") {
     return (
@@ -294,8 +323,7 @@ function KisanQueueApp() {
       >
         <Splash
           onNext={() => {
-            setOnboardingStep(0);
-            setFarmerScreen("onboarding");
+            navigate({ to: "/login" });
           }}
           onSkip={() => setFarmerScreen("home")}
         />
@@ -416,6 +444,18 @@ function KisanQueueApp() {
               </span>
               <ChevronRight className="size-3.5 text-muted-foreground" />
             </button>
+            <button
+              onClick={() => {
+                logout();
+                setFarmerScreen("splash");
+                addNotification("Logged Out", "You have been logged out of KisanQueue.", "info");
+              }}
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <LogOut className="size-4" /> {language === "ml" ? "ലോഗ് ഔട്ട്" : "Log Out"}
+              </span>
+            </button>
           </div>
 
           {/* Live Token Snapshot in Rail */}
@@ -510,7 +550,10 @@ function KisanQueueApp() {
             )}
 
             {farmerScreen === "profile" && (
-              <FarmerProfileView onBack={() => setFarmerScreen("home")} />
+              <FarmerProfileView
+                onBack={() => setFarmerScreen("home")}
+                onLogout={() => setFarmerScreen("splash")}
+              />
             )}
           </div>
 
@@ -574,10 +617,12 @@ function FarmerBottomNav({
 
 function FarmerProfileView({
   onBack,
+  onLogout,
 }: {
   onBack: () => void;
+  onLogout?: () => void;
 }) {
-  const { user, language, setLanguage, setRole } = useKisanQueue();
+  const { user, language, setLanguage, setRole, logout, addNotification } = useKisanQueue();
   const navigate = useNavigate();
 
   return (
@@ -755,6 +800,22 @@ function FarmerProfileView({
             <span className="text-[11px] text-muted-foreground font-mono">/admin</span>
           </button>
         </div>
+      </div>
+
+      {/* Log Out Action */}
+      <div className="pt-2 pb-4">
+        <button
+          type="button"
+          onClick={() => {
+            logout();
+            addNotification("Logged Out", "You have been logged out of KisanQueue.", "info");
+            if (onLogout) onLogout();
+          }}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl border border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 py-3.5 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-950/60 active:scale-95 transition-all cursor-pointer shadow-xs"
+        >
+          <LogOut className="size-4" />
+          <span>{language === "ml" ? "ലോഗ് ഔട്ട് ചെയ്യുക" : "Log Out of KisanQueue"}</span>
+        </button>
       </div>
     </div>
   );

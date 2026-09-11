@@ -127,6 +127,7 @@ export function FarmerOnboardingLoginPage() {
     largeText,
     setLargeText,
     addNotification,
+    setIsLoggedIn,
   } = useKisanQueue();
 
   // Steps: "phone" -> "otp" -> "preferences" -> "crops"
@@ -264,6 +265,8 @@ export function FarmerOnboardingLoginPage() {
       crops: selectedCrops,
       primaryCrop: cropNames || "Cultivated Crops",
     }));
+
+    setIsLoggedIn(true);
 
     addNotification({
       title: "Registration Complete",

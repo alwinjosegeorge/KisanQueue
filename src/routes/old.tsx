@@ -1225,6 +1225,7 @@ function SeniorCitizenModePage() {
   const centres = Array.isArray(queueContext?.centres) && queueContext.centres.length > 0 ? queueContext.centres : [];
   const bookSlot = queueContext?.bookSlot;
   const cancelBooking = queueContext?.cancelBooking;
+  const logout = queueContext?.logout;
 
   const fallbackCentre: ProcurementCentre = {
     id: "centre-ktm",
@@ -2479,10 +2480,21 @@ function SeniorCitizenModePage() {
               <button
                 type="button"
                 onClick={() => navigate({ to: "/" })}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-4 font-black text-stone-800 shadow-sm hover:bg-stone-50 active:scale-95 transition-all text-base"
+                className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-300 bg-white py-4 font-black text-stone-800 shadow-sm hover:bg-stone-50 active:scale-95 transition-all text-base cursor-pointer"
               >
                 <span>{ui.switchStandard}</span>
                 <ExternalLink className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (logout) logout();
+                  navigate({ to: "/" });
+                }}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-rose-300 bg-rose-50 py-3.5 font-black text-rose-800 shadow-sm hover:bg-rose-100 active:scale-95 transition-all text-sm cursor-pointer"
+              >
+                <LogOut className="size-4" />
+                <span>{language === "ml" ? "ലോഗ് ഔട്ട് ചെയ്യുക" : "Log Out of KisanQueue"}</span>
               </button>
             </div>
           </section>

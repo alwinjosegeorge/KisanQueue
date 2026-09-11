@@ -18,6 +18,9 @@ interface KisanQueueContextType {
   setRole: (role: Role) => void;
   user: User;
   setUser: (u: User | ((prev: User) => User)) => void;
+  isLoggedIn: boolean;
+  setIsLoggedIn: (val: boolean) => void;
+  logout: () => void;
   language: Language;
   setLanguage: (lang: Language) => void;
   largeText: boolean;
@@ -346,6 +349,29 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
   const [largeText, setLargeText] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
 
+  // Authentication & Session Persistence
+  const [isLoggedIn, setIsLoggedInState] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("kisanqueue_logged_in") === "true";
+    }
+    return false;
+  });
+
+  const setIsLoggedIn = (val: boolean) => {
+    setIsLoggedInState(val);
+    if (typeof window !== "undefined") {
+      if (val) {
+        localStorage.setItem("kisanqueue_logged_in", "true");
+      } else {
+        localStorage.removeItem("kisanqueue_logged_in");
+      }
+    }
+  };
+
+  const logout = () => {
+    setIsLoggedIn(false);
+  };
+
   const [user, setUser] = useState<User>({
     id: "usr-01",
     name: "Arun Kumar",
@@ -671,6 +697,9 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
         setRole,
         user,
         setUser,
+        isLoggedIn,
+        setIsLoggedIn,
+        logout,
         language,
         setLanguage,
         largeText,
