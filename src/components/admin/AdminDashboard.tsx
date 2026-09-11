@@ -64,20 +64,29 @@ const DAILY_TREND_DATA = [
 ];
 
 export function AdminDashboard() {
-  const { centres, bottlenecks, forecasts, addNotification } = useKisanQueue();
+  const { centres, bookings, queue, nowServing, bottlenecks, forecasts, addNotification } = useKisanQueue();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"overview" | "analytics" | "bottlenecks" | "forecast" | "reports">("overview");
   const [selectedCentreFilter, setSelectedCentreFilter] = useState<string>("all");
   const [reportExported, setReportExported] = useState(false);
   const [appliedRecommendations, setAppliedRecommendations] = useState<Record<string, boolean>>({});
 
-  // Statewide aggregates
+  // Statewide aggregates dynamically derived from live store
   const totalCentres = centres.length;
   const totalFarmersScheduled = centres.reduce((sum, c) => sum + c.todayBookingsCount, 0);
-  const activeQueuedFarmers = centres.reduce((sum, c) => sum + c.currentQueueLength, 0);
-  const totalDelayedCentres = centres.filter((c) => c.status === "delayed").length;
-  const totalVolumeMT = 109.0; // 109 Metric Tons
-  const totalDisbursedLakhs = "₹72.83 Lakhs";
+  const activeQueuedFarmers = queue.filter((q) => q.status === "waiting" || q.status === "serving").length;
+  const totalDelayedCentres = centres.filter((c) => c.status === "delayed" || c.activeDelayMinutes > 0).length;
+
+  // Dynamic procurement tonnage
+  const additionalVolumeMT = bookings.reduce((sum, b) => sum + (b.quantityKg || 0), 0) / 1000;
+  const totalVolumeMT = Number((105.0 + additionalVolumeMT).toFixed(1));
+
+  // Dynamic MSP Disbursed (PFMS DBT settlement)
+  const completedBookingsPayout = bookings
+    .filter((b) => b.status === "completed" || b.paymentStatus === "completed")
+    .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+  const totalDisbursedAmount = 7000000 + completedBookingsPayout;
+  const totalDisbursedLakhs = `₹${(totalDisbursedAmount / 100000).toFixed(2)} Lakhs`;
 
   const handleApplyRecommendation = (centreId: string, title: string) => {
     setAppliedRecommendations((prev) => ({ ...prev, [centreId]: true }));
@@ -291,7 +300,7 @@ export function AdminDashboard() {
               {centres
                 .filter((c) => selectedCentreFilter === "all" || c.district === selectedCentreFilter)
                 .map((centre) => {
-                  const isDelayed = centre.status === "delayed";
+                  const isDelayed = centre.status === "delayed" || (centre.activeDelayMinutes || 0) > 0;
                   const isBusy = centre.status === "busy";
 
                   return (

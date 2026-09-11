@@ -32,7 +32,9 @@ export function StaffDashboard() {
     language,
   } = useKisanQueue();
 
-  const currentCentre = centres[0]; // Kottayam Centre staff view
+  const [selectedCentreId, setSelectedCentreId] = useState<string>("centre-ktm");
+  const currentCentre = centres.find((c) => c.id === selectedCentreId) || centres[0];
+
   const [showDelayModal, setShowDelayModal] = useState(false);
   const [delayMinutesInput, setDelayMinutesInput] = useState(20);
   const [delayReasonInput, setDelayReasonInput] = useState("Moisture meter recalibration & high vehicle volume");
@@ -42,6 +44,12 @@ export function StaffDashboard() {
 
   const activeFarmer = queue.find((q) => q.queueNumber === nowServing) || queue[0];
   const waitingCount = queue.filter((q) => q.status === "waiting" || q.queueNumber > nowServing).length;
+
+  const handleOpenVerify = (tokenNum: number) => {
+    const item = queue.find((q) => q.queueNumber === tokenNum);
+    setActualWeight(item?.quantityKg || 420);
+    setShowVerifyModal(tokenNum);
+  };
 
   const handleReportDelaySubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,38 +63,60 @@ export function StaffDashboard() {
     setShowVerifyModal(null);
   };
 
+  // Compute a 8-item window around nowServing
+  const visibleQueue = React.useMemo(() => {
+    const activeIdx = queue.findIndex((q) => q.queueNumber >= nowServing);
+    const start = Math.max(0, (activeIdx === -1 ? 0 : activeIdx) - 1);
+    return queue.slice(start, start + 8);
+  }, [queue, nowServing]);
+
   return (
     <div className="content-stack pt-2 space-y-4">
-      {/* Staff Facility Header */}
-      <div className="flex items-center justify-between rounded-2xl bg-card border border-border p-4 shadow-sm">
+      {/* Staff Facility Header with Centre Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl bg-card border border-border p-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-display text-lg font-bold">
+          <div className="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-display text-lg font-bold shrink-0">
             🏢
           </div>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-              Procurement Officer Console · Gate 1
+            <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
+              Procurement Officer Console · Live Gate Control
             </span>
-            <h1 className="font-display text-lg font-bold">{currentCentre.name}</h1>
-            <p className="text-xs text-muted-foreground">Officer P. V. Thomas (ID: STF-KTM-08)</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <select
+                value={selectedCentreId}
+                onChange={(e) => setSelectedCentreId(e.target.value)}
+                className="font-display text-base font-bold bg-transparent border border-border rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+              >
+                {centres.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} ({c.district})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">Officer P. V. Thomas (ID: STF-KTM-08)</p>
           </div>
         </div>
 
-        {currentCentre.activeDelayMinutes > 0 ? (
-          <button
-            onClick={() => clearDelay(currentCentre.id)}
-            className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white shadow-sm hover:bg-emerald-700"
-          >
-            {t(language, "clearDelay")} ({currentCentre.activeDelayMinutes}m)
-          </button>
-        ) : (
-          <button
-            onClick={() => setShowDelayModal(true)}
-            className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-500/20"
-          >
-            <AlertTriangle className="size-3.5" /> {t(language, "reportDelay")}
-          </button>
-        )}
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          {currentCentre.activeDelayMinutes > 0 ? (
+            <button
+              onClick={() => clearDelay(currentCentre.id)}
+              className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition-colors flex items-center gap-1.5"
+            >
+              <Check className="size-3.5" />
+              {t(language, "clearDelay")} (+{currentCentre.activeDelayMinutes}m)
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowDelayModal(true)}
+              className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-500/20 transition-colors"
+            >
+              <AlertTriangle className="size-3.5" /> {t(language, "reportDelay")}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 6 Key Operational Metrics (As Requested in SIH Spec) */}
@@ -179,7 +209,7 @@ export function StaffDashboard() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => setShowVerifyModal(nowServing)}
+              onClick={() => handleOpenVerify(nowServing)}
               className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:scale-[1.01]"
             >
               <ShieldCheck className="size-4" /> Verify & Complete
@@ -208,7 +238,7 @@ export function StaffDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
-              {queue.slice(0, 7).map((item) => (
+              {visibleQueue.map((item) => (
                 <tr key={item.queueNumber} className={item.queueNumber === nowServing ? "bg-primary/5 font-bold" : ""}>
                   <td className="py-2.5 pr-2 font-mono font-bold">#{item.queueNumber}</td>
                   <td className="py-2.5 px-2">
@@ -250,7 +280,7 @@ export function StaffDashboard() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setShowVerifyModal(item.queueNumber)}
+                          onClick={() => handleOpenVerify(item.queueNumber)}
                           className="rounded-lg bg-primary/10 text-primary px-2 py-1 text-[11px] font-bold hover:bg-primary/20"
                         >
                           Verify
@@ -346,39 +376,51 @@ export function StaffDashboard() {
               </button>
             </div>
 
-            <div className="rounded-xl bg-muted/40 p-3 text-xs space-y-1">
-              <p>Farmer: <strong>Arun Kumar (Token #{showVerifyModal})</strong></p>
-              <p>Commodity: <strong>Paddy Grade A</strong> · Base MSP: <strong>₹32/kg</strong></p>
-            </div>
+            {(() => {
+              const targetFarmer = queue.find((q) => q.queueNumber === showVerifyModal);
+              const mspRate = targetFarmer?.crop?.toLowerCase().includes("coconut") ? 38 : targetFarmer?.crop?.toLowerCase().includes("rubber") ? 180 : 32;
+              return (
+                <>
+                  <div className="rounded-xl bg-muted/40 p-3 text-xs space-y-1">
+                    <p>
+                      Farmer: <strong>{targetFarmer?.farmerName || "Farmer"} (Token #{showVerifyModal})</strong>
+                    </p>
+                    <p>
+                      Commodity: <strong>{targetFarmer?.crop || "Paddy"}</strong> · Base MSP: <strong>₹{mspRate}/kg</strong>
+                    </p>
+                  </div>
 
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs font-bold uppercase text-muted-foreground">Certified Scale Weight (kg)</label>
-                <input
-                  type="number"
-                  value={actualWeight}
-                  onChange={(e) => setActualWeight(Number(e.target.value))}
-                  className="mt-1 w-full rounded-xl border border-input bg-background p-2.5 text-sm font-bold outline-none"
-                />
-              </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-bold uppercase text-muted-foreground">Certified Scale Weight (kg)</label>
+                      <input
+                        type="number"
+                        value={actualWeight}
+                        onChange={(e) => setActualWeight(Number(e.target.value))}
+                        className="mt-1 w-full rounded-xl border border-input bg-background p-2.5 text-sm font-bold outline-none"
+                      />
+                    </div>
 
-              <div>
-                <label className="text-xs font-bold uppercase text-muted-foreground">Moisture Reading (%) — Limit 14.0%</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={moistureReading}
-                  onChange={(e) => setMoistureReading(Number(e.target.value))}
-                  className="mt-1 w-full rounded-xl border border-input bg-background p-2.5 text-sm font-bold outline-none"
-                />
-                <span className="text-[10px] text-emerald-600 font-bold mt-0.5 block">✓ Quality passed standard (Grade A)</span>
-              </div>
+                    <div>
+                      <label className="text-xs font-bold uppercase text-muted-foreground">Moisture Reading (%) — Limit 14.0%</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={moistureReading}
+                        onChange={(e) => setMoistureReading(Number(e.target.value))}
+                        className="mt-1 w-full rounded-xl border border-input bg-background p-2.5 text-sm font-bold outline-none"
+                      />
+                      <span className="text-[10px] text-emerald-600 font-bold mt-0.5 block">✓ Quality passed standard (Grade A)</span>
+                    </div>
 
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs flex justify-between">
-                <span>Total MSP Payout Disbursed:</span>
-                <strong className="text-primary font-bold">₹{(actualWeight * 32).toLocaleString("en-IN")}</strong>
-              </div>
-            </div>
+                    <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs flex justify-between">
+                      <span>Total MSP Payout Disbursed:</span>
+                      <strong className="text-primary font-bold">₹{(actualWeight * mspRate).toLocaleString("en-IN")}</strong>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
 
             <button
               type="button"

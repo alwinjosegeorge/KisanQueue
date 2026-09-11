@@ -30,6 +30,12 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
     : { timeStr: "Immediate", minutesLeft: 0, delayMinutes: 0 };
   const farmersAhead = activeBooking ? Math.max(0, activeBooking.queueNumber - nowServing) : 0;
 
+  const visiblePipeline = React.useMemo(() => {
+    const activeIdx = queue.findIndex((q) => q.queueNumber >= nowServing);
+    const start = Math.max(0, (activeIdx === -1 ? 0 : activeIdx) - 1);
+    return queue.slice(start, start + 8);
+  }, [queue, nowServing]);
+
   return (
     <div className="content-stack pt-2 space-y-4">
       {/* Header */}
@@ -67,6 +73,17 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
                 Updated turn: <strong>{prediction.timeStr}</strong>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Turn Alert Banner if it's the farmer's turn */}
+      {activeBooking && nowServing === userQueueNumber && (
+        <div className="rounded-2xl border-2 border-emerald-400 bg-emerald-500 p-4 text-white shadow-xl animate-pulse flex items-center gap-3">
+          <span className="text-2xl">⚡</span>
+          <div>
+            <h3 className="font-display font-extrabold text-sm">YOU ARE CURRENTLY BEING CALLED!</h3>
+            <p className="text-xs text-emerald-100 mt-0.5">Please move your transport vehicle to Weighing Bay 1 immediately.</p>
           </div>
         </div>
       )}
@@ -114,7 +131,11 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
               </strong>
               <small className="block text-[10px] text-secondary mt-0.5 font-semibold">
                 {activeBooking
-                  ? (farmersAhead === 0 ? t(language, "servingNow") : `${farmersAhead} ${t(language, "farmersAhead")}`)
+                  ? (farmersAhead === 0 && nowServing === userQueueNumber
+                      ? "⚡ AT WEIGHING BAY"
+                      : nowServing > userQueueNumber
+                      ? "✓ Completed"
+                      : `${farmersAhead} ${t(language, "farmersAhead")}`)
                   : t(language, "noToken")}
               </small>
             </div>
@@ -123,17 +144,27 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
           <div className="grid grid-cols-3 gap-2 border-t border-white/15 pt-3 text-center text-xs">
             <div>
               <span className="text-[10px] text-primary-foreground/60 block">{t(language, "queueGap")}</span>
-              <strong>{activeBooking ? `${farmersAhead} ${t(language, "farmersAhead")}` : "—"}</strong>
+              <strong>
+                {activeBooking
+                  ? (nowServing === userQueueNumber ? "Your Turn" : nowServing > userQueueNumber ? "Passed" : `${farmersAhead} ahead`)
+                  : "—"}
+              </strong>
             </div>
             <div>
               <span className="text-[10px] text-primary-foreground/60 block">{t(language, "waitTime")}</span>
               <strong className={currentCentre.activeDelayMinutes > 0 ? "text-secondary" : ""}>
-                {activeBooking ? `~${prediction.minutesLeft} mins` : "Ready"}
+                {activeBooking
+                  ? (nowServing === userQueueNumber || nowServing > userQueueNumber ? "0 mins" : `~${prediction.minutesLeft} mins`)
+                  : "Ready"}
               </strong>
             </div>
             <div>
               <span className="text-[10px] text-primary-foreground/60 block">{t(language, "expectedCall")}</span>
-              <strong className="text-secondary">{activeBooking ? prediction.timeStr : "Immediate"}</strong>
+              <strong className="text-secondary">
+                {activeBooking
+                  ? (nowServing === userQueueNumber ? "Now" : nowServing > userQueueNumber ? "Done" : prediction.timeStr)
+                  : "Immediate"}
+              </strong>
             </div>
           </div>
         </div>
@@ -149,7 +180,7 @@ export function LiveQueueView({ onBack, onOpenReschedule, onOpenDirections }: Li
         </div>
 
         <div className="space-y-2">
-          {queue.slice(0, 8).map((item) => {
+          {visiblePipeline.map((item) => {
             const isServing = item.queueNumber === nowServing;
             const isUser = item.queueNumber === userQueueNumber;
             const isCompleted = item.queueNumber < nowServing;

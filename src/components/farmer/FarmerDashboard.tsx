@@ -289,9 +289,25 @@ export function FarmerDashboard({
               <p className="text-lg sm:text-xl font-black mt-1 text-white tracking-tight tabular-nums truncate leading-tight">
                 {userQueueNumber ? `#${userQueueNumber}` : "#47"}
               </p>
-              <p className="text-[9px] sm:text-[10px] text-emerald-400 font-bold truncate mt-0.5">
-                {activeBooking && farmersAhead > 0 ? `${farmersAhead} ${t(language, "farmersAhead")}` : `7 ${t(language, "farmersAhead")}`}
-              </p>
+              {activeBooking ? (
+                farmersAhead === 0 && nowServing === userQueueNumber ? (
+                  <p className="text-[9px] sm:text-[10px] text-amber-300 font-extrabold truncate mt-0.5 animate-pulse">
+                    ⚡ {t(language, "servingNow") || "It's Your Turn!"}
+                  </p>
+                ) : nowServing > userQueueNumber ? (
+                  <p className="text-[9px] sm:text-[10px] text-emerald-300 font-bold truncate mt-0.5">
+                    ✓ Done
+                  </p>
+                ) : (
+                  <p className="text-[9px] sm:text-[10px] text-emerald-400 font-bold truncate mt-0.5">
+                    {farmersAhead} {t(language, "farmersAhead")}
+                  </p>
+                )
+              ) : (
+                <p className="text-[9px] sm:text-[10px] text-emerald-400 font-bold truncate mt-0.5">
+                  7 {t(language, "farmersAhead")}
+                </p>
+              )}
             </div>
 
             {/* Metric 3: Wait Turn */}
@@ -301,10 +317,18 @@ export function FarmerDashboard({
                 <span className="truncate">{t(language, "waitTurn")}</span>
               </div>
               <p className="text-lg sm:text-xl font-black mt-1 text-white tracking-tight tabular-nums truncate leading-tight">
-                {prediction.minutesLeft > 0 ? `~${prediction.minutesLeft}m` : "~42m"}
+                {activeBooking ? (
+                  nowServing === userQueueNumber ? "0m" :
+                  nowServing > userQueueNumber ? "0m" :
+                  prediction.minutesLeft > 0 ? `~${prediction.minutesLeft}m` : "Ready"
+                ) : "~42m"}
               </p>
               <p className="text-[9px] sm:text-[10px] text-white/70 truncate mt-0.5">
-                {prediction.timeStr || "05:16"}
+                {activeBooking ? (
+                  nowServing === userQueueNumber ? "At Bay 1 Now" :
+                  nowServing > userQueueNumber ? "Completed" :
+                  prediction.timeStr || "05:16"
+                ) : (prediction.timeStr || "05:16")}
               </p>
             </div>
           </div>
@@ -341,6 +365,34 @@ export function FarmerDashboard({
           </div>
         </div>
       </section>
+
+      {/* Turn Announcement Banner (When staff calls farmer's token) */}
+      {activeBooking && nowServing === userQueueNumber && (
+        <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-600 bg-gradient-to-r from-emerald-600 to-teal-700 p-4 text-white shadow-lg animate-pulse">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-white text-emerald-800 font-extrabold text-xl shadow-md shrink-0">
+                ⚡
+              </span>
+              <div>
+                <h3 className="font-display text-sm sm:text-base font-extrabold text-white">
+                  IT'S YOUR TURN! (TOKEN #{userQueueNumber})
+                </h3>
+                <p className="text-xs text-emerald-100 mt-0.5">
+                  Officer is waiting for you at <strong>Weighing Bay 1</strong>. Please drive in with your vehicle!
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onOpenLiveQueue}
+              className="rounded-xl bg-white px-3.5 py-2 text-xs font-black text-emerald-800 shadow-md hover:bg-emerald-50 active:scale-95 transition-all shrink-0"
+            >
+              Open Bay →
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Active Booking Card (Shows Token, Centre & IVR/Web source) */}
       {activeBooking && (
