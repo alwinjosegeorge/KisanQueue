@@ -455,20 +455,20 @@ export function IVRCallSimulator({
   return (
     <div className={`flex flex-col items-center justify-center ${isModal ? "p-0" : "min-h-[88vh] p-4 sm:p-6"}`}>
       {/* Outer Shell / Card */}
-      <div className="relative w-full max-w-md bg-stone-900 text-stone-100 rounded-[38px] p-5 shadow-2xl border-4 border-stone-800 flex flex-col items-center">
+      <div className="relative w-full max-w-md bg-stone-100 text-stone-900 rounded-[38px] p-5 shadow-xl border-4 border-stone-300 flex flex-col items-center">
 
         {/* Handset Top Bezel: Speaker Grill + Camera + Signal */}
         <div className="w-full flex items-center justify-between px-2 pt-1 pb-2">
-          <div className="flex items-center gap-1 text-[10px] text-stone-400 font-mono">
-            <Radio className="size-3 text-emerald-400 animate-pulse" />
+          <div className="flex items-center gap-1 text-[10px] text-stone-500 font-mono">
+            <Radio className="size-3 text-emerald-600 animate-pulse" />
             <span>BSNL 4G</span>
           </div>
           {/* Earpiece speaker slot */}
-          <div className="w-16 h-1.5 bg-stone-700 rounded-full" />
-          <div className="text-[10px] text-stone-400 font-mono flex items-center gap-1">
+          <div className="w-16 h-1.5 bg-stone-300 rounded-full" />
+          <div className="text-[10px] text-stone-500 font-mono flex items-center gap-1">
             <span>98%</span>
             <div className="w-4 h-2 border border-stone-400 rounded-xs p-0.5 flex items-center">
-              <div className="w-full h-full bg-emerald-400" />
+              <div className="w-full h-full bg-emerald-600" />
             </div>
           </div>
         </div>
@@ -478,19 +478,19 @@ export function IVRCallSimulator({
         {/* ============================================================== */}
         {incomingSMS && (
           <div className="w-full mb-3 animate-in slide-in-from-top-4 duration-300">
-            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/90 backdrop-blur-md p-3 text-white shadow-lg space-y-1">
-              <div className="flex items-center justify-between text-[11px] font-bold text-emerald-300">
+            <div className="rounded-2xl border border-emerald-200 bg-white/95 backdrop-blur-md p-3 text-stone-900 shadow-lg ring-2 ring-emerald-500/10 space-y-1">
+              <div className="flex items-center justify-between text-[11px] font-bold text-emerald-800">
                 <span className="flex items-center gap-1.5">
-                  <MessageSquare className="size-3.5" />
+                  <MessageSquare className="size-3.5 text-emerald-600" />
                   <span>SMS from {incomingSMS.sender}</span>
                 </span>
                 <span className="text-[10px] text-stone-400">{incomingSMS.time}</span>
               </div>
-              <p className="text-xs text-stone-100 leading-relaxed font-sans">
+              <p className="text-xs text-stone-700 leading-relaxed font-sans font-medium">
                 {incomingSMS.text}
               </p>
               <div className="pt-1 flex items-center justify-end gap-2 text-[10px]">
-                <span className="text-emerald-400 font-bold">✓ Slot Confirmed in System</span>
+                <span className="text-emerald-700 font-bold">✓ Slot Confirmed in System</span>
               </div>
             </div>
           </div>
@@ -499,19 +499,16 @@ export function IVRCallSimulator({
         {/* ============================================================== */}
         {/* PHONE SCREEN (LCD Display Area) */}
         {/* ============================================================== */}
-        <div className="w-full rounded-2xl bg-stone-950 border border-stone-800 p-4 mb-3 text-white flex flex-col justify-between min-h-[260px] shadow-inner relative overflow-hidden">
-          {/* Subtle LCD scanline overlay */}
-          <div className="pointer-events-none absolute inset-0 bg-radial from-transparent via-black/20 to-black/60 opacity-60" />
-
+        <div className="w-full rounded-2xl bg-white border border-stone-200 p-4 mb-3 text-stone-900 flex flex-col justify-between min-h-[260px] shadow-xs relative overflow-hidden">
           {/* Screen Header */}
-          <div className="flex items-center justify-between border-b border-stone-800/80 pb-2 relative z-10">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-2 relative z-10">
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-emerald-500 animate-ping" />
-              <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-400 font-mono">
+              <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-800 font-mono">
                 Toll-Free IVR System
               </span>
             </div>
-            <span className="text-xs font-mono font-bold text-stone-400">
+            <span className="text-xs font-mono font-bold text-stone-500">
               {callStatus === "connected" ? formatTimer(callDuration) : "Ready"}
             </span>
           </div>
@@ -520,17 +517,17 @@ export function IVRCallSimulator({
           <div className="py-3 relative z-10 space-y-2.5">
             {callStatus === "idle" && (
               <div className="text-center py-4 space-y-2">
-                <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/20 text-primary border border-primary/30 shadow-xs">
+                <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs">
                   <PhoneCall className="size-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-stone-100">KisanQueue Voice Hotline</h3>
-                  <p className="text-[11px] text-stone-400 mt-0.5">Government Toll-Free Slot Booking</p>
+                  <h3 className="font-bold text-sm text-stone-900">KisanQueue Voice Hotline</h3>
+                  <p className="text-[11px] text-stone-500 mt-0.5">Government Toll-Free Slot Booking</p>
                 </div>
-                <div className="font-mono text-xl font-black text-emerald-400 tracking-wider">
+                <div className="font-mono text-xl font-black text-emerald-700 tracking-wider">
                   {dialedNumber}
                 </div>
-                <p className="text-[10px] text-stone-400 px-4">
+                <p className="text-[10px] text-stone-500 px-4">
                   For farmers with keypad phones. No smartphone or internet needed.
                 </p>
               </div>
@@ -538,17 +535,17 @@ export function IVRCallSimulator({
 
             {callStatus === "dialing" && (
               <div className="text-center py-6 space-y-3">
-                <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-bounce">
+                <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 animate-bounce">
                   <Phone className="size-6" />
                 </div>
                 <div>
-                  <p className="text-xs text-stone-400">Dialing Toll-Free...</p>
-                  <p className="font-mono text-lg font-bold text-emerald-400">{dialedNumber}</p>
+                  <p className="text-xs text-stone-500">Dialing Toll-Free...</p>
+                  <p className="font-mono text-lg font-bold text-emerald-700">{dialedNumber}</p>
                 </div>
                 <div className="flex justify-center gap-1">
-                  <span className="size-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                  <span className="size-1.5 bg-emerald-400 rounded-full animate-pulse delay-150" />
-                  <span className="size-1.5 bg-emerald-400 rounded-full animate-pulse delay-300" />
+                  <span className="size-1.5 bg-emerald-600 rounded-full animate-pulse" />
+                  <span className="size-1.5 bg-emerald-600 rounded-full animate-pulse delay-150" />
+                  <span className="size-1.5 bg-emerald-600 rounded-full animate-pulse delay-300" />
                 </div>
               </div>
             )}
@@ -557,7 +554,7 @@ export function IVRCallSimulator({
               <div className="space-y-2.5">
                 {/* Step Badge & Indicator */}
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-emerald-400 text-[10px] font-bold border border-primary/30">
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
                     Step {step} of 6: {
                       step === 1 ? "Identity & Language" :
                       step === 2 ? "Location & Centre" :
@@ -566,33 +563,33 @@ export function IVRCallSimulator({
                       step === 5 ? "Alternate Contact" : "Confirmation"
                     }
                   </span>
-                  <span className="text-[10px] font-mono text-stone-400 uppercase">
+                  <span className="text-[10px] font-mono text-stone-500 uppercase">
                     {selectedLang === "ml" ? "മലയാളം" : "English"}
                   </span>
                 </div>
 
                 {/* Animated Voice Audio Waveform */}
                 <div className="flex items-center justify-center gap-1 py-1">
-                  <span className="w-1 h-3 bg-emerald-500 rounded-full animate-pulse" />
-                  <span className="w-1 h-6 bg-emerald-400 rounded-full animate-pulse delay-75" />
-                  <span className="w-1 h-4 bg-emerald-500 rounded-full animate-pulse delay-150" />
-                  <span className="w-1 h-7 bg-emerald-400 rounded-full animate-pulse delay-200" />
-                  <span className="w-1 h-3 bg-emerald-500 rounded-full animate-pulse delay-100" />
+                  <span className="w-1 h-3 bg-emerald-600 rounded-full animate-pulse" />
+                  <span className="w-1 h-6 bg-emerald-500 rounded-full animate-pulse delay-75" />
+                  <span className="w-1 h-4 bg-emerald-600 rounded-full animate-pulse delay-150" />
+                  <span className="w-1 h-7 bg-emerald-500 rounded-full animate-pulse delay-200" />
+                  <span className="w-1 h-3 bg-emerald-600 rounded-full animate-pulse delay-100" />
                 </div>
 
                 {/* Current Prompts Display */}
-                <div className="rounded-xl bg-stone-900/90 border border-stone-800 p-2.5 space-y-1">
-                  <span className="text-[9.5px] font-bold tracking-wider uppercase text-stone-400 block">
+                <div className="rounded-xl bg-stone-50 border border-stone-200 p-2.5 space-y-1">
+                  <span className="text-[9.5px] font-bold tracking-wider uppercase text-stone-500 block">
                     Automated Voice Prompt:
                   </span>
-                  <p className="text-xs text-stone-100 font-medium leading-relaxed">
+                  <p className="text-xs text-stone-800 font-medium leading-relaxed">
                     {transcript[transcript.length - 1]?.text || "Listening for keypad input..."}
                   </p>
                 </div>
 
                 {/* Interactive Action Shortcuts for the current step */}
                 <div className="space-y-1">
-                  <span className="text-[9px] uppercase font-bold text-stone-400">
+                  <span className="text-[9px] uppercase font-bold text-stone-500">
                     Options (Tap or Press Keypad):
                   </span>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -601,16 +598,16 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">1.</strong> മലയാളം (ML)
+                          <strong className="text-emerald-700 font-mono">1.</strong> മലയാളം (ML)
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">2.</strong> English (EN)
+                          <strong className="text-emerald-700 font-mono">2.</strong> English (EN)
                         </button>
                       </>
                     )}
@@ -620,16 +617,16 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">1.</strong> Confirm Phone
+                          <strong className="text-emerald-700 font-mono">1.</strong> Confirm Phone
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">2.</strong> Change Phone
+                          <strong className="text-emerald-700 font-mono">2.</strong> Change Phone
                         </button>
                       </>
                     )}
@@ -639,30 +636,30 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">1.</strong> Kottayam Yard
+                          <strong className="text-emerald-700 font-mono">1.</strong> Kottayam Yard
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">2.</strong> Changanassery
+                          <strong className="text-emerald-700 font-mono">2.</strong> Changanassery
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("3")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">3.</strong> Palakkad Yard
+                          <strong className="text-emerald-700 font-mono">3.</strong> Palakkad Yard
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("4")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">4.</strong> Thrissur Hub
+                          <strong className="text-emerald-700 font-mono">4.</strong> Thrissur Hub
                         </button>
                       </>
                     )}
@@ -672,30 +669,30 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">1.</strong> Paddy (നെല്ല്)
+                          <strong className="text-emerald-700 font-mono">1.</strong> Paddy (നെല്ല്)
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">2.</strong> Coconut (തേങ്ങ)
+                          <strong className="text-emerald-700 font-mono">2.</strong> Coconut (തേങ്ങ)
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("3")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">3.</strong> Rubber (റബ്ബർ)
+                          <strong className="text-emerald-700 font-mono">3.</strong> Rubber (റബ്ബർ)
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("4")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">4.</strong> Pepper (കുരുമുളക്)
+                          <strong className="text-emerald-700 font-mono">4.</strong> Pepper (കുരുമുളക്)
                         </button>
                       </>
                     )}
@@ -705,30 +702,30 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">1.</strong> 250 kg
+                          <strong className="text-emerald-700 font-mono">1.</strong> 250 kg
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">2.</strong> 420 kg
+                          <strong className="text-emerald-700 font-mono">2.</strong> 420 kg
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("3")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">3.</strong> 500 kg
+                          <strong className="text-emerald-700 font-mono">3.</strong> 500 kg
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("4")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">4.</strong> 1,000 kg
+                          <strong className="text-emerald-700 font-mono">4.</strong> 1,000 kg
                         </button>
                       </>
                     )}
@@ -738,16 +735,16 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">1.</strong> Yes (&lt;14% Moisture)
+                          <strong className="text-emerald-700 font-mono">1.</strong> Yes (&lt;14% Moisture)
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">2.</strong> Standard Grade
+                          <strong className="text-emerald-700 font-mono">2.</strong> Standard Grade
                         </button>
                       </>
                     )}
@@ -757,23 +754,23 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">1.</strong> Tomorrow 10:00 AM
+                          <strong className="text-emerald-700 font-mono">1.</strong> Tomorrow 10:00 AM
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">2.</strong> Tomorrow 02:00 PM
+                          <strong className="text-emerald-700 font-mono">2.</strong> Tomorrow 02:00 PM
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("3")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer col-span-2"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer col-span-2 shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">3.</strong> Day After 11:00 AM
+                          <strong className="text-emerald-700 font-mono">3.</strong> Day After 11:00 AM
                         </button>
                       </>
                     )}
@@ -783,16 +780,16 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">1.</strong> Add 2nd Contact
+                          <strong className="text-emerald-700 font-mono">1.</strong> Add 2nd Contact
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-2 py-1.5 rounded-lg bg-stone-900 border border-stone-700 hover:border-emerald-500 text-left text-[11px] cursor-pointer"
+                          className="px-2 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-emerald-600 hover:bg-emerald-50/50 text-stone-800 text-left text-[11px] cursor-pointer shadow-xs transition-colors"
                         >
-                          <strong className="text-emerald-400 font-mono">2.</strong> Use Primary Number
+                          <strong className="text-emerald-700 font-mono">2.</strong> Use Primary Number
                         </button>
                       </>
                     )}
@@ -802,14 +799,14 @@ export function IVRCallSimulator({
                         <button
                           type="button"
                           onClick={() => handleKeyPress("1")}
-                          className="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-center text-xs cursor-pointer shadow-md col-span-1"
+                          className="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-center text-xs cursor-pointer shadow-xs col-span-1 transition-colors"
                         >
                           1. Confirm &amp; Book
                         </button>
                         <button
                           type="button"
                           onClick={() => handleKeyPress("2")}
-                          className="px-3 py-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 font-semibold text-center text-xs cursor-pointer col-span-1"
+                          className="px-3 py-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-center text-xs cursor-pointer border border-stone-200 col-span-1 transition-colors"
                         >
                           2. Cancel
                         </button>
@@ -820,17 +817,17 @@ export function IVRCallSimulator({
 
                 {/* Successful Confirmation Badge */}
                 {createdToken && (
-                  <div className="rounded-xl bg-emerald-950/80 border border-emerald-500/50 p-2.5 text-center space-y-1.5">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 text-xs font-bold">
-                      <CheckCircle2 className="size-4" /> Official Token Generated
+                  <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-2.5 text-center space-y-1.5 shadow-xs">
+                    <span className="inline-flex items-center gap-1 text-emerald-800 text-xs font-bold">
+                      <CheckCircle2 className="size-4 text-emerald-600" /> Official Token Generated
                     </span>
-                    <p className="font-mono text-2xl font-black text-white">
+                    <p className="font-mono text-2xl font-black text-emerald-950">
                       #{createdToken}
                     </p>
-                    <p className="text-[10px] text-stone-300 font-mono">
+                    <p className="text-[10px] text-stone-600 font-mono">
                       Booking ID: {bookingId}
                     </p>
-                    <p className="text-[11px] text-emerald-300 font-medium">
+                    <p className="text-[11px] text-emerald-800 font-medium">
                       {selectedCrop} · {selectedQuantity} kg · {selectedCentre.name}
                     </p>
                   </div>
@@ -840,16 +837,16 @@ export function IVRCallSimulator({
 
             {callStatus === "ended" && (
               <div className="text-center py-4 space-y-2.5">
-                <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-stone-800 text-stone-400">
+                <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-stone-100 text-stone-500 border border-stone-200">
                   <PhoneOff className="size-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-stone-200">Call Ended</h4>
-                  <p className="text-xs text-stone-400">Duration: {formatTimer(callDuration)}</p>
+                  <h4 className="font-bold text-sm text-stone-900">Call Ended</h4>
+                  <p className="text-xs text-stone-500">Duration: {formatTimer(callDuration)}</p>
                 </div>
 
                 {createdToken && (
-                  <div className="p-2 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-xs text-emerald-300">
+                  <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium">
                     ✓ Slot successfully reserved in live backend database as Token #{createdToken}.
                   </div>
                 )}
@@ -858,7 +855,7 @@ export function IVRCallSimulator({
                   <button
                     type="button"
                     onClick={handleStartCall}
-                    className="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-all cursor-pointer shadow-xs"
                   >
                     Call Again
                   </button>
@@ -866,7 +863,7 @@ export function IVRCallSimulator({
                     <button
                       type="button"
                       onClick={onNavigateToDashboard}
-                      className="px-3 py-1.5 rounded-xl border border-stone-700 text-stone-300 text-xs font-semibold hover:bg-stone-800 transition-all cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl border border-stone-200 bg-white text-stone-700 text-xs font-semibold hover:bg-stone-100 transition-all cursor-pointer shadow-xs"
                     >
                       View in Dashboard
                     </button>
@@ -875,7 +872,7 @@ export function IVRCallSimulator({
                     <button
                       type="button"
                       onClick={onNavigateToQueue}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-600 transition-all cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold hover:bg-emerald-100 transition-all cursor-pointer shadow-xs"
                     >
                       Live Queue
                     </button>
@@ -886,21 +883,21 @@ export function IVRCallSimulator({
           </div>
 
           {/* Screen Bottom Status Bar */}
-          <div className="flex items-center justify-between border-t border-stone-800/80 pt-2 text-[10px] text-stone-400 relative z-10">
+          <div className="flex items-center justify-between border-t border-stone-100 pt-2 text-[10px] text-stone-500 relative z-10">
             <button
               type="button"
               onClick={() => setSoundEnabled((v) => !v)}
-              className="flex items-center gap-1 hover:text-stone-200 cursor-pointer"
+              className="flex items-center gap-1 hover:text-stone-800 cursor-pointer"
               title="Toggle Audio Voice / Beeps"
             >
-              {soundEnabled ? <Volume2 className="size-3.5 text-emerald-400" /> : <VolumeX className="size-3.5 text-stone-500" />}
+              {soundEnabled ? <Volume2 className="size-3.5 text-emerald-600" /> : <VolumeX className="size-3.5 text-stone-400" />}
               <span>{soundEnabled ? "Audio On" : "Muted"}</span>
             </button>
-            <span className="font-mono">1800-425-1661</span>
+            <span className="font-mono font-semibold text-stone-600">1800-425-1661</span>
             <button
               type="button"
               onClick={handleReset}
-              className="flex items-center gap-1 hover:text-stone-200 cursor-pointer"
+              className="flex items-center gap-1 hover:text-stone-800 cursor-pointer"
               title="Reset Demo"
             >
               <RotateCcw className="size-3" />
@@ -912,7 +909,7 @@ export function IVRCallSimulator({
         {/* ============================================================== */}
         {/* TELEPHONE PHYSICAL KEYPAD (DTMF 1-9, *, 0, #) */}
         {/* ============================================================== */}
-        <div className="w-full bg-stone-950/80 rounded-2xl p-3 border border-stone-800 shadow-sm space-y-2.5">
+        <div className="w-full bg-stone-200/70 rounded-2xl p-3 border border-stone-300 shadow-inner space-y-2.5">
           {/* Keypad Grid */}
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -933,12 +930,12 @@ export function IVRCallSimulator({
                 key={btn.key}
                 type="button"
                 onClick={() => handleKeyPress(btn.key)}
-                className="flex flex-col items-center justify-center rounded-xl bg-stone-800/80 hover:bg-stone-700 active:bg-emerald-700 active:scale-95 transition-all py-2 border border-stone-700/60 shadow-xs cursor-pointer group select-none"
+                className="flex flex-col items-center justify-center rounded-xl bg-white hover:bg-stone-50 active:bg-emerald-50 active:border-emerald-500 active:scale-95 transition-all py-2 border border-stone-300/80 shadow-xs cursor-pointer group select-none"
               >
-                <span className="font-mono text-base sm:text-lg font-bold text-stone-100 group-hover:text-white">
+                <span className="font-mono text-base sm:text-lg font-bold text-stone-900 group-hover:text-emerald-800">
                   {btn.key}
                 </span>
-                <span className="text-[8.5px] uppercase font-bold text-stone-400 group-hover:text-stone-300">
+                <span className="text-[8.5px] uppercase font-bold text-stone-400 group-hover:text-stone-600">
                   {btn.sub}
                 </span>
               </button>
@@ -951,7 +948,7 @@ export function IVRCallSimulator({
               <button
                 type="button"
                 onClick={handleEndCall}
-                className="w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer col-span-2"
+                className="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer col-span-2"
               >
                 <PhoneOff className="size-4" />
                 <span>End Call</span>
@@ -960,7 +957,7 @@ export function IVRCallSimulator({
               <button
                 type="button"
                 onClick={handleStartCall}
-                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer col-span-2"
+                className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer col-span-2"
               >
                 <Phone className="size-4" />
                 <span>Call Toll-Free (1800-425-1661)</span>
@@ -974,7 +971,7 @@ export function IVRCallSimulator({
           <button
             type="button"
             onClick={onClose}
-            className="mt-3 text-xs text-stone-400 hover:text-stone-200 underline cursor-pointer"
+            className="mt-3 text-xs text-stone-500 hover:text-stone-800 underline cursor-pointer"
           >
             Close Call Simulator
           </button>
@@ -983,22 +980,22 @@ export function IVRCallSimulator({
 
       {/* Transcript Log & Explanatory Footnote for Evaluators */}
       <div className="w-full max-w-md mt-4 space-y-2">
-        <details className="rounded-2xl border border-border bg-card p-3 text-xs text-foreground shadow-sm">
-          <summary className="font-bold cursor-pointer text-primary flex items-center justify-between">
+        <details className="rounded-2xl border border-stone-200 bg-white p-3 text-xs text-stone-900 shadow-xs">
+          <summary className="font-bold cursor-pointer text-emerald-800 flex items-center justify-between">
             <span>📜 Live Call Transcript &amp; DTMF Log ({transcript.length} events)</span>
-            <span className="text-[10px] text-muted-foreground font-mono">View Log</span>
+            <span className="text-[10px] text-stone-500 font-mono">View Log</span>
           </summary>
           <div className="mt-2 space-y-1.5 max-h-48 overflow-y-auto font-mono text-[11px] pr-1">
             {transcript.length === 0 ? (
-              <p className="text-muted-foreground italic">No call in progress. Press Call to start.</p>
+              <p className="text-stone-400 italic">No call in progress. Press Call to start.</p>
             ) : (
               transcript.map((item, idx) => (
                 <div
                   key={idx}
                   className={`p-1.5 rounded-lg ${
                     item.speaker === "IVR"
-                      ? "bg-primary/10 text-primary border border-primary/20"
-                      : "bg-muted text-foreground border border-border"
+                      ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
+                      : "bg-stone-100 text-stone-800 border border-stone-200"
                   }`}
                 >
                   <span className="font-bold mr-1">[{item.time}] {item.speaker}:</span>
@@ -1009,9 +1006,9 @@ export function IVRCallSimulator({
           </div>
         </details>
 
-        <div className="rounded-2xl border border-border/80 bg-muted/30 p-3 text-[11px] text-muted-foreground space-y-1 leading-relaxed">
-          <p className="font-bold text-foreground flex items-center gap-1.5">
-            <Sparkles className="size-3.5 text-primary" /> Why this matters for Digital Inclusion (SIH):
+        <div className="rounded-2xl border border-stone-200 bg-white p-3 text-[11px] text-stone-600 space-y-1 leading-relaxed shadow-xs">
+          <p className="font-bold text-stone-900 flex items-center gap-1.5">
+            <Sparkles className="size-3.5 text-emerald-700" /> Why this matters for Digital Inclusion (SIH):
           </p>
           <p>
             Over 40% of senior &amp; marginal farmers in rural Kerala use keypad phones without data connectivity.
