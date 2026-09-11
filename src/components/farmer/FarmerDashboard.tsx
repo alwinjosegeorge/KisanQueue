@@ -25,6 +25,7 @@ import {
   Ticket,
   Plus,
   Check,
+  Phone,
   PhoneCall,
 } from "lucide-react";
 import heroImage from "@/assets/smartprocure-home.jpg";
@@ -339,6 +340,43 @@ export function FarmerDashboard({
           </div>
         </div>
       </section>
+
+      {/* Active Booking Card (Shows Token, Centre & IVR/Web source) */}
+      {activeBooking && (
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/70 p-3.5 flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-3">
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-emerald-700 text-white font-mono font-black text-base shadow-sm shrink-0">
+              #{activeBooking.queueNumber}
+            </span>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="text-xs font-bold text-stone-900">
+                  Active Booking: {activeBooking.crop} ({activeBooking.quantityKg} kg)
+                </h4>
+                {activeBooking.bookingSource === "ivr" ? (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-bold flex items-center gap-1">
+                    <Phone className="size-2.5" /> Booked via Toll-Free Call
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200 text-[10px] font-semibold">
+                    Web Booking
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-stone-600 mt-0.5">
+                {activeBooking.centreName} · {activeBooking.date}, {activeBooking.slotTime}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenLiveQueue}
+            className="px-3 py-1.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-all cursor-pointer shrink-0 shadow-2xs"
+          >
+            Track Queue
+          </button>
+        </div>
+      )}
 
       {/* Delay Alert Broadcast Banner (if operational delay exists) */}
       {currentCentre.activeDelayMinutes > 0 && (

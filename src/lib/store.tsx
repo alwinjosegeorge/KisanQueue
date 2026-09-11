@@ -43,7 +43,21 @@ interface KisanQueueContextType {
   getRecommendedCentre: (cropId?: string) => ProcurementCentre;
 
   // Actions
-  bookSlot: (centreId: string, cropName: string, quantityKg: number, date: string, slotTime: string) => Booking;
+  bookSlot: (
+    centreId: string,
+    cropName: string,
+    quantityKg: number,
+    date: string,
+    slotTime: string,
+    options?: {
+      bookingSource?: "ivr" | "web" | "counter";
+      farmerMobile?: string;
+      alternatePhone?: string;
+      qualityGrade?: string;
+      farmerName?: string;
+      languageUsed?: "ml" | "en";
+    }
+  ) => Booking;
   rescheduleBooking: (bookingId: string, newDate: string, newSlotTime: string, newCentreId?: string) => void;
   cancelBooking: (bookingId: string) => void;
 
@@ -389,8 +403,57 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
 
   const [centres, setCentres] = useState<ProcurementCentre[]>(INITIAL_CENTRES);
   const [crops] = useState<Crop[]>(INITIAL_CROPS);
-  const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
-  const [queue, setQueue] = useState<QueueItem[]>(INITIAL_QUEUE);
+
+  const [bookings, setBookingsState] = useState<Booking[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("kisanqueue_bookings");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_BOOKINGS;
+  });
+
+  const setBookings = (val: Booking[] | ((prev: Booking[]) => Booking[])) => {
+    setBookingsState((prev) => {
+      const next = typeof val === "function" ? val(prev) : val;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("kisanqueue_bookings", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+  };
+
+  const [queue, setQueueState] = useState<QueueItem[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("kisanqueue_queue");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_QUEUE;
+  });
+
+  const setQueue = (val: QueueItem[] | ((prev: QueueItem[]) => QueueItem[])) => {
+    setQueueState((prev) => {
+      const next = typeof val === "function" ? val(prev) : val;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("kisanqueue_queue", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+  };
+
   const [nowServing, setNowServing] = useState(40);
   const [bottlenecks] = useState<BottleneckAlert[]>(INITIAL_BOTTLENECKS);
   const [forecasts] = useState<DemandForecast[]>(INITIAL_FORECASTS);
@@ -476,17 +539,29 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
     cropName: string,
     quantityKg: number,
     date: string,
-    slotTime: string
+    slotTime: string,
+    options?: {
+      bookingSource?: "ivr" | "web" | "counter";
+      farmerMobile?: string;
+      alternatePhone?: string;
+      qualityGrade?: string;
+      farmerName?: string;
+      languageUsed?: "ml" | "en";
+    }
   ): Booking => {
     const centre = centres.find((c) => c.id === centreId) || centres[0];
     const newQueueNum = nowServing + queue.length + 1;
-    const cropObj = crops.find((c) => c.name.includes(cropName)) || crops[0];
+    const cropObj = crops.find((c) => c.name.toLowerCase().includes(cropName.toLowerCase())) || crops[0];
+
+    const farmerMobile = options?.farmerMobile || user.mobile;
+    const farmerName = options?.farmerName || user.name;
+    const bookingSource = options?.bookingSource || "web";
 
     const newBooking: Booking = {
       id: `KQ-${Math.floor(10000 + Math.random() * 90000)}`,
       farmerId: user.farmerId || "KL-KTM-26047",
-      farmerName: user.name,
-      farmerMobile: user.mobile,
+      farmerName,
+      farmerMobile,
       centreId: centre.id,
       centreName: centre.name,
       crop: cropName,
@@ -501,6 +576,10 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
       bookedAt: "Just now",
       transactionId: `TXN${Math.floor(10000000 + Math.random() * 90000000)}`,
       paymentStatus: "processing",
+      bookingSource,
+      alternatePhone: options?.alternatePhone,
+      qualityGrade: options?.qualityGrade,
+      languageUsed: options?.languageUsed,
     };
 
     setBookings((prev) => [newBooking, ...prev]);
@@ -519,18 +598,19 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
       ...prev.map((item) => (item.isCurrentFarmer ? { ...item, isCurrentFarmer: false } : item)),
       {
         queueNumber: newQueueNum,
-        farmerName: `${user.name} (You)`,
+        farmerName: `${farmerName} (You)`,
         farmerId: user.farmerId || "KL-KTM-26047",
         crop: cropName,
         quantityKg,
         status: "waiting",
         isCurrentFarmer: true,
+        bookingSource,
       },
     ]);
 
     addNotification(
-      "Slot Booked Successfully! 🎟️",
-      `Assigned Token #${newQueueNum} at ${centre.name} for ${date} (${slotTime}).`,
+      bookingSource === "ivr" ? "IVR Hotline Slot Booked! 📞" : "Slot Booked Successfully! 🎟️",
+      `Assigned Token #${newQueueNum} at ${centre.name} for ${cropName} (${quantityKg}kg) on ${date} (${slotTime}).`,
       "booking"
     );
 

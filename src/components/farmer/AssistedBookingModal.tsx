@@ -36,11 +36,11 @@ export function AssistedBookingModal({ isOpen, onClose }: { isOpen: boolean; onC
             onClose={onClose}
             onNavigateToDashboard={() => {
               onClose();
-              navigate({ to: "/" });
+              navigate({ to: "/", search: { screen: "home" } });
             }}
             onNavigateToQueue={() => {
               onClose();
-              navigate({ to: "/" });
+              navigate({ to: "/", search: { screen: "queue" } });
             }}
           />
         </div>

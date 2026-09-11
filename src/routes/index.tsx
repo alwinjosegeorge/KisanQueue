@@ -46,6 +46,11 @@ import { CentreMapView } from "@/components/farmer/CentreMapView";
 import { KisanQueueAIChatbot } from "@/components/KisanQueueAIChatbot";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): { screen?: string } => {
+    return {
+      screen: typeof search.screen === "string" ? search.screen : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "KisanQueue — Fair & Fast Farmer Queue Management System" },
@@ -285,10 +290,14 @@ function KisanQueueApp() {
   } = useKisanQueue();
   const { t: translate } = useTranslation();
   const navigate = useNavigate();
+  const search = Route.useSearch();
 
-  // If already logged in, default to home dashboard; otherwise show splash
+  // If already logged in or search param provided, default to home dashboard; otherwise show splash
   const [farmerScreen, setFarmerScreen] = useState<FarmerScreen>(() => {
     if (typeof window !== "undefined") {
+      if (search?.screen && ["home", "bookings", "queue", "timeline", "payment", "map", "profile"].includes(search.screen)) {
+        return search.screen as FarmerScreen;
+      }
       const storedLogin = localStorage.getItem("kisanqueue_logged_in") === "true";
       return storedLogin ? "home" : "splash";
     }
@@ -301,6 +310,13 @@ function KisanQueueApp() {
   const [selectedCentreForBooking, setSelectedCentreForBooking] = useState<string | null>(null);
   const [selectedCropForBooking, setSelectedCropForBooking] = useState<string | null>(null);
   const [assistedModalOpen, setAssistedModalOpen] = useState(false);
+
+  // Sync with search.screen whenever URL changes
+  useEffect(() => {
+    if (search?.screen && ["home", "bookings", "queue", "timeline", "payment", "map", "profile"].includes(search.screen)) {
+      setFarmerScreen(search.screen as FarmerScreen);
+    }
+  }, [search?.screen]);
 
   useEffect(() => {
     setRole("farmer");

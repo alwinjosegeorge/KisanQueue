@@ -212,8 +212,15 @@ export function StaffDashboard() {
                 <tr key={item.queueNumber} className={item.queueNumber === nowServing ? "bg-primary/5 font-bold" : ""}>
                   <td className="py-2.5 pr-2 font-mono font-bold">#{item.queueNumber}</td>
                   <td className="py-2.5 px-2">
-                    <span className="block font-semibold">{item.farmerName}</span>
-                    <span className="text-[10px] text-muted-foreground">{item.farmerId}</span>
+                    <span className="font-semibold flex items-center gap-1.5 flex-wrap">
+                      <span>{item.farmerName}</span>
+                      {item.bookingSource === "ivr" && (
+                        <span className="rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[9px] px-1.5 py-0.2 font-bold">
+                          📞 IVR
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground block">{item.farmerId}</span>
                   </td>
                   <td className="py-2.5 px-2">
                     {item.crop} · {item.quantityKg} kg

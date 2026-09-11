@@ -78,6 +78,10 @@ export interface Booking {
   bookedAt: string;
   transactionId?: string;
   paymentStatus?: "pending" | "processing" | "completed";
+  bookingSource?: "ivr" | "web" | "counter";
+  alternatePhone?: string;
+  qualityGrade?: string;
+  languageUsed?: "ml" | "en";
 }
 
 export interface QueueItem {
@@ -88,6 +92,7 @@ export interface QueueItem {
   quantityKg: number;
   status: "waiting" | "serving" | "verified" | "completed" | "skipped";
   isCurrentFarmer?: boolean;
+  bookingSource?: "ivr" | "web" | "counter";
 }
 
 export interface NotificationItem {

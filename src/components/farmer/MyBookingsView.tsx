@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useKisanQueue } from "@/lib/store";
 import { t } from "@/lib/translations";
-import { ArrowLeft, Calendar, MapPin, QrCode, RefreshCw, XCircle, CheckCircle2, ChevronRight } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, QrCode, RefreshCw, XCircle, CheckCircle2, ChevronRight, Phone } from "lucide-react";
 import { Booking } from "@/lib/types";
 
 export function MyBookingsView({
@@ -81,11 +81,23 @@ export function MyBookingsView({
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-mono text-muted-foreground">ID: {booking.id}</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-mono text-muted-foreground">ID: {booking.id}</span>
+                    {booking.bookingSource === "ivr" && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[9.5px] font-bold">
+                        <Phone className="size-2.5 text-emerald-700" /> Toll-Free Call Booking
+                      </span>
+                    )}
+                  </div>
                   <h3 className="font-bold text-sm mt-0.5">{booking.crop} · {booking.quantityKg} kg</h3>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                     <MapPin className="size-3.5 text-primary" /> {booking.centreName}
                   </p>
+                  {booking.alternatePhone && (
+                    <p className="text-[10.5px] text-muted-foreground mt-0.5 font-mono">
+                      Alt Phone: {booking.alternatePhone}
+                    </p>
+                  )}
                 </div>
 
                 <div className="text-right">
