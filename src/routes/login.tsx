@@ -151,19 +151,14 @@ export function FarmerOnboardingLoginPage() {
     largeText ? "large" : "normal"
   );
 
-  // Step 3: Crops selection (multiple)
-  const [selectedCrops, setSelectedCrops] = useState<string[]>(["paddy", "coconut"]);
+  // Step 3: Crops selection (multiple - starts empty, selected on click)
+  const [selectedCrops, setSelectedCrops] = useState<string[]>([]);
 
   // Toggle crop selection
   const toggleCrop = (cropId: string) => {
-    setSelectedCrops((prev) => {
-      if (prev.includes(cropId)) {
-        if (prev.length === 1) return prev; // Keep at least one
-        return prev.filter((id) => id !== cropId);
-      } else {
-        return [...prev, cropId];
-      }
-    });
+    setSelectedCrops((prev) =>
+      prev.includes(cropId) ? prev.filter((id) => id !== cropId) : [...prev, cropId]
+    );
   };
 
   // STEP 1: Request OTP
@@ -266,7 +261,8 @@ export function FarmerOnboardingLoginPage() {
     setUser((prev: User) => ({
       ...prev,
       ...pendingUser,
-      primaryCrop: cropNames || "Paddy & Coconut",
+      crops: selectedCrops,
+      primaryCrop: cropNames || "Cultivated Crops",
     }));
 
     addNotification({
@@ -719,7 +715,7 @@ export function FarmerOnboardingLoginPage() {
               type="button"
               onClick={handleCompleteSetup}
               disabled={isLoading || selectedCrops.length === 0}
-              className="w-full h-12 mt-2 rounded-full bg-[#183917] hover:bg-[#132d12] active:scale-[0.98] text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full h-12 mt-2 rounded-full bg-[#183917] hover:bg-[#132d12] active:scale-[0.98] text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -727,7 +723,11 @@ export function FarmerOnboardingLoginPage() {
                 <>
                   <span>
                     {language === "ml"
-                      ? "പൂർത്തിയാക്കി പ്രവേശിക്കുക"
+                      ? selectedCrops.length === 0
+                        ? "ഒരു വിള തിരഞ്ഞെടുക്കുക"
+                        : "പൂർത്തിയാക്കി പ്രവേശിക്കുക"
+                      : selectedCrops.length === 0
+                      ? "Select at least 1 crop"
                       : "Complete Setup & Enter"}
                   </span>
                   <ArrowRight className="size-4" />

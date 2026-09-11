@@ -13,6 +13,7 @@ export interface User {
   district?: string;
   state?: string;
   primaryCrop?: string;
+  crops?: string[];
   bankAccount?: string;
   ifsc?: string;
 }

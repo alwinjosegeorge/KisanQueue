@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useKisanQueue } from "@/lib/store";
 import { t } from "@/lib/translations";
@@ -23,6 +23,8 @@ import {
   Droplets,
   Sprout,
   Ticket,
+  Plus,
+  Check,
 } from "lucide-react";
 import heroImage from "@/assets/smartprocure-home.jpg";
 import cropPaddy from "@/assets/crop-paddy.jpg";
@@ -142,6 +144,7 @@ export function FarmerDashboard({
 }: FarmerDashboardProps) {
   const {
     user,
+    setUser,
     activeBooking,
     centres,
     crops,
@@ -152,10 +155,35 @@ export function FarmerDashboard({
     notifications,
     cancelBooking,
     bookSlot,
+    addNotification,
   } = useKisanQueue();
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showAddCropModal, setShowAddCropModal] = useState(false);
+  const [tempSelectedCrops, setTempSelectedCrops] = useState<string[]>([]);
   const navigate = useNavigate();
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // Crops displayed in "My Crops & Fields"
+  const displayedCrops = useMemo(() => {
+    if (user?.crops && user.crops.length > 0) {
+      return CROPS_DATA.filter((c) => user.crops?.includes(c.id));
+    }
+    if (user?.primaryCrop) {
+      const lower = user.primaryCrop.toLowerCase();
+      const matched = CROPS_DATA.filter((c) => lower.includes(c.id));
+      if (matched.length > 0) return matched;
+    }
+    return CROPS_DATA.slice(0, 2);
+  }, [user?.crops, user?.primaryCrop]);
+
+  const handleOpenAddCropModal = () => {
+    const initialSelected =
+      user?.crops && user.crops.length > 0
+        ? user.crops
+        : displayedCrops.map((c) => c.id);
+    setTempSelectedCrops(initialSelected);
+    setShowAddCropModal(true);
+  };
 
   const recommendedCentre = getRecommendedCentre();
   const currentCentre = centres.find((c) => c.id === activeBooking?.centreId) || recommendedCentre;
@@ -333,20 +361,31 @@ export function FarmerDashboard({
       {/* My Crops & Harvest Section (Horizontal Scrollable Cards matching reference image) */}
       <section>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            {t(language, "myCrops")} ({CROPS_DATA.length})
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {t(language, "myCrops")} ({displayedCrops.length})
+            </h3>
+            <button
+              type="button"
+              onClick={handleOpenAddCropModal}
+              className="inline-flex items-center gap-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary px-2.5 py-0.5 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs border border-primary/20"
+              title="Add / Manage Crops"
+            >
+              <Plus className="size-3.5 stroke-[2.5]" />
+              <span>Add</span>
+            </button>
+          </div>
           <button
             type="button"
-            onClick={() => onOpenBooking()}
-            className="text-xs font-semibold text-primary hover:underline"
+            onClick={handleOpenAddCropModal}
+            className="text-xs font-semibold text-primary hover:underline cursor-pointer"
           >
-            {t(language, "seeAll")}
+            {language === "ml" ? "മാറ്റുക" : "Manage"}
           </button>
         </div>
 
         <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
-          {CROPS_DATA.map((crop) => (
+          {displayedCrops.map((crop) => (
             <div
               key={crop.id}
               onClick={() => onOpenBooking(crop.name)}
@@ -369,6 +408,19 @@ export function FarmerDashboard({
               </div>
             </div>
           ))}
+
+          {/* Quick "+ Add Crop" Card at the end of the scroll list */}
+          <button
+            type="button"
+            onClick={handleOpenAddCropModal}
+            className="min-w-[120px] max-w-[130px] shrink-0 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary transition-all p-3 cursor-pointer group active:scale-95"
+          >
+            <span className="flex size-10 items-center justify-center rounded-full bg-background shadow-xs border border-primary/20 group-hover:scale-110 transition-transform mb-1.5">
+              <Plus className="size-5 text-primary stroke-[2.5]" />
+            </span>
+            <span className="text-xs font-bold text-foreground">Add Crop</span>
+            <span className="text-[10px] text-muted-foreground mt-0.5">+ വിള ചേർക്കുക</span>
+          </button>
         </div>
       </section>
 
@@ -575,6 +627,125 @@ export function FarmerDashboard({
                 className="rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow hover:bg-rose-700 transition-colors"
               >
                 {t(language, "yesCancelSlot")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add / Manage Crops Modal */}
+      {showAddCropModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-background rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border bg-muted/20">
+              <div className="flex items-center gap-2">
+                <span className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Sprout className="size-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">
+                    {language === "ml" ? "എന്റെ വിളകൾ ക്രമീകരിക്കുക" : "Manage My Crops & Fields"}
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    {tempSelectedCrops.length} {language === "ml" ? "വിളകൾ തിരഞ്ഞെടുത്തു" : "crops selected"}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddCropModal(false)}
+                className="size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Modal Body - Crop Selection Grid */}
+            <div className="p-4 overflow-y-auto space-y-3">
+              <p className="text-xs text-muted-foreground">
+                {language === "ml"
+                  ? "നിങ്ങൾ കൃഷി ചെയ്യുന്ന വിളകൾ തിരഞ്ഞെടുക്കുക. ഇതനുസരിച്ച് താങ്ങുവിലയും സംഭരണ സ്ലോട്ടുകളും ലഭിക്കും."
+                  : "Select all the crops you cultivate. This personalizes your MSP rates, booking quotas, and harvest procurement alerts."}
+              </p>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                {CROPS_DATA.map((crop) => {
+                  const isSelected = tempSelectedCrops.includes(crop.id);
+                  return (
+                    <button
+                      key={crop.id}
+                      type="button"
+                      onClick={() => {
+                        setTempSelectedCrops((prev) =>
+                          prev.includes(crop.id)
+                            ? prev.filter((id) => id !== crop.id)
+                            : [...prev, crop.id]
+                        );
+                      }}
+                      className={`relative flex flex-col items-center rounded-2xl p-2 text-center transition-all border cursor-pointer active:scale-95 ${
+                        isSelected
+                          ? "border-primary bg-primary/10 ring-2 ring-primary/40 shadow-sm"
+                          : "border-border bg-card hover:border-muted-foreground/30 opacity-70"
+                      }`}
+                    >
+                      {isSelected && (
+                        <span className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+                          <Check className="size-3 stroke-[3]" />
+                        </span>
+                      )}
+                      <img
+                        src={crop.image}
+                        alt={crop.name}
+                        className="size-14 rounded-xl object-cover shadow-xs"
+                      />
+                      <span className="mt-1.5 text-[11px] font-bold text-foreground leading-tight line-clamp-1">
+                        {crop.name.split(" ")[0]}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground font-semibold">
+                        {crop.msp.split(" ")[0]}/kg
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-border bg-muted/10 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowAddCropModal(false)}
+                className="px-4 py-2 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
+              >
+                {language === "ml" ? "റദ്ദാക്കുക" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                disabled={tempSelectedCrops.length === 0}
+                onClick={() => {
+                  if (tempSelectedCrops.length === 0) return;
+                  const cropNames = tempSelectedCrops
+                    .map((id) => CROPS_DATA.find((c) => c.id === id)?.name.split(" ")[0])
+                    .filter(Boolean)
+                    .join(" & ");
+                  setUser((prev) => ({
+                    ...prev,
+                    crops: tempSelectedCrops,
+                    primaryCrop: cropNames || prev.primaryCrop,
+                  }));
+                  addNotification(
+                    "Crops Updated",
+                    `Your crops have been updated (${tempSelectedCrops.length} selected).`,
+                    "success"
+                  );
+                  setShowAddCropModal(false);
+                }}
+                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              >
+                {language === "ml"
+                  ? `സംരക്ഷിക്കുക (${tempSelectedCrops.length})`
+                  : `Save Crops (${tempSelectedCrops.length})`}
               </button>
             </div>
           </div>

@@ -356,6 +356,7 @@ export function KisanQueueProvider({ children }: { children: React.ReactNode }) 
     district: "Kottayam",
     state: "Kerala",
     primaryCrop: "Paddy & Coconut",
+    crops: ["paddy", "coconut"],
     bankAccount: "SBI A/C **** 4891",
     ifsc: "SBIN0070114",
   });
