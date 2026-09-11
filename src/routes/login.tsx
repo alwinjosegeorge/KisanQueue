@@ -146,7 +146,7 @@ export function FarmerOnboardingLoginPage() {
   });
 
   // Step 2: Preferences
-  const [ageGroup, setAgeGroup] = useState<"general" | "senior">("general");
+  const [age, setAge] = useState<string>("48");
   const [fontSizeChoice, setFontSizeChoice] = useState<"normal" | "large" | "xlarge">(
     largeText ? "large" : "normal"
   );
@@ -275,9 +275,11 @@ export function FarmerOnboardingLoginPage() {
       type: "success",
     });
 
+    const isSenior = Number(age) >= 60;
+
     setTimeout(() => {
       setIsLoading(false);
-      if (ageGroup === "senior") {
+      if (isSenior) {
         navigate({ to: "/old" });
       } else {
         navigate({ to: "/" });
@@ -524,48 +526,27 @@ export function FarmerOnboardingLoginPage() {
             </div>
 
             <div className="space-y-4">
-              {/* 1. Age Selection */}
+              {/* 1. Age Input */}
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-stone-700 px-1">
                   <UserRound className="size-3.5 text-[#183917]" />
-                  <span>Age Group (പ്രായം)</span>
+                  <span>Age</span>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setAgeGroup("general")}
-                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-                      ageGroup === "general"
-                        ? "border-[#183917] bg-[#183917]/5 ring-2 ring-[#183917]/20 shadow-sm"
-                        : "border-stone-200 bg-white hover:border-stone-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-stone-900">Under 60</span>
-                      {ageGroup === "general" && (
-                        <Check className="size-3.5 text-[#183917] stroke-[3]" />
-                      )}
-                    </div>
-                    <p className="text-[10px] text-stone-500 mt-0.5">Standard Farmer Mode</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setAgeGroup("senior")}
-                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-                      ageGroup === "senior"
-                        ? "border-[#183917] bg-[#183917]/5 ring-2 ring-[#183917]/20 shadow-sm"
-                        : "border-stone-200 bg-white hover:border-stone-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-stone-900">60+ Years 👵</span>
-                      {ageGroup === "senior" && (
-                        <Check className="size-3.5 text-[#183917] stroke-[3]" />
-                      )}
-                    </div>
-                    <p className="text-[10px] text-emerald-800 font-medium mt-0.5">Senior Assistance Mode</p>
-                  </button>
+                <div className="relative flex items-center">
+                  <input
+                    type="number"
+                    min={18}
+                    max={110}
+                    placeholder="Enter Age"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value.replace(/\D/g, ""))}
+                    className="w-full h-12 rounded-2xl border border-stone-200 bg-white px-4 text-sm font-medium text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-700/30 focus:border-emerald-700 transition-all shadow-sm"
+                  />
+                  {age && Number(age) >= 60 && (
+                    <span className="absolute right-3 px-2.5 py-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 rounded-lg">
+                      60+ Senior Mode 👵
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -574,7 +555,7 @@ export function FarmerOnboardingLoginPage() {
                 <div className="flex items-center justify-between text-xs font-bold text-stone-700 px-1">
                   <div className="flex items-center gap-1.5">
                     <Languages className="size-3.5 text-[#183917]" />
-                    <span>Language (ഭാഷ)</span>
+                    <span>Language</span>
                   </div>
                   <span className="text-[10px] text-emerald-800 font-bold">
                     {SUPPORTED_LANGUAGES.find((l) => l.id === language)?.native}
@@ -610,7 +591,7 @@ export function FarmerOnboardingLoginPage() {
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-stone-700 px-1">
                   <Type className="size-3.5 text-[#183917]" />
-                  <span>Font Size (അക്ഷര വലുപ്പം)</span>
+                  <span>Font Size</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <button
