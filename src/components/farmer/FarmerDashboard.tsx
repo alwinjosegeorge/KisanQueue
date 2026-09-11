@@ -40,7 +40,8 @@ import cropBanana from "@/assets/crop-banana.jpg";
 const CROPS_DATA = [
   {
     id: "paddy",
-    name: "Paddy (നെല്ല്)",
+    name: "Paddy",
+    nameMl: "നെല്ല് (Paddy)",
     timeframeKey: "readyHarvest" as const,
     msp: "₹32 / kg MSP",
     badgeKey: "healthy" as const,
@@ -49,7 +50,8 @@ const CROPS_DATA = [
   },
   {
     id: "coconut",
-    name: "Raw Coconut (തേങ്ങ)",
+    name: "Raw Coconut",
+    nameMl: "തേങ്ങ (Raw Coconut)",
     timeframeKey: "oneMonthHarvest" as const,
     msp: "₹38 / kg MSP",
     badgeKey: "normal" as const,
@@ -59,6 +61,7 @@ const CROPS_DATA = [
   {
     id: "rubber",
     name: "Rubber (RSS4)",
+    nameMl: "റബ്ബർ (Rubber RSS4)",
     timeframeKey: "dailyTapping" as const,
     msp: "₹180 / kg MSP",
     badgeKey: "peakTap" as const,
@@ -67,7 +70,8 @@ const CROPS_DATA = [
   },
   {
     id: "pepper",
-    name: "Black Pepper (കുരുമുളക്)",
+    name: "Black Pepper",
+    nameMl: "കുരുമുളക് (Black Pepper)",
     timeframeKey: "dryingStage" as const,
     msp: "₹520 / kg MSP",
     badgeKey: "gradeA" as const,
@@ -76,7 +80,8 @@ const CROPS_DATA = [
   },
   {
     id: "cardamom",
-    name: "Cardamom (ഏലം)",
+    name: "Cardamom",
+    nameMl: "ഏലം (Cardamom)",
     timeframeKey: "curingStage" as const,
     msp: "₹1,850 / kg MSP",
     badgeKey: "gradeSpecial" as const,
@@ -85,7 +90,8 @@ const CROPS_DATA = [
   },
   {
     id: "arecanut",
-    name: "Areca Nut (അടയ്ക്ക)",
+    name: "Areca Nut",
+    nameMl: "അടയ്ക്ക (Areca Nut)",
     timeframeKey: "sunDrying" as const,
     msp: "₹360 / kg MSP",
     badgeKey: "gradeA" as const,
@@ -94,7 +100,8 @@ const CROPS_DATA = [
   },
   {
     id: "nutmeg",
-    name: "Nutmeg (ജാതിക്ക)",
+    name: "Nutmeg",
+    nameMl: "ജാതിക്ക (Nutmeg)",
     timeframeKey: "maceSeparation" as const,
     msp: "₹280 / kg MSP",
     badgeKey: "healthy" as const,
@@ -103,7 +110,8 @@ const CROPS_DATA = [
   },
   {
     id: "coffee",
-    name: "Robusta Coffee (കാപ്പി)",
+    name: "Robusta Coffee",
+    nameMl: "കാപ്പി (Robusta Coffee)",
     timeframeKey: "cherryPicking" as const,
     msp: "₹210 / kg MSP",
     badgeKey: "gradeA" as const,
@@ -112,7 +120,8 @@ const CROPS_DATA = [
   },
   {
     id: "banana",
-    name: "Nendran (നേന്ത്രക്കായ)",
+    name: "Nendran Banana",
+    nameMl: "നേന്ത്രക്കായ (Banana)",
     timeframeKey: "matureBunch" as const,
     msp: "₹42 / kg MSP",
     badgeKey: "healthy" as const,
@@ -372,7 +381,7 @@ export function FarmerDashboard({
               title="Add / Manage Crops"
             >
               <Plus className="size-3.5 stroke-[2.5]" />
-              <span>Add</span>
+              <span>{language === "ml" ? "ചേർക്കുക" : "Add"}</span>
             </button>
           </div>
           <button
@@ -403,7 +412,9 @@ export function FarmerDashboard({
                 </span>
               </div>
               <div className="p-2.5">
-                <h4 className="text-xs font-bold truncate text-foreground">{crop.name}</h4>
+                <h4 className="text-xs font-bold truncate text-foreground">
+                  {language === "ml" ? crop.nameMl : crop.name}
+                </h4>
                 <p className="text-[10px] text-muted-foreground mt-0.5">{t(language, crop.timeframeKey)}</p>
               </div>
             </div>
@@ -418,8 +429,12 @@ export function FarmerDashboard({
             <span className="flex size-10 items-center justify-center rounded-full bg-background shadow-xs border border-primary/20 group-hover:scale-110 transition-transform mb-1.5">
               <Plus className="size-5 text-primary stroke-[2.5]" />
             </span>
-            <span className="text-xs font-bold text-foreground">Add Crop</span>
-            <span className="text-[10px] text-muted-foreground mt-0.5">+ വിള ചേർക്കുക</span>
+            <span className="text-xs font-bold text-foreground">
+              {language === "ml" ? "വിള ചേർക്കുക" : "Add Crop"}
+            </span>
+            <span className="text-[10px] text-muted-foreground mt-0.5">
+              {language === "ml" ? "+ വിള ചേർക്കുക" : "Tap to add"}
+            </span>
           </button>
         </div>
       </section>
@@ -700,7 +715,7 @@ export function FarmerDashboard({
                         className="size-14 rounded-xl object-cover shadow-xs"
                       />
                       <span className="mt-1.5 text-[11px] font-bold text-foreground leading-tight line-clamp-1">
-                        {crop.name.split(" ")[0]}
+                        {language === "ml" ? crop.nameMl.split(" ")[0] : crop.name}
                       </span>
                       <span className="text-[10px] text-muted-foreground font-semibold">
                         {crop.msp.split(" ")[0]}/kg
@@ -726,7 +741,10 @@ export function FarmerDashboard({
                 onClick={() => {
                   if (tempSelectedCrops.length === 0) return;
                   const cropNames = tempSelectedCrops
-                    .map((id) => CROPS_DATA.find((c) => c.id === id)?.name.split(" ")[0])
+                    .map((id) => {
+                      const c = CROPS_DATA.find((item) => item.id === id);
+                      return c ? (language === "ml" ? c.nameMl.split(" ")[0] : c.name) : "";
+                    })
                     .filter(Boolean)
                     .join(" & ");
                   setUser((prev) => ({
@@ -735,8 +753,10 @@ export function FarmerDashboard({
                     primaryCrop: cropNames || prev.primaryCrop,
                   }));
                   addNotification(
-                    "Crops Updated",
-                    `Your crops have been updated (${tempSelectedCrops.length} selected).`,
+                    language === "ml" ? "വിളകൾ പുതുക്കി" : "Crops Updated",
+                    language === "ml"
+                      ? `നിങ്ങളുടെ വിളകൾ പുതുക്കി (${tempSelectedCrops.length} എണ്ണം തിരഞ്ഞെടുത്തു).`
+                      : `Your crops have been updated (${tempSelectedCrops.length} selected).`,
                     "success"
                   );
                   setShowAddCropModal(false);

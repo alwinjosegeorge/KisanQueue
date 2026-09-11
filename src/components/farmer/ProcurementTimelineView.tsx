@@ -3,7 +3,7 @@ import { useKisanQueue } from "@/lib/store";
 import { ArrowLeft, Check, Clock, ShieldCheck, Scale, CheckCircle2, IndianRupee } from "lucide-react";
 
 export function ProcurementTimelineView({ onBack }: { onBack: () => void }) {
-  const { activeBooking } = useKisanQueue();
+  const { activeBooking, language } = useKisanQueue();
   const currentStep = activeBooking ? activeBooking.currentStepIndex : 2;
 
   const steps = [
@@ -37,8 +37,14 @@ export function ProcurementTimelineView({ onBack }: { onBack: () => void }) {
         <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
         <div className="relative z-10 flex items-center justify-between">
           <div>
-            <span className="eyebrow text-secondary">Token #47</span>
-            <h2 className="font-display text-2xl font-bold mt-1">Paddy (നെല്ല്) · 420 kg</h2>
+            <span className="eyebrow text-secondary">Token #{activeBooking?.queueNumber || 47}</span>
+            <h2 className="font-display text-2xl font-bold mt-1">
+              {activeBooking
+                ? `${activeBooking.crop} · ${activeBooking.quantityKg} kg`
+                : language === "ml"
+                ? "നെല്ല് · 420 kg"
+                : "Paddy · 420 kg"}
+            </h2>
             <p className="text-xs text-primary-foreground/75">Kottayam Procurement Centre · Gate 1</p>
           </div>
           <div className="text-right">

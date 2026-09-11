@@ -65,7 +65,7 @@ const KisanQueueContext = createContext<KisanQueueContextType | undefined>(undef
 const INITIAL_CROPS: Crop[] = [
   {
     id: "paddy",
-    name: "Paddy (നെല്ല്)",
+    name: "Paddy",
     localName: { ml: "നെല്ല് (Paddy)", hi: "धान (Paddy)" },
     mspPerKg: 32,
     icon: "🌾",
@@ -73,7 +73,7 @@ const INITIAL_CROPS: Crop[] = [
   },
   {
     id: "coconut",
-    name: "Raw Coconut (തേങ്ങ)",
+    name: "Raw Coconut",
     localName: { ml: "പച്ചത്തേങ്ങ (Raw Coconut)", hi: "कच्चा नारियल (Coconut)" },
     mspPerKg: 38,
     icon: "🥥",
@@ -81,7 +81,7 @@ const INITIAL_CROPS: Crop[] = [
   },
   {
     id: "rubber",
-    name: "Rubber Sheet (റബ്ബർ ഷീറ്റ് - RSS4)",
+    name: "Rubber Sheet (RSS4)",
     localName: { ml: "റബ്ബർ ഷീറ്റ് (Rubber RSS4)", hi: "रबर शीट (Rubber)" },
     mspPerKg: 180,
     icon: "🪵",
@@ -89,7 +89,7 @@ const INITIAL_CROPS: Crop[] = [
   },
   {
     id: "pepper",
-    name: "Black Pepper (കുരുമുളക്)",
+    name: "Black Pepper",
     localName: { ml: "കുരുമുളക് (Black Pepper)", hi: "काली मिर्च (Black Pepper)" },
     mspPerKg: 520,
     icon: "🌿",
@@ -97,7 +97,7 @@ const INITIAL_CROPS: Crop[] = [
   },
   {
     id: "cardamom",
-    name: "Green Cardamom (ഏലം)",
+    name: "Green Cardamom",
     localName: { ml: "ഏലം (Cardamom)", hi: "इलायची (Cardamom)" },
     mspPerKg: 1850,
     icon: "🌱",
@@ -105,7 +105,7 @@ const INITIAL_CROPS: Crop[] = [
   },
   {
     id: "arecanut",
-    name: "Areca Nut (അടയ്ക്ക)",
+    name: "Areca Nut",
     localName: { ml: "അടയ്ക്ക (Areca Nut)", hi: "सुपारी (Areca Nut)" },
     mspPerKg: 360,
     icon: "🌰",
@@ -113,7 +113,7 @@ const INITIAL_CROPS: Crop[] = [
   },
   {
     id: "nutmeg",
-    name: "Nutmeg & Mace (ജാതിക്ക)",
+    name: "Nutmeg & Mace",
     localName: { ml: "ജാതിക്ക (Nutmeg)", hi: "जायफल (Nutmeg)" },
     mspPerKg: 280,
     icon: "🍂",
@@ -121,7 +121,7 @@ const INITIAL_CROPS: Crop[] = [
   },
   {
     id: "coffee",
-    name: "Robusta Coffee (കാപ്പി)",
+    name: "Robusta Coffee",
     localName: { ml: "കാപ്പിക്കുരു (Coffee)", hi: "कॉफ़ी (Coffee)" },
     mspPerKg: 210,
     icon: "☕",
@@ -129,7 +129,7 @@ const INITIAL_CROPS: Crop[] = [
   },
   {
     id: "banana",
-    name: "Nendran Banana (നേന്ത്രക്കായ)",
+    name: "Nendran Banana",
     localName: { ml: "നേന്ത്രക്കായ (Nendran)", hi: "केला (Banana)" },
     mspPerKg: 42,
     icon: "🍌",
@@ -244,7 +244,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     farmerMobile: "+91 94471 28930",
     centreId: "centre-ktm",
     centreName: "Kottayam Procurement Centre",
-    crop: "Paddy (നെല്ല്)",
+    crop: "Paddy",
     quantityKg: 420,
     mspPerKg: 32,
     totalAmount: 13440,
@@ -264,7 +264,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     farmerMobile: "+91 94471 28930",
     centreId: "centre-ktm",
     centreName: "Kottayam Procurement Centre",
-    crop: "Paddy (നെല്ല്)",
+    crop: "Paddy",
     quantityKg: 280,
     mspPerKg: 32,
     totalAmount: 8960,
@@ -284,7 +284,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     farmerMobile: "+91 94471 28930",
     centreId: "centre-cgry",
     centreName: "Changanassery Procurement Centre",
-    crop: "Coconut (തേങ്ങ)",
+    crop: "Raw Coconut",
     quantityKg: 190,
     mspPerKg: 38,
     totalAmount: 7220,

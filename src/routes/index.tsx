@@ -786,7 +786,11 @@ function FarmerProfileView({
           >
             <div className="flex items-center gap-2.5">
               <span className="text-base">👵</span>
-              <span>മുതിർന്ന കർഷകർക്കുള്ള മോഡ് (60+ Senior Mode)</span>
+              <span>
+                {language === "ml"
+                  ? "മുതിർന്ന കർഷകർക്കുള്ള മോഡ് (60+ Senior Mode)"
+                  : "Senior Farmers Mode (60+)"}
+              </span>
             </div>
             <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-400">/old</span>
           </button>

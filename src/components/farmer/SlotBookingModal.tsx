@@ -162,7 +162,9 @@ export function SlotBookingModal({
                       }`}
                     >
                       <span className="text-2xl">{crop.icon}</span>
-                      <span className="mt-1 font-bold text-xs">{crop.name}</span>
+                      <span className="mt-1 font-bold text-xs">
+                        {language === "ml" ? (crop.localName?.ml || crop.name) : crop.name}
+                      </span>
                       <span className="text-[11px] font-semibold text-primary mt-0.5">
                         MSP: ₹{crop.mspPerKg}/kg
                       </span>
@@ -351,7 +353,12 @@ export function SlotBookingModal({
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
                     <span className="text-muted-foreground block text-[10px]">Crop & Weight</span>
-                    <strong>{selectedCrop} · {quantity} kg</strong>
+                    <strong>
+                      {language === "ml"
+                        ? currentCrop.localName?.ml || selectedCrop
+                        : selectedCrop}{" "}
+                      · {quantity} kg
+                    </strong>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[10px]">Total MSP Payout</span>
