@@ -222,15 +222,15 @@ export function FarmerDashboard({
             </div>
           </div>
 
-          {/* 3 Frosted Metric Cards (Matching reference image!) */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mt-3.5">
+          {/* 3 Frosted Metric Cards (Matching reference image with robust font sizing & no overflow) */}
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5 mt-3">
             {/* Metric 1: Now Serving */}
-            <div className="rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2.5 sm:p-3 text-white shadow-md flex flex-col justify-between">
-              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white/90 font-semibold">
-                <Wind className="size-3.5 text-emerald-400" />
-                <span>{t(language, "nowServing")}</span>
+            <div className="min-w-0 overflow-hidden rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2 sm:p-2.5 text-white shadow-md flex flex-col justify-between">
+              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-white/90 font-semibold min-w-0">
+                <Wind className="size-3 shrink-0 text-emerald-400" />
+                <span className="truncate">{t(language, "nowServing")}</span>
               </div>
-              <p className="font-display text-xl sm:text-2xl font-black mt-1 text-[#F5B544] tracking-tight">
+              <p className="text-lg sm:text-xl font-black mt-1 text-[#F5B544] tracking-tight tabular-nums truncate leading-tight">
                 #{nowServing}
               </p>
               <p className="text-[9px] sm:text-[10px] text-white/70 truncate mt-0.5">{t(language, "weighBay")}</p>
@@ -239,14 +239,14 @@ export function FarmerDashboard({
             {/* Metric 2: Your Token */}
             <div
               onClick={() => onOpenBooking()}
-              className="rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2.5 sm:p-3 text-white shadow-md cursor-pointer hover:bg-black/50 transition-all flex flex-col justify-between"
+              className="min-w-0 overflow-hidden rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2 sm:p-2.5 text-white shadow-md cursor-pointer hover:bg-black/50 transition-all flex flex-col justify-between"
               title={activeBooking ? `Your active token #${userQueueNumber}` : t(language, "tapToGenerate")}
             >
-              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white font-bold">
-                <Sparkles className="size-3.5 text-amber-300" />
-                <span>{t(language, "yourToken")}</span>
+              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-white font-bold min-w-0">
+                <Sparkles className="size-3 shrink-0 text-amber-300" />
+                <span className="truncate">{t(language, "yourToken")}</span>
               </div>
-              <p className="font-display text-xl sm:text-2xl font-black mt-1 text-white tracking-tight">
+              <p className="text-lg sm:text-xl font-black mt-1 text-white tracking-tight tabular-nums truncate leading-tight">
                 {userQueueNumber ? `#${userQueueNumber}` : "#47"}
               </p>
               <p className="text-[9px] sm:text-[10px] text-emerald-400 font-bold truncate mt-0.5">
@@ -255,12 +255,12 @@ export function FarmerDashboard({
             </div>
 
             {/* Metric 3: Wait Turn */}
-            <div className="rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2.5 sm:p-3 text-white shadow-md flex flex-col justify-between">
-              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white/90 font-semibold">
-                <Droplets className="size-3.5 text-blue-300" />
-                <span>{t(language, "waitTurn")}</span>
+            <div className="min-w-0 overflow-hidden rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 p-2 sm:p-2.5 text-white shadow-md flex flex-col justify-between">
+              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-white/90 font-semibold min-w-0">
+                <Droplets className="size-3 shrink-0 text-blue-300" />
+                <span className="truncate">{t(language, "waitTurn")}</span>
               </div>
-              <p className="font-display text-xl sm:text-2xl font-black mt-1 text-white tracking-tight">
+              <p className="text-lg sm:text-xl font-black mt-1 text-white tracking-tight tabular-nums truncate leading-tight">
                 {prediction.minutesLeft > 0 ? `~${prediction.minutesLeft}m` : "~42m"}
               </p>
               <p className="text-[9px] sm:text-[10px] text-white/70 truncate mt-0.5">
@@ -270,45 +270,35 @@ export function FarmerDashboard({
           </div>
 
           {/* Hero Action Buttons */}
-          {activeBooking ? (
-            <div className="grid grid-cols-[1.3fr_1fr] gap-2.5 mt-3.5">
-              <button
-                type="button"
-                onClick={onOpenLiveQueue}
-                className="flex items-center justify-between rounded-2xl bg-white text-[#123D35] px-4 py-3 text-xs sm:text-sm font-extrabold shadow-lg hover:bg-white/95 active:scale-95 transition-all"
-              >
-                <span>{t(language, "trackLiveQueue")}</span>
-                <ChevronRight className="size-4 stroke-[3]" />
-              </button>
+          <div className="grid grid-cols-[1.3fr_1fr] gap-2 sm:gap-2.5 mt-3">
+            <button
+              type="button"
+              onClick={onOpenLiveQueue}
+              className="flex items-center justify-between rounded-2xl bg-white text-[#123D35] px-3.5 py-3 text-xs sm:text-sm font-extrabold shadow-lg hover:bg-white/95 active:scale-95 transition-all min-w-0"
+            >
+              <span className="truncate">{t(language, "trackLiveQueue")}</span>
+              <ChevronRight className="size-4 shrink-0 stroke-[3]" />
+            </button>
+            {activeBooking ? (
               <button
                 type="button"
                 onClick={() => setShowCancelModal(true)}
-                className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/20 bg-black/45 backdrop-blur-md px-3 py-3 text-xs sm:text-sm font-bold text-white hover:bg-black/60 active:scale-95 transition-all shadow-md"
+                className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/20 bg-black/45 backdrop-blur-md px-3 py-3 text-xs sm:text-sm font-bold text-white hover:bg-black/60 active:scale-95 transition-all shadow-md min-w-0"
               >
-                <XCircle className="size-4" />
-                <span>{t(language, "cancelSlot")}</span>
+                <XCircle className="size-4 shrink-0" />
+                <span className="truncate">{t(language, "cancelSlot")}</span>
               </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-[1.3fr_1fr] gap-2.5 mt-3.5">
-              <button
-                type="button"
-                onClick={() => onOpenLiveQueue()}
-                className="flex items-center justify-between rounded-2xl bg-white text-[#123D35] px-4 py-3 text-xs sm:text-sm font-extrabold shadow-lg hover:bg-white/95 active:scale-95 transition-all"
-              >
-                <span>{t(language, "trackLiveQueue")}</span>
-                <ChevronRight className="size-4 stroke-[3]" />
-              </button>
+            ) : (
               <button
                 type="button"
                 onClick={() => onOpenBooking()}
-                className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/20 bg-black/45 backdrop-blur-md px-3 py-3 text-xs sm:text-sm font-bold text-white hover:bg-black/60 active:scale-95 transition-all shadow-md"
+                className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/20 bg-black/45 backdrop-blur-md px-3 py-3 text-xs sm:text-sm font-bold text-white hover:bg-black/60 active:scale-95 transition-all shadow-md min-w-0"
               >
-                <CalendarDays className="size-4" />
-                <span>{t(language, "customSlot")}</span>
+                <CalendarDays className="size-4 shrink-0" />
+                <span className="truncate">{t(language, "customSlot")}</span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </section>
 
@@ -398,49 +388,49 @@ export function FarmerDashboard({
           </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={() => onOpenBooking()}
-            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3 text-foreground transition-all hover:border-primary/50 hover:shadow-sm active:scale-95"
+            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-2 sm:p-2.5 text-foreground transition-all hover:border-primary/50 hover:shadow-sm active:scale-95 min-w-0"
           >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Ticket className="size-5" />
+            <span className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+              <Ticket className="size-4 sm:size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">{t(language, "generateToken")}</span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-center leading-tight line-clamp-2 w-full break-words">{t(language, "generateToken")}</span>
           </button>
 
           <button
             type="button"
             onClick={onOpenLiveQueue}
-            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3 text-foreground transition-all hover:border-primary/50 hover:shadow-sm"
+            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-2 sm:p-2.5 text-foreground transition-all hover:border-primary/50 hover:shadow-sm active:scale-95 min-w-0"
           >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <UsersRound className="size-5" />
+            <span className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+              <UsersRound className="size-4 sm:size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">{t(language, "liveQueue")}</span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-center leading-tight line-clamp-2 w-full break-words">{t(language, "liveQueue")}</span>
           </button>
 
           <button
             type="button"
             onClick={onOpenBookingsList}
-            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3 text-foreground transition-all hover:border-primary/50 hover:shadow-sm"
+            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-2 sm:p-2.5 text-foreground transition-all hover:border-primary/50 hover:shadow-sm active:scale-95 min-w-0"
           >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <PackageCheck className="size-5" />
+            <span className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+              <PackageCheck className="size-4 sm:size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">{t(language, "myBookings")}</span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-center leading-tight line-clamp-2 w-full break-words">{t(language, "myBookings")}</span>
           </button>
 
           <button
             type="button"
             onClick={onOpenPayments}
-            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3 text-foreground transition-all hover:border-primary/50 hover:shadow-sm"
+            className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-2 sm:p-2.5 text-foreground transition-all hover:border-primary/50 hover:shadow-sm active:scale-95 min-w-0"
           >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <IndianRupee className="size-5" />
+            <span className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+              <IndianRupee className="size-4 sm:size-5" />
             </span>
-            <span className="text-[11px] font-bold text-center leading-tight">{t(language, "paymentStatus")}</span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-center leading-tight line-clamp-2 w-full break-words">{t(language, "paymentStatus")}</span>
           </button>
         </div>
       </section>
