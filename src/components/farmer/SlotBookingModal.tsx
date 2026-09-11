@@ -146,32 +146,6 @@ export function SlotBookingModal({
           {/* STEP 1: CROP & QUANTITY */}
           {step === 1 && (
             <div className="space-y-4">
-              {/* Instant Token Quick Action Banner */}
-              <div className="rounded-2xl border-2 border-emerald-500/30 bg-emerald-500/10 p-3.5 shadow-sm space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                      <Sparkles className="size-3.5 text-emerald-600" /> {t(language, "instantTokenGen")}
-                    </h4>
-                    <p className="text-[10.5px] text-muted-foreground mt-0.5">
-                      {t(language, "instantTokenGenSub")}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const availableSlot = currentCentre.slots.find((s) => s.status !== "full")?.time || "11:00 – 12:00 PM";
-                      const newBooking = bookSlot(selectedCentreId, selectedCrop, quantity, selectedDate, availableSlot);
-                      setConfirmedBookingId(newBooking.id);
-                      setAssignedQueueNumber(newBooking.queueNumber);
-                      setStep(5);
-                    }}
-                    className="rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-md hover:bg-emerald-700 active:scale-95 transition-all whitespace-nowrap"
-                  >
-                    ⚡ {t(language, "getTokenNow")}
-                  </button>
-                </div>
-              </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase text-muted-foreground">{t(language, "selectCrop")}</label>
