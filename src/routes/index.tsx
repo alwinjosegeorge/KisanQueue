@@ -22,6 +22,7 @@ import {
   Building2,
   LogIn,
   KeyRound,
+  X,
 } from "lucide-react";
 
 import { useKisanQueue } from "@/lib/store";
@@ -624,6 +625,7 @@ function FarmerProfileView({
 }) {
   const { user, language, setLanguage, setRole, logout, addNotification } = useKisanQueue();
   const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   return (
     <div className="content-stack pt-2 space-y-4">
@@ -631,10 +633,21 @@ function FarmerProfileView({
       <div className="relative overflow-hidden rounded-3xl bg-primary p-6 text-primary-foreground shadow-xl">
         <div className="pointer-events-none absolute inset-0 bg-dots text-white/10" />
         <div className="relative z-10 flex items-center justify-between">
-          <span className="eyebrow text-secondary">Verified Farmer Profile</span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold">
-            <ShieldCheck className="size-3.5" /> Aadhaar Linked
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="eyebrow text-secondary font-bold">Verified Farmer Profile</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-bold">
+              <ShieldCheck className="size-3" /> Aadhaar Linked
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowLogoutConfirm(true)}
+            className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/25 hover:bg-rose-500/40 border border-rose-200/30 text-white px-3 py-1 text-xs font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
+            title="Log Out"
+          >
+            <LogOut className="size-3.5 text-rose-200" />
+            <span>{language === "ml" ? "ലോഗ് ഔട്ട്" : "Log Out"}</span>
+          </button>
         </div>
 
         <div className="relative z-10 mt-6 flex items-center gap-4">
@@ -656,26 +669,30 @@ function FarmerProfileView({
         </div>
       </div>
 
-      {/* Switch Account / Login Button */}
-      <button
-        onClick={() => navigate({ to: "/login" })}
-        className="w-full flex items-center justify-between rounded-2xl border border-primary/20 bg-primary/5 p-3.5 text-xs font-bold text-primary hover:bg-primary/10 transition-all shadow-sm"
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-            <LogIn className="size-4" />
+      {/* Account Action Buttons: Switch Account & Log Out */}
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => navigate({ to: "/login" })}
+          className="flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-card hover:bg-primary/5 p-3 text-xs font-bold text-foreground transition-all shadow-xs active:scale-95 cursor-pointer"
+        >
+          <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <LogIn className="size-3.5" />
           </div>
-          <div className="text-left">
-            <p className="font-bold text-foreground">
-              {language === "ml" ? "കർഷക ലോഗിൻ / അക്കൗണ്ട് മാറുക" : "Farmer Login / Switch Account"}
-            </p>
-            <span className="text-[10px] text-muted-foreground font-normal">
-              {language === "ml" ? "OTP അല്ലെങ്കിൽ കർഷക ഐഡി ഉപയോഗിച്ച് പ്രവേശിക്കുക" : "Login via Mobile OTP, Kerala Farmer ID, or 1-Tap Demo Profiles"}
-            </span>
+          <span>{language === "ml" ? "അക്കൗണ്ട് മാറുക" : "Switch Account"}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowLogoutConfirm(true)}
+          className="flex items-center justify-center gap-2 rounded-2xl border border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-950/70 p-3 text-xs font-bold text-rose-700 dark:text-rose-300 transition-all shadow-xs active:scale-95 cursor-pointer"
+        >
+          <div className="flex size-7 items-center justify-center rounded-lg bg-rose-200/60 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300">
+            <LogOut className="size-3.5" />
           </div>
-        </div>
-        <ChevronRight className="size-4 text-primary" />
-      </button>
+          <span>{language === "ml" ? "ലോഗ് ഔട്ട് ചെയ്യുക" : "Log Out"}</span>
+        </button>
+      </div>
 
       {/* Land & Crop Registry */}
       <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
@@ -803,20 +820,76 @@ function FarmerProfileView({
       </div>
 
       {/* Log Out Action */}
-      <div className="pt-2 pb-4">
+      <div className="pt-2 pb-6">
         <button
           type="button"
-          onClick={() => {
-            logout();
-            addNotification("Logged Out", "You have been logged out of KisanQueue.", "info");
-            if (onLogout) onLogout();
-          }}
+          onClick={() => setShowLogoutConfirm(true)}
           className="w-full flex items-center justify-center gap-2 rounded-2xl border border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 py-3.5 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-950/60 active:scale-95 transition-all cursor-pointer shadow-xs"
         >
           <LogOut className="size-4" />
           <span>{language === "ml" ? "ലോഗ് ഔട്ട് ചെയ്യുക" : "Log Out of KisanQueue"}</span>
         </button>
       </div>
+
+      {/* Log Out Confirmation Dialog Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-5 text-foreground shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2.5 text-rose-600">
+                <span className="flex size-9 items-center justify-center rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600">
+                  <LogOut className="size-4.5" />
+                </span>
+                <h3 className="font-display font-bold text-base text-foreground">
+                  {language === "ml" ? "ലോഗ് ഔട്ട് ചെയ്യണോ?" : "Log Out of KisanQueue?"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="rounded-full p-1 text-muted-foreground hover:bg-muted cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {language === "ml"
+                ? "നിങ്ങൾ ലോഗ് ഔട്ട് ചെയ്യുകയാണോ? വീണ്ടും പ്രവേശിക്കാൻ ഫോൺ നമ്പറും ഒടിപിയും നൽകേണ്ടിവരും."
+                : "Are you sure you want to log out? You will need your phone number and OTP to sign in again."}
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="rounded-xl border border-border bg-background py-2.5 text-xs font-semibold text-foreground hover:bg-muted cursor-pointer"
+              >
+                {language === "ml" ? "റദ്ദാക്കുക (Cancel)" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLogoutConfirm(false);
+                  logout();
+                  addNotification(
+                    "Logged Out",
+                    language === "ml"
+                      ? "നിങ്ങൾ വിജയകരമായി ലോഗ് ഔട്ട് ചെയ്തു."
+                      : "You have been logged out of KisanQueue.",
+                    "info"
+                  );
+                  if (onLogout) onLogout();
+                }}
+                className="rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-rose-700 transition-colors cursor-pointer"
+              >
+                {language === "ml" ? "അതെ, ലോഗ് ഔട്ട്" : "Yes, Log Out"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
