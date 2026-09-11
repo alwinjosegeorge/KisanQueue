@@ -1248,7 +1248,7 @@ function SeniorCitizenModePage() {
     id: "usr-01",
     name: "Arun Kumar",
     role: "farmer" as const,
-    mobile: "+91 94471 28930",
+    mobile: "+91 82812 51299",
     farmerId: "KL-KTM-26047",
     village: "Kumarakom",
     district: "Kottayam",
@@ -2263,7 +2263,7 @@ function SeniorCitizenModePage() {
                     {ui.farmerIdLabel}: {safeUser.farmerId || "KL-KTM-26047"}
                   </p>
                   <p className="text-xs text-emerald-100 mt-0.5">
-                    {safeUser.mobile || "+91 94471 28930"}
+                    {safeUser.mobile || "+91 82812 51299"}
                   </p>
                 </div>
               </div>

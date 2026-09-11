@@ -103,7 +103,7 @@ export function NotificationDrawer({
             // SMS Feed Simulator (SIH Digital Literacy Demonstration)
             <div className="space-y-3">
               <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-primary">
-                📱 <strong>Direct SMS Relay Active</strong>: For non-smartphone users, all queue movements and delay alerts are sent to registered mobile <span className="font-mono font-bold">+91 94471 28930</span>.
+                📱 <strong>Direct SMS Relay Active</strong>: For non-smartphone users, all queue movements and delay alerts are sent to registered mobile <span className="font-mono font-bold">+91 82812 51299</span>.
               </div>
 
               {notifications.map((notif, idx) => (

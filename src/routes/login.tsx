@@ -131,7 +131,7 @@ export function FarmerOnboardingLoginPage() {
 
   // Steps: "phone" -> "otp" -> "preferences" -> "crops"
   const [step, setStep] = useState<"phone" | "otp" | "preferences" | "crops">("phone");
-  const [phoneNumber, setPhoneNumber] = useState("9447128930");
+  const [phoneNumber, setPhoneNumber] = useState("8281251299");
   const [otpCode, setOtpCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -139,7 +139,7 @@ export function FarmerOnboardingLoginPage() {
   // User Profile
   const [pendingUser, setPendingUser] = useState<Partial<User>>({
     name: "Arun Kumar",
-    mobile: "+91 94471 28930",
+    mobile: "+91 82812 51299",
     farmerId: "KL-KTM-26047",
     village: "Kumarakom",
     district: "Kottayam",

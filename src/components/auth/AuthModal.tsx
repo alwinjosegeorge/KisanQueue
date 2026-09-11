@@ -5,7 +5,7 @@ import { X, CheckCircle2, Phone, ShieldCheck, KeyRound, UserCheck, ArrowRight } 
 export function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { setRole, addNotification, setIsLoggedIn } = useKisanQueue();
   const [authMode, setAuthMode] = useState<"otp" | "farmerId" | "staff" | "register">("otp");
-  const [mobile, setMobile] = useState("9447128930");
+  const [mobile, setMobile] = useState("8281251299");
   const [otpSent, setOtpSent] = useState(false);
   const [otpValue, setOtpValue] = useState("");
   const [farmerIdInput, setFarmerIdInput] = useState("KL-KTM-26047");

@@ -100,7 +100,7 @@ export function IVRCallSimulator({
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5 | 6>(1);
   const [subStep, setSubStep] = useState<number>(0);
   const [selectedLang, setSelectedLang] = useState<"ml" | "en">("en");
-  const [confirmedPhone, setConfirmedPhone] = useState(user?.mobile || "+91 94471 28930");
+  const [confirmedPhone, setConfirmedPhone] = useState(user?.mobile || "+91 82812 51299");
   const [selectedCentre, setSelectedCentre] = useState(centres[0]);
   const [selectedCrop, setSelectedCrop] = useState("Paddy");
   const [selectedQuantity, setSelectedQuantity] = useState(420);
@@ -373,7 +373,7 @@ export function IVRCallSimulator({
         setAlternatePhone("+91 98470 11223 (Son / Neighbour)");
         addTranscript("FARMER", "Pressed 1 [Added Alternate Contact]");
       } else {
-        setAlternatePhone("Primary Mobile (+91 94471 28930)");
+        setAlternatePhone("Primary Mobile (+91 82812 51299)");
         addTranscript("FARMER", "Pressed 2 [Use Primary Mobile]");
       }
 
